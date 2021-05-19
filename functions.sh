@@ -73,3 +73,70 @@ getUrls()
             echo "$doms" |httprobe -c 50 |bbrf url add - -s httprobe --show-new
     fi
 }
+
+#input platform/site
+#Example  addPrograms intigriti 
+addPrograms()
+{
+    RED="\e[31m"
+    YELLOW="\e[33m"
+    ENDCOLOR="\e[0m"
+
+    if [ -z "$1" ]
+    then
+      echo "Use addPrograms platform (intrigrit, bugcrowd, h1, etc)"
+      return 1;
+    fi
+    program=$1
+    while true;
+    do
+        # Read the user input   
+        site="$1"  
+        echo -en "${YELLOW}Program name: ${ENDCOLOR}"  
+        read program
+        echo -en "${YELLOW}Reward? (1:money, 2:points, 3:thanks) ${ENDCOLOR} "
+        read reward
+        case $reward in
+        1)    val="money";;
+        2)    val="points";;
+        3)    val="thanks";;
+        esac
+        echo -en "${YELLOW}Url?  ${ENDCOLOR} "
+        read url
+
+        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url"
+        bbrf use "$program" 
+    #echo -n "Creating $program in $site (default)"  
+        echo ""
+        IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
+        #if empty skip
+        if [ ! -z "$wildcards" ]
+            then
+                bbrf inscope add $wildcards 
+            echo -n "Scope added \n"  
+
+        else    
+            echo -n "Empty!"
+    fi         
+    IFS= read -r -p "$(echo -en $YELLOW " Add OUT scope:" $ENDCOLOR)" oswildcards
+    if [ ! -z "$oswildcards" ]
+         then
+             bbrf outscope add $oswildcards
+             echo ""
+             echo -ne "${YELLOW}out Scope added $oswildcards${ENDCOLOR}"  
+         else
+             echo -n "Empty!"
+    fi
+    echo ""
+    echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getdomains  
+    echo -ne "${RED}Getting urls ${ENDCOLOR}\n"; geturls  
+    #echo -ne "${YELLOW}continue? (y/n)${YELLOW}" 
+    #read cont
+    #if [ "$cont" == "n" ]; then
+    #        echo "exiting"
+    #        exit
+    #else 
+    #    echo "" #"not n "
+    #fi
+    done
+} 
