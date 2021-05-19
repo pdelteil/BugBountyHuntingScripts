@@ -1,3 +1,6 @@
+# shell script functions to be loaded on your bashrc file 
+
+# displays all the disabled programs in BBRF
 getDisabledPrograms()
 {
     for value in $(bbrf programs --show-disabled 2>/dev/null);
@@ -9,9 +12,21 @@ getDisabledPrograms()
             fi
     done
 }
-diffFiles(){
+# This function allows to find the difference between to input/output files (containing domains or urls)
+# Example if you ran bbrf urls multiple times and you want to output only the new urls
+#1. bbrf urls > file1.txt
+#some programs/urls were added 
+#2. bbrf urls > file2.txt
+#using the function we can output only the new added content to the file
+
+#diffFiles file1.txt file2.txt output.txt
+diffFiles()
+{
     comm -3 <(sort $1) <(sort $2) > $3
 }
+
+# This function is used when adding a new program 
+# it requires subfinder and assetfinder
 
 getDomains()
 {
@@ -22,6 +37,8 @@ getDomains()
     bbrf scope in|assetfinder|bbrf domain add - -s assetfinder
 }
 
+# This function is used when adding a new program and after the getDomains function
+# it requires httpx and httprobe
 getUrls()
 {
     RED="\e[31m"
