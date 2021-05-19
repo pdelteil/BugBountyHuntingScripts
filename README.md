@@ -5,4 +5,8 @@
 Loaded from the .bashrc file. 
 You can check them running `declare -F` 
 
-## aliases 
+## TO ADD 
+
+* BBRF Stats 
+* Function to Add programs 
+
