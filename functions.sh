@@ -128,8 +128,8 @@ addPrograms()
              echo -n "Empty!"
     fi
     echo ""
-    echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getdomains  
-    echo -ne "${RED}Getting urls ${ENDCOLOR}\n"; geturls  
+    echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getDomains  
+    echo -ne "${RED}Getting urls ${ENDCOLOR}\n"; getUrls  
     #echo -ne "${YELLOW}continue? (y/n)${YELLOW}" 
     #read cont
     #if [ "$cont" == "n" ]; then
