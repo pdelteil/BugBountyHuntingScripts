@@ -73,7 +73,8 @@ getUrls()
             echo "$doms" |httprobe -c 50 |bbrf url add - -s httprobe --show-new
     fi
 }
-
+#Use this function if you need to add several programs from a site
+#You need to add Name, Reward, URL, inscope and outscope
 #input platform/site
 #Example  addPrograms intigriti 
 addPrograms()
@@ -140,3 +141,17 @@ addPrograms()
     #fi
     done
 } 
+
+
+removeURLsInChunks()
+{
+    size=$(bbrf urls|wc -l); 
+    chunk=5000; 
+    urls="1,${chunk}p" 
+    parts=$((size%chunk?size/chunk+1:size/chunk)) 
+    echo $parts ; 
+    for i in $(seq 1 $parts)
+        do echo "try $i"
+        bbrf urls|sed -n "$urls"|bbrf url remove -
+    done
+}
