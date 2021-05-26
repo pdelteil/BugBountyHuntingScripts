@@ -70,7 +70,7 @@ getUrls()
             echo -en "${RED} httpx domains${ENDCOLOR}\n"        
             echo "$doms" |httpx -silent -threads 100 |bbrf url add - -s httpx --show-new
             echo -en "${RED} httprobe domains${ENDCOLOR}\n"        
-            echo "$doms" |httprobe -c 50 |bbrf url add - -s httprobe --show-new
+            echo "$doms" |httprobe -c 50 -prefer-https |bbrf url add - -s httprobe --show-new
     fi
 }
 #Use this function if you need to add several programs from a site
@@ -185,4 +185,42 @@ program=$2
         init=$(( $init + $chunk ))
         end=$(( $end + $chunk ))
     done
+} 
+#resolve domains IN CHUNKS
+resolveDomainsInChunks()
+{
+ if [ -z "$1" ] || [ -z "$2" ]
+    then
+      echo "Use resolveDomainsInChunks fileUnresolvedDomains PROGRAM"
+      return 1;
+    fi
+
+RED="\e[31m"
+YELLOW="\e[33m"
+ENDCOLOR="\e[0m"
+file=$1
+p=$2
+ size=$(cat $file |wc -l); 
+ echo $size
+ chunk=100; 
+ parts=$((size%chunk?size/chunk+1:size/chunk)) ; 
+ echo $parts ;
+ init=1
+ end=$chunk
+ for i in $(seq 1 $parts) ; 
+    do
+        echo "try $i"; 
+        
+        urls="${init},${end}p"; 
+        #sed -n "$urls" $file    |dnsx -silent -a -resp | tr -d '[]' 
+        #sed -n  "$urls" $file|awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx 
+        #>(awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx) \
+        #sed -n  "$urls" $file |awk '{print $1":"$2}' |bbrf domain add - -p "$p" -s dnsx --show-new
+        sed -n  "$urls" $fil| awk '{print $2":"$1}' |bbrf ip add - -p "$p" -s dnsx
+        #>(awk '{print $2":"$1}' |bbrf ip update - -p "$p" -s dnsx)
+        
+        #|httpx -silent -threads 500 |bbrf url add - -s httpx --show-new -p "$program"; 
+        init=$(( $init + $chunk ))
+        end=$(( $end + $chunk ))
+  done
 } 
