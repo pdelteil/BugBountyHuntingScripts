@@ -85,7 +85,7 @@ addPrograms()
 
     if [ -z "$1" ]
     then
-      echo "Use addPrograms platform (intrigrit, bugcrowd, h1, etc)"
+      echo "Use addPrograms platform (intrigriti, bugcrowd, h1, hackenproof, etc)"
       return 1;
     fi
     program=$1
@@ -141,7 +141,6 @@ addPrograms()
     #fi
     done
 } 
-
 
 removeURLsInChunks()
 {
