@@ -47,11 +47,20 @@ diffFiles()
 
 getDomains()
 {
-    bbrf scope in --wildcard|bbrf inscope add -; 
-    bbrf scope in --wildcard|bbrf domain add - --show-new; 
-    bbrf scope in |bbrf domain add - --show-new; 
-    bbrf scope in| subfinder -t 60 -silent |bbrf domain add - -s subfinder  --show-new; 
-    bbrf scope in|assetfinder|bbrf domain add - -s assetfinder
+    RED="\e[31m"
+    ENDCOLOR="\e[0m"
+    wild=$(bbrf scope in --wildcard|grep -v DEBUG)
+
+    echo "$wild"|bbrf inscope add -; 
+    echo "$wild"|bbrf domain add - --show-new; 
+    bbrf scope in|bbrf domain add - --show-new; 
+    if [ ${#wild} -gt 0 ] 
+        then
+            echo -ne "${RED} Running subfinder${ENDCOLOR}\n"
+            bbrf scope in|subfinder -t 60 -silent |bbrf domain add - -s subfinder  --show-new; 
+            echo -ne "${RED} Running assetfinder${ENDCOLOR}\n"
+            bbrf scope in|assetfinder|bbrf domain add - -s assetfinder --show-new; 
+   fi
 }
 
 # This function is used when adding a new program and after the getDomains function
@@ -85,10 +94,9 @@ addPrograms()
 
     if [ -z "$1" ]
     then
-      echo "Use addPrograms platform (intrigriti, bugcrowd, h1, hackenproof, etc)"
+      echo "Use addPrograms platform (intigriti, bugcrowd, h1, hackenproof, etc)"
       return 1;
     fi
-    program=$1
     while true;
     do
         # Read the user input   
@@ -98,23 +106,28 @@ addPrograms()
         echo -en "${YELLOW}Reward? (1:money, 2:points, 3:thanks) ${ENDCOLOR} "
         read reward
         case $reward in
-        1)    val="money";;
-        2)    val="points";;
-        3)    val="thanks";;
+            1)    val="money";;
+            2)    val="points";;
+            3)    val="thanks";;
         esac
-        echo -en "${YELLOW}Url?  ${ENDCOLOR} "
+        echo -en "${YELLOW}Url? ${ENDCOLOR} "
         read url
+        echo -en "${YELLOW}Recon? ${ENDCOLOR} (1:false [default], 2:true) "
+        read recon
+        case $recon in 
+            1)    val_recon="false";;
+            2)    val_recon="true";;
+            *)    val_recon="false";;
+        esac
 
         bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url"
         bbrf use "$program" 
-    #echo -n "Creating $program in $site (default)"  
-        echo ""
         IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
         #if empty skip
         if [ ! -z "$wildcards" ]
             then
                 bbrf inscope add $wildcards 
-            echo -n "Scope added \n"  
+            echo -en "Scope added \n"  
 
         else    
             echo -n "Empty!"
@@ -123,22 +136,10 @@ addPrograms()
     if [ ! -z "$oswildcards" ]
          then
              bbrf outscope add $oswildcards
-             echo ""
              echo -ne "${YELLOW}out Scope added $oswildcards${ENDCOLOR}"  
-         else
-             echo -n "Empty!"
     fi
-    echo ""
     echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getDomains  
     echo -ne "${RED}Getting urls ${ENDCOLOR}\n"; getUrls  
-    #echo -ne "${YELLOW}continue? (y/n)${YELLOW}" 
-    #read cont
-    #if [ "$cont" == "n" ]; then
-    #        echo "exiting"
-    #        exit
-    #else 
-    #    echo "" #"not n "
-    #fi
     done
 } 
 
