@@ -112,12 +112,11 @@ addPrograms()
         esac
         echo -en "${YELLOW}Url? ${ENDCOLOR} "
         read url
-        echo -en "${YELLOW}Recon? ${ENDCOLOR} (1:false [default], 2:true) "
+        echo -en "${YELLOW}Recon? ${ENDCOLOR} (1:false, 2:true)"
         read recon
         case $recon in 
             1)    val_recon="false";;
             2)    val_recon="true";;
-            *)    val_recon="false";;
         esac
 
         bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url"
