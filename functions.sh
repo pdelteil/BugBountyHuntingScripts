@@ -112,7 +112,7 @@ addPrograms()
         esac
         echo -en "${YELLOW}Url? ${ENDCOLOR} "
         read url
-        echo -en "${YELLOW}Recon? ${ENDCOLOR} (1:false, 2:true)"
+        echo -en "${YELLOW}Recon? ${ENDCOLOR} (1:false, 2:true) "
         read recon
         case $recon in 
             1)    val_recon="false";;
@@ -135,7 +135,7 @@ addPrograms()
     if [ ! -z "$oswildcards" ]
          then
              bbrf outscope add $oswildcards
-             echo -ne "${YELLOW}out Scope added $oswildcards${ENDCOLOR}"  
+             echo -ne "${YELLOW}out Scope added $oswildcards${ENDCOLOR}\n"  
     fi
     echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getDomains  
     echo -ne "${RED}Getting urls ${ENDCOLOR}\n"; getUrls  
