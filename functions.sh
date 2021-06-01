@@ -119,7 +119,7 @@ addPrograms()
             2)    val_recon="true";;
         esac
 
-        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url"
+        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$recon"
         bbrf use "$program" 
         IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
         #if empty skip
