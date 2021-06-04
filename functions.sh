@@ -149,6 +149,7 @@ addPrograms()
     done
 } 
 
+# is faster to remove urls in chunks than directly 
 removeURLsInChunks()
 {
     size=$(bbrf urls|wc -l); 
