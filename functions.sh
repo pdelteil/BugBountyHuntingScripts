@@ -91,7 +91,7 @@ getUrls()
 #Use this function if you need to add several programs from a site
 #You need to add Name, Reward, URL, inscope and outscope
 #input platform/site
-#Example  addPrograms intigriti 
+#Example addPrograms intigriti 
 addPrograms()
 {
     RED="\e[31m"
@@ -100,7 +100,7 @@ addPrograms()
 
     if [ -z "$1" ]
     then
-      echo "Use addPrograms platform (intigriti, bugcrowd, h1, hackenproof, etc)"
+      echo "Use addPrograms platform (intigriti, bugcrowd, h1, hackenproof, self, etc)"
       return 1;
     fi
     while true;
@@ -118,6 +118,7 @@ addPrograms()
         esac
         echo -en "${YELLOW}Url? ${ENDCOLOR} "
         read url
+        #recon means the scope is not bounded or clear
         echo -en "${YELLOW}Recon? ${ENDCOLOR} (1:false, 2:true) "
         read recon
         case $recon in 
