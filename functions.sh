@@ -229,3 +229,15 @@ p=$2
         end=$(( $end + $chunk ))
   done
 } 
+#Finds a program using a domain or url as input
+findProgram()
+{
+    if [ -z "$1" ]
+    then
+      echo "Use findProgram URL or domain"
+      return 1;
+    fi
+    program=$(bbrf show "$1" |jq '.program'|sed 's/"//g');  
+    tags='.tags.site+", " +._id+", "+.tags.reward +", "+.tags.url+", disabled:"+(.disabled|tostring)+ ", recon:"+(.tags.recon|tostring)'
+    bbrf show "$program" | jq "$tags" 
+}
