@@ -6,9 +6,15 @@
 # Input parameter: filename
 getBBRFStats()
 {   
+     if [ -z "$1" ]
+      then
+       echo "Use getBBRFStats outputfile.txt"
+       return 1;
+    fi
+
     IFS=$'\n'
     filename=$1
-    for value in $(bbrf programs --show-disabled);
+    for value in $(bbrf programs --show-disabled --show-empty-scope);
         do 
             echo "Getting stats of program $value"
             numUrls=$(bbrf urls -p "$value" | wc -l)
