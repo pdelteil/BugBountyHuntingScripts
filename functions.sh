@@ -243,3 +243,14 @@ findProgram()
     tags='.tags.site+", " +._id+", "+.tags.reward +", "+.tags.url+", disabled:"+(.disabled|tostring)+ ", recon:"+(.tags.recon|tostring)'
     bbrf show "$program" | jq "$tags" 
 }
+
+#nuclei helper (will split it to another file soon)
+testNucleiTemplate()
+{
+ templateID=$1
+ URL=$2
+ pathToTemplate=$(locate $templateID) 
+ echo "nuclei -debug -t $pathToTemplate -u $URL"
+ nuclei -debug -t $pathToTemplate -u $URL
+     
+}
