@@ -8,7 +8,7 @@ getBBRFStats()
 {   
      if [ -z "$1" ]
       then
-       echo "Use getBBRFStats outputfile.txt"
+       echo "Use ${FUNCNAME[0]} outputfile.txt"
        return 1;
     fi
 
@@ -100,7 +100,7 @@ addPrograms()
 
     if [ -z "$1" ]
     then
-      echo "Use addPrograms platform (intigriti, bugcrowd, h1, hackenproof, self, etc)"
+      echo "Use ${FUNCNAME[0]} platform (intigriti, bugcrowd, h1, hackenproof, self, etc)"
       return 1;
     fi
     while true;
@@ -168,7 +168,7 @@ addURLsInCHUNKS()
 {
  if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "Use addURLsInCHUNKS fileWithURLS PROGRAM"
+      echo "Use ${FUNCNAME[0]} fileWithURLS PROGRAM"
       return 1;
     fi
 
@@ -198,15 +198,15 @@ resolveDomainsInChunks()
 {
  if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "Use resolveDomainsInChunks fileUnresolvedDomains PROGRAM"
+      echo "Use ${FUNCNAME[0]} fileUnresolvedDomains PROGRAM"
       return 1;
     fi
 
-RED="\e[31m"
-YELLOW="\e[33m"
-ENDCOLOR="\e[0m"
-file=$1
-p=$2
+ RED="\e[31m"
+ YELLOW="\e[33m"
+ ENDCOLOR="\e[0m"
+ file=$1
+ p=$2
  size=$(cat $file |wc -l); 
  echo $size
  chunk=100; 
@@ -236,7 +236,7 @@ findProgram()
 {
     if [ -z "$1" ]
     then
-      echo "Use findProgram URL or domain"
+      echo "Use ${FUNCNAME[0]} URL or domain"
       return 1;
     fi
     program=$(bbrf show "$1" |jq '.program'|sed 's/"//g');  
@@ -247,6 +247,12 @@ findProgram()
 #nuclei helper (will split it to another file soon)
 testNucleiTemplate()
 {
+ if [ -z "$1" ]
+    then
+      echo "Use ${FUNCNAME[0]} URL or domain"
+      return 1;
+    fi
+
  templateID=$1
  URL=$2
  pathToTemplate=$(locate $templateID) 
