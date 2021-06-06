@@ -255,7 +255,7 @@ testNucleiTemplate()
 
  templateID=$1
  URL=$2
- pathToTemplate=$(locate $templateID) 
+ pathToTemplate=$(locate $templateID|grep nuclei-templates) 
  echo "nuclei -debug -t $pathToTemplate -u $URL"
  nuclei -debug -t $pathToTemplate -u $URL
      
