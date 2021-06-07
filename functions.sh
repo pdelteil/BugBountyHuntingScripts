@@ -45,6 +45,11 @@ getDisabledPrograms()
 #diffFiles file1.txt file2.txt output.txt
 diffFiles()
 {
+    if [ -z "$1" ] | [ -z "$2" ] | [ -z "$3" ]
+    then
+      echo "Use ${FUNCNAME[0]} file1.txt file2.txt output.txt"
+      return 1;
+    fi
     comm -3 <(sort $1) <(sort $2) > $3
 }
 
@@ -126,22 +131,19 @@ addPrograms()
             2)    val_recon="true";;
         esac
 
-        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$recon"
-        bbrf use "$program" 
+        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$recon" -t android:"$android" -t iOS:"$iOS"
+        #bbrf use "$program" 
         IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
         #if empty skip
         if [ ! -z "$wildcards" ]
             then
-                bbrf inscope add $wildcards 
+                bbrf inscope add $wildcards -p "$program"
             echo -en "Scope added \n"  
-
-        else    
-            echo -n "Empty!"
-    fi         
+        fi         
     IFS= read -r -p "$(echo -en $YELLOW " Add OUT scope:" $ENDCOLOR)" oswildcards
     if [ ! -z "$oswildcards" ]
          then
-             bbrf outscope add $oswildcards
+             bbrf outscope add $oswildcards -p "$program"
              echo -ne "${YELLOW}out Scope added $oswildcards${ENDCOLOR}\n"  
     fi
     echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getDomains  
