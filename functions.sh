@@ -130,8 +130,20 @@ addPrograms()
             1)    val_recon="false";;
             2)    val_recon="true";;
         esac
+        echo -en "${YELLOW}Android app? ${ENDCOLOR} (1:false, 2:true) "
+        read android
+        case $android in 
+            1)    val_android="false";;
+            2)    val_android="true";;
+        esac
+        echo -en "${YELLOW}Android app? ${ENDCOLOR} (1:false, 2:true) "
+        read iOS
+        case $iOS in 
+            1)    val_iOS="false";;
+            2)    val_iOS="true";;
+        esac
 
-        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$recon" -t android:"$android" -t iOS:"$iOS"
+        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" -t android:"$val_android" -t iOS:"$val_iOS"
         #bbrf use "$program" 
         IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
         #if empty skip
