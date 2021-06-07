@@ -136,7 +136,6 @@ addPrograms()
         esac
 
         bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" -t android:"$val_android" -t iOS:"$val_iOS"
-        #bbrf use "$program" 
         IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
         #if empty skip
         if [ ! -z "$wildcards" ]
@@ -259,3 +258,4 @@ testNucleiTemplate()
  echo "nuclei -debug -t $pathToTemplate -u $URL"
  nuclei -debug -t $pathToTemplate -u $URL
 }
+    
