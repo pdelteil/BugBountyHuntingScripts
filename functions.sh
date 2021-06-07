@@ -1,5 +1,9 @@
 # shell script functions to be loaded on your bashrc file 
 
+#Global variables
+RED="\e[31m"
+YELLOW="\e[33m"
+ENDCOLOR="\e[0m"
 # creates a file with BBRF stats 
 # The output is in the form 
 #  program1, #domains, #urls
@@ -58,10 +62,7 @@ diffFiles()
 
 getDomains()
 {
-    RED="\e[31m"
-    ENDCOLOR="\e[0m"
     wild=$(bbrf scope in --wildcard|grep -v DEBUG)
-
     echo "$wild"|bbrf inscope add -; 
     echo "$wild"|bbrf domain add - --show-new; 
     bbrf scope in|bbrf domain add - --show-new; 
@@ -78,11 +79,6 @@ getDomains()
 # it requires httpx and httprobe
 getUrls()
 {
-    RED="\e[31m"
-    YELLOW="\e[33m"
-    ENDCOLOR="\e[0m"
-
-    #IFS=$'\n'
     doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n') 
     #echo $doms
     if [ ${#doms} -gt 0 ] 
@@ -99,10 +95,6 @@ getUrls()
 #Example addPrograms intigriti 
 addPrograms()
 {
-    RED="\e[31m"
-    YELLOW="\e[33m"
-    ENDCOLOR="\e[0m"
-
     if [ -z "$1" ]
     then
       echo "Use ${FUNCNAME[0]} platform (intigriti, bugcrowd, h1, hackenproof, self, etc)"
@@ -186,11 +178,8 @@ addURLsInCHUNKS()
       return 1;
     fi
 
-RED="\e[31m"
-YELLOW="\e[33m"
-ENDCOLOR="\e[0m"
-file=$1
-program=$2
+ file=$1
+ program=$2
  size=$(cat $file |wc -l); 
  chunk=1000; 
  parts=$((size%chunk?size/chunk+1:size/chunk)) ; 
@@ -216,9 +205,6 @@ resolveDomainsInChunks()
       return 1;
     fi
 
- RED="\e[31m"
- YELLOW="\e[33m"
- ENDCOLOR="\e[0m"
  file=$1
  p=$2
  size=$(cat $file |wc -l); 
