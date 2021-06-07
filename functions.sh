@@ -128,7 +128,7 @@ addPrograms()
             1)    val_android="false";;
             2)    val_android="true";;
         esac
-        echo -en "${YELLOW}Android app? ${ENDCOLOR} (1:false, 2:true) "
+        echo -en "${YELLOW}iOS app? ${ENDCOLOR} (1:false, 2:true) "
         read iOS
         case $iOS in 
             1)    val_iOS="false";;
@@ -144,7 +144,7 @@ addPrograms()
                 bbrf inscope add $wildcards -p "$program"
             echo -en "Scope added \n"  
         fi         
-    IFS= read -r -p "$(echo -en $YELLOW " Add OUT scope:" $ENDCOLOR)" oswildcards
+    IFS= read -r -p "$(echo -en $YELLOW " Add OUT scope: " $ENDCOLOR)" oswildcards
     if [ ! -z "$oswildcards" ]
          then
              bbrf outscope add $oswildcards -p "$program"
@@ -239,7 +239,7 @@ findProgram()
       echo "Use ${FUNCNAME[0]} URL or domain"
       return 1;
     fi
-    program=$(bbrf show "$1" |jq '.program'|sed 's/"//g');  
+    program=$(bbrf show "$1" |jq -r '.program');  
     tags='.tags.site+", " +._id+", "+.tags.reward +", "+.tags.url+", disabled:"+(.disabled|tostring)+ ", recon:"+(.tags.recon|tostring)'
     bbrf show "$program" | jq "$tags" 
 }
@@ -258,5 +258,4 @@ testNucleiTemplate()
  pathToTemplate=$(locate $templateID|grep nuclei-templates) 
  echo "nuclei -debug -t $pathToTemplate -u $URL"
  nuclei -debug -t $pathToTemplate -u $URL
-     
 }
