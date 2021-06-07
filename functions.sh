@@ -249,7 +249,7 @@ testNucleiTemplate()
 {
  if [ -z "$1" ]
     then
-      echo "Use ${FUNCNAME[0]} URL or domain"
+      echo "Use ${FUNCNAME[0]} nuclei-template-id URL"
       return 1;
     fi
 
