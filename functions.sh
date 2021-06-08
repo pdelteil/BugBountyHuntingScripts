@@ -18,24 +18,24 @@ getBBRFStats()
 
     IFS=$'\n'
     filename=$1
-    for value in $(bbrf programs --show-disabled --show-empty-scope);
+    for program in $(bbrf programs --show-disabled --show-empty-scope);
         do 
-            echo "Getting stats of program $value"
-            numUrls=$(bbrf urls -p "$value" | wc -l)
-            numDomains=$(bbrf domains -p "$value" | wc -l)
-            echo -e "$value, $numDomains,  $numUrls" >> $filename
+            echo "Getting stats of program $program"
+            numUrls=$(bbrf urls -p "$program" | wc -l)
+            numDomains=$(bbrf domains -p "$program" | wc -l)
+            echo -e "$program, $numDomains,  $numUrls" >> $filename
     done
 }
 
 # displays all the disabled programs in BBRF
 getDisabledPrograms()
 {
-    for value in $(bbrf programs --show-disabled 2>/dev/null);
+    for program in $(bbrf programs --show-disabled 2>/dev/null);
         do 
-            disabled=$(bbrf show "$value" 2>/dev/null| jq '.disabled')
+            disabled=$(bbrf show "$program" 2>/dev/null| jq '.disabled')
             if [ "$disabled" == "true" ] 
             then
-                echo -e $value
+                echo -e $program
             fi
     done
 }
@@ -243,6 +243,24 @@ findProgram()
     bbrf show "$program" | jq "$tags" 
 }
 
+#input tag name
+listTagValues()
+{   
+    if [ -z "$1" ]
+    then
+        echo "Use ${FUNCNAME[0]} TagName"
+        return 1;
+    fi
+
+    tag="$1"
+    IFS=$'\n'
+    for program in $(bbrf programs --show-disabled --show-empty-scope);
+        do 
+            #tags='tags.site'
+            echo "$program " $(bbrf show "$program"|jq '.tags.site')
+    done
+    
+}
 #nuclei helper (will split it to another file soon)
 testNucleiTemplate()
 {
@@ -258,4 +276,4 @@ testNucleiTemplate()
  echo "nuclei -debug -t $pathToTemplate -u $URL"
  nuclei -debug -t $pathToTemplate -u $URL
 }
-    
+  
