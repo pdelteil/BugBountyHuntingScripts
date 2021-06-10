@@ -277,3 +277,18 @@ testNucleiTemplate()
  nuclei -debug -t $pathToTemplate -u $URL
 }
   
+addDomainsFromChaos()
+{
+    IFS=$'\n'  
+   echo  "Getting domains.."
+
+    for domain in $(bbrf domains --all)
+        do
+         echo "Calling chaos $domain"
+         results=$(chaos -silent -d $domain -key 1ba7ccb9d5b344605816ab032272296d4787529a31a71015bd6d298fd8ffade5)
+         echo "$results"| bbrf domain add - -p@INFER --show-new -s chaos
+         echo "$results"| httpx -silent -threads 100   |bbrf url add - -s httpx --show-new -p@INFER
+         echo "$results"| httprobe -c 50 -prefer-https |bbrf url add - -s httprobe --show-new -p@INFER
+
+        done 
+}
