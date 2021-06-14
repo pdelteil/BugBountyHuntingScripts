@@ -58,7 +58,8 @@ diffFiles()
 }
 
 # This function is used when adding a new program 
-# it requires subfinder and assetfinder
+# it requires dnsx, subfinder and assetfinder
+#dnsx will get rid of dead subdomains
 
 getDomains()
 {
@@ -69,9 +70,9 @@ getDomains()
     if [ ${#wild} -gt 0 ] 
         then
             echo -ne "${RED} Running subfinder${ENDCOLOR}\n"
-            bbrf scope in|subfinder -t 60 -silent |bbrf domain add - -s subfinder  --show-new; 
+            bbrf scope in|subfinder -t 60 -silent |dnsx -silent|bbrf domain add - -s subfinder  --show-new; 
             echo -ne "${RED} Running assetfinder${ENDCOLOR}\n"
-            bbrf scope in|assetfinder|bbrf domain add - -s assetfinder --show-new; 
+            bbrf scope in|assetfinder|dnsx -silent| bbrf domain add - -s assetfinder --show-new; 
    fi
 }
 
