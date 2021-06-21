@@ -1,4 +1,4 @@
-# BBRF-maintenance
+# BBRF & nuclei bash helpers 
 
 ## How to install
 
