@@ -18,7 +18,7 @@ You can check them running `declare -F`
 You can also use tab to autocomplete them. 
 
 
-## Functions 
+## BBRF helpers 
 
 
 1. AddPrograms() 
