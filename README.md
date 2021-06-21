@@ -1,19 +1,25 @@
-# BBRF-maintenance
+# BBRF & nuclei bash helpers 
 
 ## How to install
 
-``git clone https://github.com/pdelteil/BBRF-maintenance.git``
+```
+git clone https://github.com/pdelteil/BBRF-maintenance.git
 
-``location=$(pwd); echo "source $location/BBRF-maintenance/functions.sh " >> ~/.bashrc ``
+location=$(pwd); echo "source $location/BBRF-maintenance/bbrf_helper.sh " >> ~/.bashrc
 
-``source ~/.bashrc ``
+location=$(pwd); echo "source $location/BBRF-maintenance/nuclei_helper.sh " >> ~/.bashrc
 
+source ~/.bashrc 
+```
 
-## Functions 
 
 Loaded from the .bashrc file. 
 You can check them running `declare -F` 
 You can also use tab to autocomplete them. 
+
+
+## BBRF helpers 
+
 
 1. AddPrograms() 
 
