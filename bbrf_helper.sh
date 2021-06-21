@@ -244,7 +244,7 @@ findProgram()
     bbrf show "$program" | jq "$tags" 
 }
 
-#input tag name
+# Lists all key values of a given tag 
 listTagValues()
 {   
     if [ -z "$1" ]
@@ -263,32 +263,16 @@ listTagValues()
     
 }
 
-
-#nuclei helper (will split it to another file soon)
-testNucleiTemplate()
-{
- if [ -z "$1" ]
-    then
-      echo "Use ${FUNCNAME[0]} nuclei-template-id URL"
-      return 1;
-    fi
-
- templateID=$1
- URL=$2
- pathToTemplate=$(locate $templateID|grep nuclei-templates) 
- echo "nuclei -debug -t $pathToTemplate -u $URL"
- nuclei -debug -t $pathToTemplate -u $URL
-}
-  
+#get all domains and try to find more subdomains using chaos project  
 addDomainsFromChaos()
 {
     IFS=$'\n'  
-   echo  "Getting domains.."
+    echo  "Getting domains.."
 
     for domain in $(bbrf domains --all)
         do
          echo "Calling chaos $domain"
-         results=$(chaos -silent -d $domain -key $chaosKey
+         results=$(chaos -silent -d $domain -key $chaosKey)
          echo "$results"| bbrf domain add - -p@INFER --show-new -s chaos
          echo "$results"| httpx -silent -threads 100   |bbrf url add - -s httpx --show-new -p@INFER
          echo "$results"| httprobe -c 50 -prefer-https |bbrf url add - -s httprobe --show-new -p@INFER
