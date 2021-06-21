@@ -73,8 +73,6 @@ getDomains()
             bbrf scope in|subfinder -t 60 -silent |dnsx -silent|bbrf domain add - -s subfinder  --show-new; 
             echo -ne "${RED} Running assetfinder${ENDCOLOR}\n"
             bbrf scope in|assetfinder|dnsx -silent| bbrf domain add - -s assetfinder --show-new; 
-            echo -ne "${RED} Running chaos${ENDCOLOR}\n"
-            bbrf scope in|chaos -silent -key $chaosKey | bbrf domain add - -s chaos --show-new; 
    fi
 }
 
@@ -246,8 +244,9 @@ findProgram()
     bbrf show "$program" | jq "$tags" 
 }
 
-# Lists all key values of a given tag 
-# TODO list all tags and select one 
+# Li
+
+#input tag name
 listTagValues()
 {   
     if [ -z "$1" ]
@@ -270,12 +269,12 @@ listTagValues()
 addDomainsFromChaos()
 {
     IFS=$'\n'  
-    echo  "Getting domains.."
+   echo  "Getting domains.."
 
     for domain in $(bbrf domains --all)
         do
          echo "Calling chaos $domain"
-         results=$(chaos -silent -d $domain -key $chaosKey)
+         results=$(chaos -silent -d $domain -key $chaosKey
          echo "$results"| bbrf domain add - -p@INFER --show-new -s chaos
          echo "$results"| httpx -silent -threads 100   |bbrf url add - -s httpx --show-new -p@INFER
          echo "$results"| httprobe -c 50 -prefer-https |bbrf url add - -s httprobe --show-new -p@INFER
