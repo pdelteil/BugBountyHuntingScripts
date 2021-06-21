@@ -282,3 +282,23 @@ addDomainsFromChaos()
 
         done 
 }
+# sets debug mode on or off
+debugMode()
+{
+ if [ -z "$1" ]
+    then
+        echo "Use ${FUNCNAME[0]} false/true"
+        return 1;
+    fi
+ if [ "false" == "$1" ]
+    then
+        echo "Setting debug mode off"
+        sed -i 's/"debug": true/"debug": false/g' ~/.bbrf/config.json
+ fi
+ if [ "true" == "$1" ]
+    then
+        echo "Setting debug mode on"
+        sed -i 's/"debug": false/"debug": true/g' ~/.bbrf/config.json
+ fi
+
+} 
