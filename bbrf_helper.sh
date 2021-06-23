@@ -270,22 +270,18 @@ listTagValues()
 addDomainsFromChaos()
 {
     IFS=$'\n'  
-    echo  "Getting domains.."
+    echo  "Getting domains from chaos"
 
-    for program in $(bbrf programs)
+    for prog in $(bbrf programs)
         do
-         echo "Calling chaos $program"
-         #results=$(chaos -silent -d $domain -key $chaosKey)
-         bbrf scope in -p "$program"|chaos -silent -key $chaosKey | bbrf domain add - -s chaos --show-new -p  "$program"|notify -silent
-         #echo "$results"| bbrf domain add - -p@INFER --show-new -s chaos
-         #echo "$results"| httpx -silent -threads 100   |bbrf url add - -s httpx --show-new -p@INFER
-         #echo "$results"| httprobe -c 50 -prefer-https |bbrf url add - -s httprobe --show-new -p@INFER
-
+         echo " $prog"
+         bbrf scope in -p "$prog"|chaos -silent -key $chaosKey|bbrf domain add - -s chaos --show-new -p "$prog"|notify -silent
         done 
 }
 # sets debug mode on or off
 debugMode()
 {
+ configFile='~/.bbrf/config.json'
  if [ -z "$1" ]
     then
         echo "Use ${FUNCNAME[0]} false/true"
@@ -294,12 +290,12 @@ debugMode()
  if [ "false" == "$1" ]
     then
         echo "Setting debug mode off"
-        sed -i 's/"debug": true/"debug": false/g' ~/.bbrf/config.json
+        sed -i 's/"debug": true/"debug": false/g' $configFile
  fi
  if [ "true" == "$1" ]
     then
         echo "Setting debug mode on"
-        sed -i 's/"debug": false/"debug": true/g' ~/.bbrf/config.json
+        sed -i 's/"debug": false/"debug": true/g' $configFile
  fi
 
 } 
