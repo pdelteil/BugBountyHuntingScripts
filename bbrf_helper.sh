@@ -274,7 +274,7 @@ addDomainsFromChaos()
     for prog in $(bbrf programs)
         do
          echo " $prog"
-         bbrf scope in -p "$prog" \ 
+         bbrf scope in -p "$prog" \
                                 | chaos -silent -key $chaosKey \
                                 | dnsx -silent \
                                 | bbrf domain add - -s chaos --show-new -p "$prog" \
