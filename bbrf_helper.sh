@@ -276,7 +276,7 @@ addDomainsFromChaos()
         do
          echo "Calling chaos $program"
          #results=$(chaos -silent -d $domain -key $chaosKey)
-         bbrf scope in -p "$program"|chaos -silent -key $chaosKey | bbrf domain add - -s chaos --show-new -p  "$program"|notify
+         bbrf scope in -p "$program"|chaos -silent -key $chaosKey | bbrf domain add - -s chaos --show-new -p  "$program"|notify -silent
          #echo "$results"| bbrf domain add - -p@INFER --show-new -s chaos
          #echo "$results"| httpx -silent -threads 100   |bbrf url add - -s httpx --show-new -p@INFER
          #echo "$results"| httprobe -c 50 -prefer-https |bbrf url add - -s httprobe --show-new -p@INFER
