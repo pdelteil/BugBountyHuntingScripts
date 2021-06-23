@@ -74,7 +74,7 @@ getDomains()
             echo -ne "${RED} Running assetfinder${ENDCOLOR}\n"
             bbrf scope in|assetfinder|dnsx -silent| bbrf domain add - -s assetfinder --show-new; 
             echo -ne "${RED} Running chaos${ENDCOLOR}\n"
-            bbrf scope in|chaos -silent -key $chaosKey | bbrf domain add - -s chaos --show-new; 
+            bbrf scope in|chaos -silent -key $chaosKey |dnsx -silent|bbrf domain add - -s chaos --show-new; 
    fi
 }
 
@@ -83,7 +83,6 @@ getDomains()
 getUrls()
 {
     doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n') 
-    #echo $doms
     if [ ${#doms} -gt 0 ] 
         then
             echo -en "${RED} httpx domains${ENDCOLOR}\n"        
@@ -275,7 +274,11 @@ addDomainsFromChaos()
     for prog in $(bbrf programs)
         do
          echo " $prog"
-         bbrf scope in -p "$prog"|chaos -silent -key $chaosKey|bbrf domain add - -s chaos --show-new -p "$prog"|notify -silent
+         bbrf scope in -p "$prog" \ 
+                                | chaos -silent -key $chaosKey \
+                                | dnsx -silent \
+                                | bbrf domain add - -s chaos --show-new -p "$prog" \
+                                | notify -silent
         done 
 }
 # sets debug mode on or off
