@@ -85,24 +85,24 @@ getDomains()
         then
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|subfinder -t 60 -silent |dnsx -silent |tee --append "$tempFile"
+                echo "$scopeIn"|subfinder -t 60 -silent |dnsx -silent |tee --append "$tempFile-subfinder"
             else
                 echo "$scopeIn"|subfinder -t 60 -silent |dnsx -silent|bbrf domain add - -s subfinder  --show-new;
             fi
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
 
             if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|assetfinder|dnsx -silent|tee --append "$tempFile"
+                echo "$scopeIn"|assetfinder|dnsx -silent|tee --append "$tempFile-assetfinder"
             else
                 echo "$scopeIn"|assetfinder|dnsx -silent| bbrf domain add - -s assetfinder --show-new;
             fi
 
             echo -ne "${RED} Running chaos ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent| tee --append "$tempFile"
+                echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent| tee --append "$tempFile-chaos"
                 echo -ne "${YELLOW} Removing duplicates from file ${ENDCOLOR}\n"
-                sort -u "$tempFile" > "$file"
-                rm "$tempFile"
+                cat "$tempFile-*" > "$file"
+                #rm "$tempFile"
                 echo "Done getDomains for "|notify -silent
             else
                 echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent|bbrf domain add - -s chaos --show-new;
@@ -131,7 +131,7 @@ addPrograms()
 {
     if [ -z "$1" ]
     then
-      echo 'Use ${FUNCNAME[0]} platform (intigriti, bugcrowd, h1, hackenproof, self, etc)'
+      echo "Use ${FUNCNAME[0]} platform (intigriti, bugcrowd, h1, hackenproof, self, etc)"
       return 1;
     fi
     while true;
@@ -140,7 +140,7 @@ addPrograms()
         site="$1"
         echo -en "${YELLOW}Program name: ${ENDCOLOR}"
         read program
-        echo -en '${YELLOW}Reward? (1:money, 2:points, 3:thanks) ${ENDCOLOR} '
+        echo -en "${YELLOW}Reward? (1:money, 2:points, 3:thanks) ${ENDCOLOR} "
         read reward
         case $reward in
             1)    val="money";;
@@ -202,12 +202,12 @@ removeURLsInChunks()
     done
 }
 
-#ADD URLS IN CHUNKS
+#ADD URLS IN CHUNKS from FILE containing domains 
 addURLsInCHUNKS()
 {
  if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "Use ${FUNCNAME[0]} fileWithURLS PROGRAM"
+      echo "Use ${FUNCNAME[0]} fileWithURLS"
       return 1;
     fi
 
@@ -224,7 +224,7 @@ addURLsInCHUNKS()
         echo "try $i"; 
         
         urls="${init},${end}p"; 
-        sed -n "$urls" $file |httpx -silent -threads 500 |bbrf url add - -s httpx --show-new -p "$program"; 
+        sed -n "$urls" $file |httpx -silent -threads 250 |bbrf url add - -s httpx --show-new -p@INFER; 
         init=$(( $init + $chunk ))
         end=$(( $end + $chunk ))
     done
@@ -234,7 +234,7 @@ resolveDomainsInChunks()
 {
  if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "Use ${FUNCNAME[0]} fileUnresolvedDomains PROGRAM"
+      echo "Use ${FUNCNAME[0]} fileUnresolvedDomains"
       return 1;
     fi
 
@@ -256,7 +256,7 @@ resolveDomainsInChunks()
         #sed -n  "$urls" $file|awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx 
         #>(awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx) \
         #sed -n  "$urls" $file |awk '{print $1":"$2}' |bbrf domain add - -p "$p" -s dnsx --show-new
-        sed -n  "$urls" $fil| awk '{print $2":"$1}' |bbrf ip add - -p "$p" -s dnsx
+        sed -n  "$urls" $fil| awk '{print $2":"$1}' |bbrf ip add - -p@INFER -s dnsx
         #>(awk '{print $2":"$1}' |bbrf ip update - -p "$p" -s dnsx)
         
         #|httpx -silent -threads 500 |bbrf url add - -s httpx --show-new -p "$program"; 
@@ -316,7 +316,7 @@ addDomainsFromChaos()
 # sets debug mode on or off
 debugMode()
 {
- configFile='~/.bbrf/config.json'
+ configFile="$HOME/.bbrf/config.json"
  if [ -z "$1" ]
     then
         echo "Use ${FUNCNAME[0]} false/true"
