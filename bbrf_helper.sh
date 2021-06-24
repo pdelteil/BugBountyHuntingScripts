@@ -5,8 +5,7 @@ RED="\e[31m"
 YELLOW="\e[33m"
 ENDCOLOR="\e[0m"
 # creates a file with BBRF stats 
-# The output is in the form 
-#  program1, #domains, #urls
+# The output is in the form  program1, #domains, #urls
 # Input parameter: filename
 getBBRFStats()
 {   
@@ -28,6 +27,7 @@ getBBRFStats()
 }
 
 # displays all the disabled programs in BBRF
+# DEPRECATED due to BBRF update
 getDisabledPrograms()
 {
     for program in $(bbrf programs --show-disabled 2>/dev/null);
@@ -59,22 +59,55 @@ diffFiles()
 
 # This function is used when adding a new program 
 # it requires dnsx, subfinder and assetfinder
-#dnsx will get rid of dead subdomains
-
+# dnsx will get rid of dead subdomains
+# optional parameter is a file to output the data 
 getDomains()
 {
+    #no params
+    file="$1
+    if [ -z "$file" ]
+    then
+        echo "1" 
+        #echo -ne "${YELLOW} Running bbrf mode ${ENDCOLOR}\n"
+    else 
+        echo "1"
+        # echo -ne "${YELLOW} Running filemode ${ENDCOLOR}\n"
+        fileMode=true
+        tempFile="/tmp/$file.temp"
+    fi
+    
+    IFS=$'\n'
     wild=$(bbrf scope in --wildcard|grep -v DEBUG)
-    echo "$wild"|bbrf inscope add -; 
-    echo "$wild"|bbrf domain add - --show-new; 
-    bbrf scope in|bbrf domain add - --show-new; 
+    echo "$wild"|bbrf inscope add -
+    echo "$wild"|bbrf domain add - --show-new
+    scopeIn=$(bbrf scope in)
+    echo "$scopeIn"|bbrf domain add - --show-new
+    # when theres no wildcard we dont need the next steps
     if [ ${#wild} -gt 0 ] 
         then
-            echo -ne "${RED} Running subfinder${ENDCOLOR}\n"
-            bbrf scope in|subfinder -t 60 -silent |dnsx -silent|bbrf domain add - -s subfinder  --show-new; 
-            echo -ne "${RED} Running assetfinder${ENDCOLOR}\n"
-            bbrf scope in|assetfinder|dnsx -silent| bbrf domain add - -s assetfinder --show-new; 
-            echo -ne "${RED} Running chaos${ENDCOLOR}\n"
-            bbrf scope in|chaos -silent -key $chaosKey |dnsx -silent|bbrf domain add - -s chaos --show-new; 
+            # echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
+            if [ "$fileMode" = true ] ; then
+                echo "$scopeIn"|subfinder -t 60 -silent |dnsx -silent |tee --append "$tempFile"
+            else
+                echo "$scopeIn"|subfinder -t 60 -silent |dnsx -silent|bbrf domain add - -s subfinder  --show-new
+            fi   
+            # echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
+
+            if [ "$fileMode" = true ] ; then
+                echo "$scopeIn"|assetfinder|dnsx -silent | tee --append "$tempFile"
+            else    
+                echo "$scopeIn"|assetfinder|dnsx -silent| bbrf domain add - -s assetfinder --show-new
+            fi
+
+            #echo -ne "${RED} Running chaos ${ENDCOLOR}\n"
+            if [ "$fileMode" = true ] ; then
+                echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent| tee --append "$tempFile" 
+                #echo -ne "${YELLOW} Removing duplicates from file ${ENDCOLOR}\n"
+                #sort -u "$tempFile" > "$file"
+                #rm "$tempFile"
+            else
+                echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent|bbrf domain add - -s chaos --show-new
+            fi
    fi
 }
 
@@ -85,9 +118,9 @@ getUrls()
     doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n') 
     if [ ${#doms} -gt 0 ] 
         then
-            echo -en "${RED} httpx domains${ENDCOLOR}\n"        
+            echo -ne "${RED} httpx domains${ENDCOLOR}\n"        
             echo "$doms" |httpx -silent -threads 100 |bbrf url add - -s httpx --show-new
-            echo -en "${RED} httprobe domains${ENDCOLOR}\n"        
+            echo -ne "${RED} httprobe domains${ENDCOLOR}\n"        
             echo "$doms" |httprobe -c 50 -prefer-https |bbrf url add - -s httprobe --show-new
     fi
 }
