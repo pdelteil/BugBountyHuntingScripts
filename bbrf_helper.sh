@@ -277,7 +277,23 @@ resolveDomainsInChunks()
         end=$(( $end + $chunk ))
   done
 } 
-#Finds a program using a domain or url as input
+#Checks if a program exists based on part of the name
+checkProgram()
+{
+    if [ -z "$1" ]
+    then
+      echo "Use ${FUNCNAME[0]} text"
+      return 1;
+    fi
+    text="$1"
+    output=$(bbrf programs | grep -i "$text")
+    if [ ${#output} -gt 0 ] 
+    then
+        echo -ne "${YELLOW}$output ${ENDCOLOR} \n\n"
+    else    
+        echo -ne "${RED}No results${ENDCOLOR}\n\n"
+    fi
+}
 findProgram()
 {
     if [ -z "$1" ]
