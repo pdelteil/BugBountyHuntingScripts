@@ -211,20 +211,18 @@ addURLsInCHUNKS()
       return 1;
     fi
 
- file=$1
- program=$2
- size=$(cat $file |wc -l); 
- chunk=1000; 
- parts=$((size%chunk?size/chunk+1:size/chunk)) ; 
- echo $parts ;
+ file="$1"
+ size=$(cat "$file" |wc -l)
+ chunk=1000
+ parts=$((size%chunk?size/chunk+1:size/chunk))
+ echo $parts
  init=1
  end=$chunk
  for i in $(seq 1 $parts) ; 
     do
-        echo "try $i"; 
-        
+        echo "try $i"
         urls="${init},${end}p"; 
-        sed -n "$urls" $file |httpx -silent -threads 250 |bbrf url add - -s httpx --show-new -p@INFER; 
+        sed -n "$urls" "$file" |httpx -silent -threads 250 |bbrf url add - -s httpx --show-new -p@INFER; 
         init=$(( $init + $chunk ))
         end=$(( $end + $chunk ))
     done
@@ -239,7 +237,6 @@ resolveDomainsInChunks()
     fi
 
  file=$1
- p=$2
  size=$(cat $file |wc -l); 
  echo $size
  chunk=100; 
@@ -275,6 +272,7 @@ findProgram()
     program=$(bbrf show "$1" |jq -r '.program');  
     tags='.tags.site+", " +._id+", "+.tags.reward +", "+.tags.url+", disabled:"+(.disabled|tostring)+ ", recon:"+(.tags.recon|tostring)'
     bbrf show "$program" | jq "$tags" 
+    #TODO return better output when the input is not found
 }
 
 # Lists all key values of a given tag 
