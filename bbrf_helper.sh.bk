@@ -64,12 +64,14 @@ diffFiles()
 getDomains()
 {
     #no params
-    file="$1"
+    file="$1
     if [ -z "$file" ]
     then
+        echo "1" 
         echo -ne "${YELLOW} Running bbrf mode ${ENDCOLOR}\n"
     else
-        echo -ne "${YELLOW} Running filemode ${ENDCOLOR}\n"
+        echo "1"
+         echo -ne "${YELLOW} Running filemode ${ENDCOLOR}\n"
         fileMode=true
         tempFile="/tmp/$file.temp"
     fi
@@ -89,7 +91,7 @@ getDomains()
             else
                 echo "$scopeIn"|subfinder -t 60 -silent |dnsx -silent|bbrf domain add - -s subfinder  --show-new;
             fi
-            echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
+            # echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
 
             if [ "$fileMode" = true ] ; then
                 echo "$scopeIn"|assetfinder|dnsx -silent|tee --append "$tempFile"
@@ -103,7 +105,6 @@ getDomains()
                 echo -ne "${YELLOW} Removing duplicates from file ${ENDCOLOR}\n"
                 sort -u "$tempFile" > "$file"
                 rm "$tempFile"
-                echo "Done getDomains for "|notify -silent
             else
                 echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent|bbrf domain add - -s chaos --show-new;
             fi
