@@ -4,6 +4,7 @@
 
 # example of use 
 # testNucleiTemplate open-redirect http://www.sample.com
+# TODO add flag to debug optional
 testNucleiTemplate()
 {
  if [ -z "$1" ]

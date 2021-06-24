@@ -202,27 +202,43 @@ removeURLsInChunks()
     done
 }
 
-#ADD URLS IN CHUNKS from FILE containing domains 
-addURLsInCHUNKS()
+# 1. ADD Domains IN CHUNKS from FILE containing domains 
+# 2. Add URLs to program probing domains from FILE containing domains
+addInCHUNKS()
 {
  if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "Use ${FUNCNAME[0]} fileWithURLS"
-      return 1;
+      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains source"
+      echo "To add urls use ${FUNCNAME[0]} fileWithDomains urls"
+      return 1
     fi
-
+ if [ "$2" ==  "domains" ] || [ "$2" == "urls" ]
+    then
+        echo "" 
+    else
+        echo " use domains or urls "
+        return 1
+    fi
+ source="$3"
  file="$1"
  size=$(cat "$file" |wc -l)
+ echo "Size "$size
  chunk=1000
+ echo "Chunk size "$chunk
  parts=$((size%chunk?size/chunk+1:size/chunk))
- echo $parts
+ echo "Chunks "$parts
  init=1
  end=$chunk
- for i in $(seq 1 $parts) ; 
+ for i in $(seq 1 $parts);
     do
-        echo "try $i"
+        echo "Adding chunk $i"
         urls="${init},${end}p"; 
-        sed -n "$urls" "$file" |httpx -silent -threads 250 |bbrf url add - -s httpx --show-new -p@INFER; 
+        if [ "$2" == "urls" ]
+        then
+            sed -n "$urls" "$file"|bbrf url add - -s httpx --show-new -p@INFER
+        else
+            sed -n "$urls" "$file"|bbrf domain add - -s "$source" --show-new -p@INFER
+        fi
         init=$(( $init + $chunk ))
         end=$(( $end + $chunk ))
     done
@@ -239,21 +255,21 @@ resolveDomainsInChunks()
  file=$1
  size=$(cat $file |wc -l); 
  echo $size
- chunk=100; 
- parts=$((size%chunk?size/chunk+1:size/chunk)) ; 
- echo $parts ;
+ chunk=100
+ parts=$((size%chunk?size/chunk+1:size/chunk))
+ echo $parts
  init=1
  end=$chunk
  for i in $(seq 1 $parts) ; 
     do
-        echo "try $i"; 
+        echo "try $i"
         
-        urls="${init},${end}p"; 
+        urls="${init},${end}p"
         #sed -n "$urls" $file    |dnsx -silent -a -resp | tr -d '[]' 
         #sed -n  "$urls" $file|awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx 
         #>(awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx) \
         #sed -n  "$urls" $file |awk '{print $1":"$2}' |bbrf domain add - -p "$p" -s dnsx --show-new
-        sed -n  "$urls" $fil| awk '{print $2":"$1}' |bbrf ip add - -p@INFER -s dnsx
+        sed -n  "$urls" $file| awk '{print $2":"$1}' |bbrf ip add - -p@INFER -s dnsx
         #>(awk '{print $2":"$1}' |bbrf ip update - -p "$p" -s dnsx)
         
         #|httpx -silent -threads 500 |bbrf url add - -s httpx --show-new -p "$program"; 
@@ -269,10 +285,14 @@ findProgram()
       echo "Use ${FUNCNAME[0]} URL or domain"
       return 1;
     fi
-    program=$(bbrf show "$1" |jq -r '.program');  
-    tags='.tags.site+", " +._id+", "+.tags.reward +", "+.tags.url+", disabled:"+(.disabled|tostring)+ ", recon:"+(.tags.recon|tostring)'
-    bbrf show "$program" | jq "$tags" 
-    #TODO return better output when the input is not found
+    program=$(bbrf show "$1" |jq -r '.program')
+    if [ ${#program} -gt 0 ] 
+    then
+        tags='.tags.site+", " +._id+", "+.tags.reward +", "+.tags.url+", disabled:"+(.disabled|tostring)+ ", recon:"+(.tags.recon|tostring)'
+        bbrf show "$program" | jq "$tags" 
+    else
+        echo -ne "${RED}No program found${ENDCOLOR}\n\n"
+    fi
 }
 
 # Lists all key values of a given tag 
