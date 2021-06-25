@@ -358,12 +358,12 @@ debugMode()
     fi
  if [ "false" == "$1" ]
     then
-        echo "Setting debug mode off"
+        echo "Setting BBRF debug mode off"
         sed -i 's/"debug": true/"debug": false/g' $configFile
  fi
  if [ "true" == "$1" ]
     then
-        echo "Setting debug mode on"
+        echo "Setting BBRF debug mode on"
         sed -i 's/"debug": false/"debug": true/g' $configFile
  fi
 
