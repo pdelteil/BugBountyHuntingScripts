@@ -353,11 +353,11 @@ debugMode()
  configFile="$HOME/.bbrf/config.json"
 
  #detect if debug mode is not set in config file 
- debug=$(grep debug $configFile)
+ debug=$(grep '"debug"' $configFile)
  
  if [ ${#debug} == 0 ] #debug word not found in config file
     then
-        sed -i 's/}/,"debug":true}/g' $configFile
+        sed -i 's/}/,"debug": true}/g' $configFile
  fi
  if [ -z "$1" ]
     then
