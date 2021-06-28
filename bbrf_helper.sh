@@ -96,17 +96,17 @@ getDomains()
             else
                 echo "$scopeIn"|assetfinder|dnsx -silent| bbrf domain add - -s assetfinder --show-new;
             fi
-
-            echo -ne "${RED} Running chaos ${ENDCOLOR}\n"
-            if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent| tee --append "$tempFile-chaos"
-                echo -ne "${YELLOW} Removing duplicates from file ${ENDCOLOR}\n"
-                cat "$tempFile-*" > "$file"
+            #chaos is included in httpx
+            #echo -ne "${RED} Running chaos ${ENDCOLOR}\n"
+            #if [ "$fileMode" = true ] ; then
+            #    echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent| tee --append "$tempFile-chaos"
+            #    echo -ne "${YELLOW} Removing duplicates from file ${ENDCOLOR}\n"
+            #    cat "$tempFile-*" > "$file"
                 #rm "$tempFile"
-                echo "Done getDomains for "|notify -silent
-            else
-                echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent|bbrf domain add - -s chaos --show-new;
-            fi
+            #    echo "Done getDomains for "|notify -silent
+            #else
+            #    echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent|bbrf domain add - -s chaos --show-new;
+            #fi
    fi
 }
 
@@ -140,14 +140,16 @@ addPrograms()
         site="$1"
         echo -en "${YELLOW}Program name: ${ENDCOLOR}"
         read program
-        echo -en "${YELLOW}Reward? (1:money, 2:points, 3:thanks) ${ENDCOLOR} "
+        echo -en "${YELLOW}Reward? (1:money[default:press Enter], 2:points, 3:thanks) ${ENDCOLOR} "
         read reward
         case $reward in
-            1)    val="money";;
-            2)    val="points";;
-            3)    val="thanks";;
+            1 )    val="money";;
+            2 )    val="points";;
+            3 )    val="thanks";;
+            "")    val="money";;
         esac
         echo -en "${YELLOW}Url? ${ENDCOLOR} "
+        # TODO create tentative url combining site + program name
         read url
         #recon means the scope is not bounded or clear
         echo -en "${YELLOW}Recon? ${ENDCOLOR} (1:false, 2:true) "
@@ -156,20 +158,30 @@ addPrograms()
             1)    val_recon="false";;
             2)    val_recon="true";;
         esac
-        echo -en "${YELLOW}Android app? ${ENDCOLOR} (1:false, 2:true) "
+        echo -en "${YELLOW}Android app? ${ENDCOLOR} (1:false[default:press Enter], 2:true) "
         read android
         case $android in 
-            1)    val_android="false";;
-            2)    val_android="true";;
+            1 )    val_android="false";;
+            2 )    val_android="true";;
+            "")    val_android="false";;
         esac
-        echo -en "${YELLOW}iOS app? ${ENDCOLOR} (1:false, 2:true) "
+        echo -en "${YELLOW}iOS app? ${ENDCOLOR} (1:false[default:press Enter], 2:true) "
         read iOS
         case $iOS in 
-            1)    val_iOS="false";;
-            2)    val_iOS="true";;
+            1 )    val_iOS="false";;
+            2 )    val_iOS="true";;
+            "")    val_iOS="false";;
+        esac
+        echo -en "${YELLOW}Source code? ${ENDCOLOR} (1:false[default:press Enter], 2:true) "
+        read source
+        case $source in 
+            1 )    val_source="false";;
+            2 )    val_source="true";;
+            "")    val_source="false";;
         esac
 
-        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" -t android:"$val_android" -t iOS:"$val_iOS"
+        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
+                            -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source"
         IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
         #if empty skip
         if [ ! -z "$wildcards" ]
@@ -304,7 +316,7 @@ findProgram()
     program=$(bbrf show "$1" |jq -r '.program')
     if [ ${#program} -gt 0 ] 
     then
-        tags='.tags.site+", " +._id+", "+.tags.reward +", "+.tags.url+", disabled:"+(.disabled|tostring)+ ", recon:"+(.tags.recon|tostring)'
+        tags='.tags.site+", "+._id+", "+.tags.reward+", "+.tags.url+", disabled:"+(.disabled|tostring)+", recon:"+(.tags.recon|tostring)+", source code: "+(.tags.sourceCode|tostring)'
         bbrf show "$program" | jq "$tags" 
     else
         echo -ne "${RED}No program found${ENDCOLOR}\n\n"
