@@ -118,9 +118,9 @@ getUrls()
     if [ ${#doms} -gt 0 ]
         then
             echo -en "${RED} httpx domains ${ENDCOLOR}\n"
-            echo "$doms" |httpx -silent -threads 100 |bbrf url add - -s httpx --show-new;
+            echo "$doms"|httpx -silent -threads 100|bbrf url add - -s httpx --show-new
             echo -en "${RED} httprobe domains ${ENDCOLOR}\n"
-            echo "$doms" |httprobe -c 50 -prefer-https |bbrf url add - -s httprobe --show-new;
+            echo "$doms"|httprobe -c 50 -prefer-https|bbrf url add - -s httprobe --show-new
     fi
 }
 # Use this function if you need to add several programs from a site
@@ -131,7 +131,7 @@ addPrograms()
 {
     if [ -z "$1" ]
     then
-      echo "Use ${FUNCNAME[0]} platform (intigriti, bugcrowd, h1, hackenproof, self, etc)"
+      echo -ne "Use ${FUNCNAME[0]} site\nExample ${FUNCNAME[0]} h1\nExample ${FUNCNAME[0]} bugcrowd\n"
       return 1;
     fi
     while true;
@@ -182,19 +182,23 @@ addPrograms()
 
         bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
                             -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source"
-        IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
+        #IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
+        echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}"
+        read inscope
         #if empty skip
-        if [ ! -z "$wildcards" ]
+        if [ ! -z "$inscope" ]
             then
-                bbrf inscope add $wildcards -p "$program"
-            echo -en "Scope added \n"  
+                #echo "inscope $inscope-"
+                bbrf inscope add "$inscope" -p "$program"
+                #echo -en "in scope added \n"  
         fi         
-    IFS= read -r -p "$(echo -en $YELLOW " Add OUT scope: " $ENDCOLOR)" oswildcards
-    if [ ! -z "$oswildcards" ]
-         then
-             bbrf outscope add $oswildcards -p "$program"
-             echo -ne "${YELLOW}out Scope added $oswildcards${ENDCOLOR}\n"  
-    fi
+        echo -en "${YELLOW} Add OUT scope: ${ENDCOLOR}" 
+        read outscope
+        if [ ! -z "$outscope" ]
+           then
+               bbrf outscope add "$outscope" -p "$program"
+               echo -ne "${YELLOW}out Scope added${ENDCOLOR}\n"  
+        fi
     echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getDomains  
     echo -ne "${RED}Getting urls ${ENDCOLOR}\n"; getUrls  
     done
@@ -344,19 +348,22 @@ listTagValues()
 }
 
 #get all domains and try to find more subdomains using chaos project  
-addDomainsFromChaos()
+addDomainsAndUrls()
 {
     IFS=$'\n'  
-    echo  "Getting domains from chaos"
+    echo  "Getting domains from subfinder"
 
     for prog in $(bbrf programs)
         do
          echo " $prog"
          bbrf scope in -p "$prog" \
-                                | chaos -silent -key $chaosKey \
+                                | subfinder -t 60 -silent \
                                 | dnsx -silent \
-                                | bbrf domain add - -s chaos --show-new -p "$prog" \
-                                | notify -silent
+                                | bbrf domain add - -s subfinder --show-new -p "$prog" \
+                                | grep -v DEBUG| notify -silent
+        #urls
+        bbrf urls -p "$prog" |httpx -silent -threads 120|bbrf url add - -s httpx --show-new -p "$prog" \
+                             |grep -v DEBUG|notify -silent 
         done 
 }
 # sets debug mode on or off
