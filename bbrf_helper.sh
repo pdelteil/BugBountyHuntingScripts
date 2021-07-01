@@ -302,7 +302,7 @@ checkProgram()
       return 1;
     fi
     text="$1"
-    output=$(bbrf programs | grep -i "$text")
+    output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
     if [ ${#output} -gt 0 ] 
     then
         echo -ne "${YELLOW}$output ${ENDCOLOR} \n\n"
