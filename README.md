@@ -2,6 +2,19 @@
 
 ## How to install
 
+### Depencencies 
+
+TODO : installation script
+httpx 
+``GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx``
+dnsx 
+``GO111MODULE=on go get -v github.com/projectdiscovery/dnsx/cmd/dnsx``
+assetfinder 
+``GO111MODULE=on go get -u github.com/tomnomnom/assetfinder`` 
+
+httprobe
+``GO111MODULE=on go get -u github.com/tomnomnom/httprobe``
+
 ```
 git clone https://github.com/pdelteil/BBRF-maintenance.git
 
@@ -11,7 +24,6 @@ location=$(pwd); echo "source $location/BBRF-maintenance/nuclei_helper.sh " >> ~
 
 source ~/.bashrc 
 ```
-
 
 Loaded from the .bashrc file. 
 You can check them running `declare -F` 
