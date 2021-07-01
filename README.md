@@ -1,19 +1,26 @@
 # BBRF & nuclei bash helpers 
 
-## How to install
 
 ### Depencencies 
 
 TODO : installation script
-httpx 
-``GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx``
-dnsx 
+
+
+#### httpx 
+
+
+`GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx`
+
+#### dnsx 
 ``GO111MODULE=on go get -v github.com/projectdiscovery/dnsx/cmd/dnsx``
-assetfinder 
+
+#### assetfinder 
 ``GO111MODULE=on go get -u github.com/tomnomnom/assetfinder`` 
 
-httprobe
+#### httprobe
 ``GO111MODULE=on go get -u github.com/tomnomnom/httprobe``
+
+## How to install
 
 ```
 git clone https://github.com/pdelteil/BBRF-maintenance.git
