@@ -305,9 +305,9 @@ checkProgram()
     output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
     if [ ${#output} -gt 0 ] 
     then
-        echo -ne "${YELLOW}$output ${ENDCOLOR} \n\n"
+        echo -ne "${YELLOW}Program found: $output ${ENDCOLOR} \n\n"
     else    
-        echo -ne "${RED}No results${ENDCOLOR}\n\n"
+        echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
     fi
 }
 findProgram()
@@ -323,7 +323,7 @@ findProgram()
         tags='.tags.site+", "+._id+", "+.tags.reward+", "+.tags.url+", disabled:"+(.disabled|tostring)+", recon:"+(.tags.recon|tostring)+", source code: "+(.tags.sourceCode|tostring)'
         bbrf show "$program" | jq "$tags" 
     else
-        echo -ne "${RED}No program found${ENDCOLOR}\n\n"
+        echo -ne "${RED}No program found!${ENDCOLOR}\n\n"
     fi
 }
 
