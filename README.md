@@ -20,6 +20,9 @@ TODO : installation script
 #### httprobe
 ``GO111MODULE=on go get -u github.com/tomnomnom/httprobe``
 
+#### subfinder
+``GO111MODULE=on go get -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder``
+
 ## How to install
 
 ```
