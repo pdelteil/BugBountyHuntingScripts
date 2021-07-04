@@ -65,6 +65,7 @@ getDomains()
 {
     #no params
     file="$1"
+    
     if [ -z "$file" ]
     then
         echo -ne "${YELLOW} Running bbrf mode ${ENDCOLOR}\n"
@@ -134,12 +135,15 @@ addPrograms()
       echo -ne "Use ${FUNCNAME[0]} site\nExample ${FUNCNAME[0]} h1\nExample ${FUNCNAME[0]} bugcrowd\n"
       return 1;
     fi
+    unset IFS
     while true;
     do
+        #reset
         # Read the user input
         site="$1"
         echo -en "${YELLOW}Program name: ${ENDCOLOR}"
         read program
+        program=$(echo $program|sed 's/^ *//;s/ *$//')
         echo -en "${YELLOW}Reward? (1:money[default:press Enter], 2:points, 3:thanks) ${ENDCOLOR} "
         read reward
         case $reward in
@@ -179,24 +183,31 @@ addPrograms()
             2 )    val_source="true";;
             "")    val_source="false";;
         esac
-
-        bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
-                            -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source"
-        #IFS= read -r -p "$(echo -en $YELLOW" Add IN scope: "$ENDCOLOR)" wildcards
-        echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}"
-        read inscope
-        #if empty skip
-        if [ ! -z "$inscope" ]
+        
+        result=$(bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
+                            -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source")
+        #echo $result
+        if [[ $result == *"conflict"* ]] 
             then
-                #echo "inscope $inscope-"
-                bbrf inscope add "$inscope" -p "$program"
-                #echo -en "in scope added \n"  
+            echo "Program conflict"
+            bbrf use "$program"
+        fi
+        echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
+        read -r inscope_input
+        #if empty skip
+        if [ ! -z "$inscope_input" ]
+            then
+                bbrf inscope add $inscope_input -p "$program"
+                echo -ne "${RED} inscope: \n"
+                bbrf scope in -p "$program"
+                echo -ne "${ENDCOLOR}\n"
+                
         fi         
         echo -en "${YELLOW} Add OUT scope: ${ENDCOLOR}" 
-        read outscope
-        if [ ! -z "$outscope" ]
+        read -r outscope_input
+        if [ ! -z "$outscope_input" ]
            then
-               bbrf outscope add "$outscope" -p "$program"
+               bbrf outscope add $outscope_input #-p "$program"
                echo -ne "${YELLOW}out Scope added${ENDCOLOR}\n"  
         fi
     echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getDomains  
