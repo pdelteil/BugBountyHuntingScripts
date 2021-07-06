@@ -316,7 +316,7 @@ checkProgram()
     output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
     if [ ${#output} -gt 0 ] 
     then
-        echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
+        echo -ne "${YELLOW}Program found: $output ${ENDCOLOR} \n\n"
     else    
         echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
     fi
