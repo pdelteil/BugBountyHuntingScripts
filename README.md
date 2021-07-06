@@ -5,11 +5,11 @@
 
 TODO : installation script
 
+#### subfinder
+``GO111MODULE=on go get -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder``
 
 #### httpx 
-
-
-`GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx`
+``GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx``
 
 #### dnsx 
 ``GO111MODULE=on go get -v github.com/projectdiscovery/dnsx/cmd/dnsx``
@@ -18,7 +18,7 @@ TODO : installation script
 ``GO111MODULE=on go get -u github.com/tomnomnom/assetfinder`` 
 
 #### httprobe
-``GO111MODULE=on go get -u github.com/tomnomnom/httprobe``
+``go get -u github.com/tomnomnom/httprobe``
 
 ## How to install
 
