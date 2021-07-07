@@ -7,7 +7,7 @@ ENDCOLOR="\e[0m"
 # creates a file with BBRF stats 
 # The output is in the form  program1, #domains, #urls
 # Input parameter: filename
-getBBRFStats()
+getStats()
 {   
      if [ -z "$1" ]
       then
