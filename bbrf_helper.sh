@@ -323,12 +323,13 @@ checkProgram()
 }
 findProgram()
 {
-    if [ -z "$1" ]
+    INPUT=$(echo "$1"|sed 's/\/*$//g') #in case the add a trailing / 
+    if [ -z "$INPUT" ]
     then
       echo "Use ${FUNCNAME[0]} URL or domain"
       return 1;
     fi
-    program=$(bbrf show "$1" |jq -r '.program')
+    program=$(bbrf show "$INPUT" |jq -r '.program')
     if [ ${#program} -gt 0 ] 
     then
         tags='.tags.site+", "+._id+", "+.tags.reward+", "+.tags.url+", disabled:"+(.disabled|tostring)+", recon:"+(.tags.recon|tostring)+", source code: "+(.tags.sourceCode|tostring)'
