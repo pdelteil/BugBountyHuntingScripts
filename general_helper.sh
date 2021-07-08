@@ -11,7 +11,20 @@ function createScreen()
 	screen -q -S "$1"
 }
 # finds and then open a file with nano
-locatenano()
+locateNano()
+{
+    if [ -z "$1" ]
+    then
+      echo -e "Use ${FUNCNAME[0]} filename"
+      return 1;
+    fi
+    search="$1"
+    location=$(locate $search)
+    #TODO choose from list when there are more than 1 result
+    nano $location
+}
+# finds and then open a file with nano
+locateCat()
 {
     if [ -z "$1" ]
     then
@@ -22,6 +35,6 @@ locatenano()
     location=$(locate $search)
     #TODO choose from list when there are more than 1 result
     echo $location
-    nano $location
+    cat $location
 }
 
