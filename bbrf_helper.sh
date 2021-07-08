@@ -141,6 +141,7 @@ addPrograms()
         #reset
         # Read the user input
         site="$1"
+        addedDate=$(date +%D-%H:%M)
         echo -en "${YELLOW}Program name: ${ENDCOLOR}"
         read program
         program=$(echo $program|sed 's/^ *//;s/ *$//')
@@ -185,7 +186,7 @@ addPrograms()
         esac
         
         result=$(bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
-                            -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source")
+                            -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate")
         #echo $result
         if [[ $result == *"conflict"* ]] 
             then
