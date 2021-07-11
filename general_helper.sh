@@ -19,9 +19,14 @@ locateNano()
       return 1;
     fi
     search="$1"
-    location=$(locate $search)
+    location=$(locate $search|head -n 1)
     #TODO choose from list when there are more than 1 result
-    nano $location
+    if [ ${#location} -gt 0 ]
+    then
+        nano $location
+    else    
+        echo "Not found: $search"
+    fi
 }
 # finds and then open a file with nano
 locateCat()
@@ -32,9 +37,16 @@ locateCat()
       return 1;
     fi
     search="$1"
-    location=$(locate $search)
-    #TODO choose from list when there are more than 1 result
-    echo $location
-    cat $location
+    location=$(locate $search|head -n 1 )
+    #TODO choose from list when there are more than 1 result 
+
+    if [ ${#location} -gt 0 ]
+    then
+        echo $location
+        cat $location
+        echo ""
+    else
+        echo "Not found: $search"
+    fi
 }
 
