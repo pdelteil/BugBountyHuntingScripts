@@ -13,8 +13,9 @@ showLogs()
 axiomModule=$1
 #find latest folder of given axiomModule
 log_path=$(ls -t ~/.axiom/tmp/$axiomModule* | head -n 1|sed 's/://g')
+log_path=$log_path/logs
 cd $log_path
 #nuclei especific grep rules 
-cat $log_path/logs/*|grep "2021-"|grep -v Unsolicited
+cat $log_path/*|grep "2021-"|grep -v Unsolicited
 
 }
