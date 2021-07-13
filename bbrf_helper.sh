@@ -333,7 +333,7 @@ findProgram()
     program=$(bbrf show "$INPUT" |jq -r '.program')
     if [ ${#program} -gt 0 ] 
     then
-        tags='.tags.site+", "+._id+", "+.tags.reward+", "+.tags.url+", disabled:"+(.disabled|tostring)+", recon:"+(.tags.recon|tostring)+", source code: "+(.tags.sourceCode|tostring)'
+        tags='.tags.site+", "+._id+", "+.tags.reward+", "+.tags.url+", disabled:"+(.disabled|tostring)+", Added Date: "+.tags.addedDate+", recon:"+(.tags.recon|tostring)+", source code: "+(.tags.sourceCode|tostring)'
         bbrf show "$program" | jq "$tags" 
     else
         echo -ne "${RED}No program found!${ENDCOLOR}\n\n"
