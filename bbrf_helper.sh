@@ -7,7 +7,6 @@ ENDCOLOR="\e[0m"
 # creates a file with BBRF stats 
 # The output is in the form  program1, #domains, #urls
 # Input parameter: filename
-# TODO column names
 # TODO program origin
 
 getStats()
@@ -20,13 +19,16 @@ getStats()
 
     IFS=$'\n'
     filename=$1
+    #headers
+    echo -e  "Program, Site, #domains, #urls" >> $filename
     for program in $(bbrf programs --show-disabled --show-empty-scope);
         do 
             echo "Getting stats of program $program"
-            numUrls=$(bbrf urls -p "$program" | wc -l)
-            numDomains=$(bbrf domains -p "$program" | wc -l)
-            echo -e "$program, $numDomains,  $numUrls" >> $filename
-    done
+            site=$(bbrf show "$program"|jq -r '.tags.site')
+            numUrls=$(bbrf urls -p "$program"|wc -l)
+            numDomains=$(bbrf domains -p "$program"|wc -l)
+            echo -e "$program, $site, $numDomains, $numUrls" >> $filename
+        done
 }
 
 # displays all the disabled programs in BBRF
@@ -130,7 +132,7 @@ getUrls()
 # Use this function if you need to add several programs from a site
 # You need to add Name, Reward, URL, inscope and outscope
 # input platform/site
-# Example addPrograms intigriti
+# Example addPrograms intigriti hunter
 addPrograms()
 {
     if [ -z "$1" ] || [ -z "$2" ]
@@ -326,6 +328,9 @@ checkProgram()
         echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
     fi
 }
+
+#finds the program name from a domain or a URL 
+#Useful when you find a bug but you don't know where to report it to. 
 findProgram()
 {
     INPUT=$(echo "$1"|sed 's/\/*$//g') #in case the add a trailing / 
@@ -337,8 +342,16 @@ findProgram()
     program=$(bbrf show "$INPUT" |jq -r '.program')
     if [ ${#program} -gt 0 ] 
     then
-        tags='.tags.site+", "+._id+", "+.tags.author+", "+.tags.reward+", "+.tags.url+", disabled:"+(.disabled|tostring)+", Added Date: "+.tags.addedDate+", recon:"+(.tags.recon|tostring)+", source code: "+(.tags.sourceCode|tostring)'
-        bbrf show "$program" | jq "$tags" 
+        site=".tags.site"
+        author=".tags.author"
+        reward=".tags.reward"
+        url=".tags.url"
+        AddedDate=".tags.addedDate"
+        disabled="(.disabled|tostring)"
+        recon="(.tags.recon|tostring)"
+        source="(.tags.sourceCode|tostring)"
+        tags="$site"'+", "+._id+", "+'"$author"'+", "+'"$reward"'+", "+'"$url"'+", disabled:"+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon:"+'"$recon"'+", source code: "+'"$source"
+        bbrf show "$program" | jq "$tags"
     else
         echo -ne "${RED}No program found!${ENDCOLOR}\n\n"
     fi
@@ -365,6 +378,7 @@ listTagValues()
 }
 
 #get all domains and try to find more subdomains using chaos project  
+#DEPRECATED
 addDomainsAndUrls()
 {
     IFS=$'\n'  
