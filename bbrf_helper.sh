@@ -7,8 +7,6 @@ ENDCOLOR="\e[0m"
 # creates a file with BBRF stats 
 # The output is in the form  program1, #domains, #urls
 # Input parameter: filename
-# TODO program origin
-
 getStats()
 {   
      if [ -z "$1" ]
@@ -143,7 +141,6 @@ addPrograms()
     unset IFS
     while true;
     do
-        #reset
         # Read the user input
         site="$1"
         author="$2"
@@ -223,6 +220,7 @@ addPrograms()
 } 
 
 # is faster to remove urls in chunks than directly 
+# works for the current active program
 removeURLsInChunks()
 {
     size=$(bbrf urls|wc -l); 
@@ -330,10 +328,10 @@ checkProgram()
 }
 
 #finds the program name from a domain or a URL 
-#Useful when you find a bug but you don't know where to report it to. 
+#Useful when you found a bug but you don't know where to report it. 
 findProgram()
 {
-    INPUT=$(echo "$1"|sed 's/\/*$//g') #in case the add a trailing / 
+    INPUT=$(echo "$1"|sed 's/\/*$//g') #in case the input has a trailing / 
     if [ -z "$INPUT" ]
     then
       echo "Use ${FUNCNAME[0]} URL or domain"
