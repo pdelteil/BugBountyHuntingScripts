@@ -7,6 +7,9 @@ ENDCOLOR="\e[0m"
 # creates a file with BBRF stats 
 # The output is in the form  program1, #domains, #urls
 # Input parameter: filename
+# TODO column names
+# TODO program origin
+
 getStats()
 {   
      if [ -z "$1" ]
@@ -130,9 +133,9 @@ getUrls()
 # Example addPrograms intigriti
 addPrograms()
 {
-    if [ -z "$1" ]
+    if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo -ne "Use ${FUNCNAME[0]} site\nExample ${FUNCNAME[0]} h1\nExample ${FUNCNAME[0]} bugcrowd\n"
+      echo -ne "Use ${FUNCNAME[0]} site author\nExample ${FUNCNAME[0]} h1 hunter\nExample ${FUNCNAME[0]} bugcrowd hunter\n"
       return 1;
     fi
     unset IFS
@@ -141,6 +144,7 @@ addPrograms()
         #reset
         # Read the user input
         site="$1"
+        author="$2"
         addedDate=$(date +%D-%H:%M)
         echo -en "${YELLOW}Program name: ${ENDCOLOR}"
         read program
@@ -186,7 +190,7 @@ addPrograms()
         esac
         
         result=$(bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
-                            -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate")
+                 -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" -t author:"$author")
         #echo $result
         if [[ $result == *"conflict"* ]] 
             then
@@ -333,7 +337,7 @@ findProgram()
     program=$(bbrf show "$INPUT" |jq -r '.program')
     if [ ${#program} -gt 0 ] 
     then
-        tags='.tags.site+", "+._id+", "+.tags.reward+", "+.tags.url+", disabled:"+(.disabled|tostring)+", Added Date: "+.tags.addedDate+", recon:"+(.tags.recon|tostring)+", source code: "+(.tags.sourceCode|tostring)'
+        tags='.tags.site+", "+._id+", "+.tags.author+", "+.tags.reward+", "+.tags.url+", disabled:"+(.disabled|tostring)+", Added Date: "+.tags.addedDate+", recon:"+(.tags.recon|tostring)+", source code: "+(.tags.sourceCode|tostring)'
         bbrf show "$program" | jq "$tags" 
     else
         echo -ne "${RED}No program found!${ENDCOLOR}\n\n"
