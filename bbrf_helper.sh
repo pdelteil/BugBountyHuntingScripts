@@ -89,16 +89,16 @@ getDomains()
         then
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|subfinder -t 60 -silent |dnsx -silent |tee --append "$tempFile-subfinder"
+                echo "$scopeIn"|subfinder -t 100 -silent |dnsx -t 200 -silent |tee --append "$tempFile-subfinder"
             else
-                echo "$scopeIn"|subfinder -t 60 -silent |dnsx -silent|bbrf domain add - -s subfinder  --show-new;
+                echo "$scopeIn"|subfinder -t 100 -silent |dnsx -t 200 -silent|bbrf domain add - -s subfinder  --show-new;
             fi
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
 
             if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|assetfinder|dnsx -silent|tee --append "$tempFile-assetfinder"
+                echo "$scopeIn"|assetfinder|dnsx -t 200 -silent|tee --append "$tempFile-assetfinder"
             else
-                echo "$scopeIn"|assetfinder|dnsx -silent| bbrf domain add - -s assetfinder --show-new;
+                echo "$scopeIn"|assetfinder|dnsx -t 200 -silent| bbrf domain add - -s assetfinder --show-new;
             fi
             #chaos is included in httpx
             #echo -ne "${RED} Running chaos ${ENDCOLOR}\n"
@@ -122,9 +122,9 @@ getUrls()
     if [ ${#doms} -gt 0 ]
         then
             echo -en "${RED} httpx domains ${ENDCOLOR}\n"
-            echo "$doms"|httpx -silent -threads 100|bbrf url add - -s httpx --show-new
+            echo "$doms"|httpx -silent -threads 150|bbrf url add - -s httpx --show-new
             echo -en "${RED} httprobe domains ${ENDCOLOR}\n"
-            echo "$doms"|httprobe -c 50 -prefer-https|bbrf url add - -s httprobe --show-new
+            echo "$doms"|httprobe -c 150 -prefer-https|bbrf url add - -s httprobe --show-new
     fi
 }
 # Use this function if you need to add several programs from a site
@@ -326,12 +326,32 @@ checkProgram()
         echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
     fi
 }
+#Checks if a program exists using h1's api
+checkProgramH1()
+{
+    if [ -z "$1" ]
+    then
+      echo "Use ${FUNCNAME[0]} text"
+      return 1;
+    fi
+    text="$1"
+    #textAlt=$(echo "$text"|tr -d '.' | tr -d ',')
+    programs=$(bbrf programs --show-disabled --show-empty-scope)
+    result=$(echo "$programs"|tr -cd '[:alnum:]'| grep -i "$text")
+    if [ ${#result} -gt 0 ] 
+    then
+        echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
+    else    
+        echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
+    fi
+}
 
 #finds the program name from a domain or a URL 
 #Useful when you found a bug but you don't know where to report it. 
 findProgram()
 {
-    INPUT=$(echo "$1"|sed 's/\/*$//g') #in case the input has a trailing / 
+
+    INPUT=$(echo "$1"|sed -e 's|^[^/]*//||' -e 's|/.*$||') #in case the input has a trailing / 
     if [ -z "$INPUT" ]
     then
       echo "Use ${FUNCNAME[0]} URL or domain"
