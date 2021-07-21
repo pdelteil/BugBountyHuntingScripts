@@ -15,7 +15,12 @@ axiomModule=$1
 log_path=$(ls -t ~/.axiom/tmp/$axiomModule* | head -n 1|sed 's/://g')
 log_path=$log_path/logs
 cd $log_path
+#TODO add more grep especific rules for other modules
 #nuclei especific grep rules 
-cat $log_path/*|grep "2021-"|grep -v Unsolicited
-
+if [ $axiomModule = "nuclei" ] 
+    then
+        cat $log_path/*|grep "2021-"|grep -v Unsolicited
+    else    
+        cat $log_path/*
+fi
 }

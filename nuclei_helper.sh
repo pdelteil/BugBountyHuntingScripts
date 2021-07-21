@@ -19,3 +19,4 @@ testNucleiTemplate()
  echo "nuclei -debug -t $pathToTemplate -u $URL"
  nuclei -debug -t $pathToTemplate -u $URL
 }
+alias updateNuclei='GO111MODULE=on go get github.com/projectdiscovery/nuclei/v2/cmd/nuclei'
