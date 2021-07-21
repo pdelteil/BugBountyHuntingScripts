@@ -1,4 +1,4 @@
-# BBRF & nuclei bash helpers 
+# Bug bounty hunting scripts (helpers)
 
 
 ### Depencencies 
