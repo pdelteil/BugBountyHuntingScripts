@@ -1,23 +1,23 @@
 # Bug bounty hunting scripts (helpers)
 
 
-### Depencencies 
+## Depencencies 
 
 TODO : installation script
 
-#### subfinder
+##### subfinder
 ``GO111MODULE=on go get -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder``
 
-#### httpx 
+##### httpx 
 ``GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx``
 
-#### dnsx 
+##### dnsx 
 ``GO111MODULE=on go get -v github.com/projectdiscovery/dnsx/cmd/dnsx``
 
-#### assetfinder 
+##### assetfinder 
 ``GO111MODULE=on go get -u github.com/tomnomnom/assetfinder`` 
 
-#### httprobe
+##### httprobe
 ``go get -u github.com/tomnomnom/httprobe``
 
 ## How to install
