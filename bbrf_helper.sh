@@ -98,9 +98,9 @@ getDomains()
             if [ "$fileMode" = true ] ; then
                 echo "$scopeIn"|assetfinder|dnsx -t 200 -silent|tee --append "$tempFile-assetfinder"
             else
-                echo "$scopeIn"|assetfinder|dnsx -t 200 -silent| bbrf domain add - -s assetfinder --show-new;
+                echo "$scopeIn"|assetfinder|dnsx -t 200 -silent|bbrf domain add - -s assetfinder --show-new;
             fi
-            #chaos is included in httpx
+            #chaos is included in subfinder
             #echo -ne "${RED} Running chaos ${ENDCOLOR}\n"
             #if [ "$fileMode" = true ] ; then
             #    echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent| tee --append "$tempFile-chaos"
@@ -160,31 +160,31 @@ addPrograms()
         # TODO create tentative url combining site + program name
         read url
         #recon means the scope is not bounded or clear
-        echo -en "${YELLOW}Recon? ${ENDCOLOR} (1:false, 2:true) "
+        echo -en "${YELLOW}Recon? ${ENDCOLOR} (0:false, 1:true) "
         read recon
         case $recon in 
-            1)    val_recon="false";;
-            2)    val_recon="true";;
+            0)    val_recon="false";;
+            1)    val_recon="true";;
         esac
-        echo -en "${YELLOW}Android app? ${ENDCOLOR} (1:false[default:press Enter], 2:true) "
+        echo -en "${YELLOW}Android app? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
         read android
         case $android in 
-            1 )    val_android="false";;
-            2 )    val_android="true";;
-            "")    val_android="false";;
+             0)    val_android="false";;
+             1)    val_android="true";;
+             "")    val_android="false";;
         esac
-        echo -en "${YELLOW}iOS app? ${ENDCOLOR} (1:false[default:press Enter], 2:true) "
+        echo -en "${YELLOW}iOS app? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
         read iOS
         case $iOS in 
-            1 )    val_iOS="false";;
-            2 )    val_iOS="true";;
+             0)    val_iOS="false";;
+             1)    val_iOS="true";;
             "")    val_iOS="false";;
         esac
-        echo -en "${YELLOW}Source code? ${ENDCOLOR} (1:false[default:press Enter], 2:true) "
+        echo -en "${YELLOW}Source code? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
         read source
         case $source in 
-            1 )    val_source="false";;
-            2 )    val_source="true";;
+            0)    val_source="false";;
+            1)    val_source="true";;
             "")    val_source="false";;
         esac
         
@@ -193,7 +193,7 @@ addPrograms()
         #echo $result
         if [[ $result == *"conflict"* ]] 
             then
-            echo "Program conflict"
+            echo "Program already on BBRF!"
             bbrf use "$program"
         fi
         echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
