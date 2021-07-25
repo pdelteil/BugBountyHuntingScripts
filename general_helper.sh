@@ -49,4 +49,8 @@ locateCat()
         echo "Not found: $search"
     fi
 }
-
+#use getField n (where n is the nth column)
+getField() 
+{
+  awk  -v number=$1 '{print $number}'
+}
