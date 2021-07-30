@@ -54,3 +54,9 @@ getField()
 {
   awk  -v number=$1 '{print $number}'
 }
+#sort urls by TLD domain
+sortByDomain()
+{
+    sed -e 's/^\([^.]*\.[^.]*\)$/.\1/'|sort -t . -k2|sed -e 's/^\.//'
+} 
+

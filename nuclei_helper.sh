@@ -19,11 +19,3 @@ testNucleiTemplate()
  echo "nuclei -debug -t $pathToTemplate -u $URL"
  nuclei -debug -t $pathToTemplate -u $URL
 }
-
-#sort urls by TLD domain
-sortByDomain()
-{
-    sed -e 's/^\([^.]*\.[^.]*\)$/.\1/'|sort -t . -k2|sed -e 's/^\.//'
-} 
-#aliases
-alias updateNuclei='GO111MODULE=on go get github.com/projectdiscovery/nuclei/v2/cmd/nuclei'
