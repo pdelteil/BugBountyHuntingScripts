@@ -22,7 +22,12 @@ TODO : installation script
 
 ## How to install
 
-Run setup.sh
+git clone https://github.com/pdelteil/Bug-bounty-hunting-scripts.git
+
+cd Bug-bounty-hunting-scripts
+
+#Run setup.sh
+./setup.sh 
 
 You can check them running `declare -F` 
 You can also use tab to autocomplete them. 
