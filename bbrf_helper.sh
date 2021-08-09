@@ -124,7 +124,7 @@ getUrls()
             echo -en "${RED} httpx domains ${ENDCOLOR}\n"
             echo "$doms"|httpx -silent -threads 150|bbrf url add - -s httpx --show-new
             echo -en "${RED} httprobe domains ${ENDCOLOR}\n"
-            echo "$doms"|httprobe -c 150 -prefer-https|bbrf url add - -s httprobe --show-new
+            echo "$doms"|httprobe -c 150 --prefer-https|bbrf url add - -s httprobe --show-new
     fi
 }
 # Use this function if you need to add several programs from a site
