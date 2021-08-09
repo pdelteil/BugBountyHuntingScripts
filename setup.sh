@@ -19,7 +19,7 @@ GO111MODULE=on go get -v github.com/projectdiscovery/dnsx/cmd/dnsx
 GO111MODULE=on go get -u github.com/tomnomnom/assetfinder
 
 #httprobe
-go get -u github.com/tomnomnom/httprobe
+go get -u github.com/tomnomnom/httprobe@master
 
 
 echo "Adding bbrf_helper.sh to $shellConfig"
