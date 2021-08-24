@@ -18,14 +18,15 @@ getStats()
     IFS=$'\n'
     filename=$1
     #headers
-    echo -e  "Program, Site, #domains, #urls" >> $filename
+    echo -e  "Program, Site, disabled, #domains, #urls" >> $filename
     for program in $(bbrf programs --show-disabled --show-empty-scope);
         do 
             echo "Getting stats of program $program"
             site=$(bbrf show "$program"|jq -r '.tags.site')
+            disabled=$(bbrf show "$program" | jq -r  '.disabled')
             numUrls=$(bbrf urls -p "$program"|wc -l)
             numDomains=$(bbrf domains -p "$program"|wc -l)
-            echo -e "$program, $site, $numDomains, $numUrls" >> $filename
+            echo -e "$program, $site, $disabled, $numDomains, $numUrls" >> $filename
         done
 }
 
