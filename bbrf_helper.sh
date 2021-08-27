@@ -18,15 +18,18 @@ getStats()
     IFS=$'\n'
     filename=$1
     #headers
-    echo -e  "Program, Site, disabled, #domains, #urls" >> $filename
+    echo -e  "Program, Site, disabled, reward, author, #domains, #urls" >> $filename
     for program in $(bbrf programs --show-disabled --show-empty-scope);
         do 
             echo "Getting stats of program $program"
-            site=$(bbrf show "$program"|jq -r '.tags.site')
-            disabled=$(bbrf show "$program" | jq -r  '.disabled')
+            description=$(bbrf show "$program")
+            site=$(echo "$description"    |jq -r '.tags.site')
+            reward=$(echo "$description"  |jq -r '.tags.reward')
+            disabled=$(echo "$description"|jq -r '.disabled')
+            author=$(echo "$description"|jq -r '.tags.author')
             numUrls=$(bbrf urls -p "$program"|wc -l)
             numDomains=$(bbrf domains -p "$program"|wc -l)
-            echo -e "$program, $site, $disabled, $numDomains, $numUrls" >> $filename
+            echo -e "$program, $site, $disabled, $reward, $author, $numDomains, $numUrls" >> $filename
         done
 }
 
@@ -242,7 +245,7 @@ addInCHUNKS()
  if [ -z "$1" ] || [ -z "$2" ]
     then
       echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains source"
-      echo "To add urls use ${FUNCNAME[0]} fileWithDomains urls"
+      echo "To add urls use ${FUNCNAME[0]} fileWithUrls urls"
       return 1
     fi
  if [ "$2" ==  "domains" ] || [ "$2" == "urls" ]
