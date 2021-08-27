@@ -194,7 +194,8 @@ addPrograms()
         if [[ $result == *"conflict"* ]] 
             then
             echo "Program already on BBRF!"
-            bbrf use "$program"
+            bbrf show "$program"
+            exit
         fi
         echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
         read -r inscope_input
