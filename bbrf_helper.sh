@@ -267,7 +267,7 @@ addInCHUNKS()
  end=$chunk
  for i in $(seq 1 $parts);
     do
-        echo "Adding chunk $i"
+        echo "Adding chunk $i/$parts"
         urls="${init},${end}p"; 
         if [ "$2" == "urls" ]
         then
