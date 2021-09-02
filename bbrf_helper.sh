@@ -18,6 +18,7 @@ getInScope()
     IFS=$'\n' 
     if [[ "$1" == "-disabled" ]]
         then
+            outputFile="$2"
             command=$(bbrf programs --show-disabled)
             echo -ne "${RED} Getting inscope of enabled and disabled programs ${ENDCOLOR}\n"
         else
@@ -25,7 +26,8 @@ getInScope()
             echo -ne "${RED} Getting inscope of only enabled programs ${ENDCOLOR}\n"
     fi
      for program in $command;
-        do echo "$program" ; 
+        do 
+            echo "$program" 
             bbrf scope in -p "$program" >> $outputFile
         done
 }
