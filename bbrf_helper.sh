@@ -4,6 +4,31 @@
 RED="\e[31m"
 YELLOW="\e[33m"
 ENDCOLOR="\e[0m"
+
+#get inscope of all programs 
+getInScope()
+{
+    if [ -z "$1" ] || [[ "$1" == "-h"* ]] 
+    then
+       echo "Use ${FUNCNAME[0]} outputfile.txt"
+       echo "Use ${FUNCNAME[0]} -disabled outputfile.txt (to include disabled programs)"
+       return 1;
+    fi
+    outputFile="$1"
+    IFS=$'\n' 
+    if [[ "$1" == "-disabled" ]]
+        then
+            command=$(bbrf programs --show-disabled)
+            echo -ne "${RED} Getting inscope of enabled and disabled programs ${ENDCOLOR}\n"
+        else
+            command=$(bbrf programs)
+            echo -ne "${RED} Getting inscope of only enabled programs ${ENDCOLOR}\n"
+    fi
+     for program in $command;
+        do echo "$program" ; 
+            bbrf scope in -p "$program" >> $outputFile
+        done
+}
 # creates a file with BBRF stats 
 # The output is in the form  program1, #domains, #urls
 # Input parameter: filename
@@ -449,3 +474,4 @@ debugMode()
  fi
 
 } 
+
