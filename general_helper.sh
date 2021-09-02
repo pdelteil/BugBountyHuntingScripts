@@ -54,6 +54,7 @@ getField()
 {
   awk  -v number=$1 '{print $number}'
 }
+
 #sort urls by TLD domain
 sortByDomain()
 {
