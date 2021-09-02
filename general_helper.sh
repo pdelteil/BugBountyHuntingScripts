@@ -1,5 +1,6 @@
-#general helper functions 
 
+#general helper functions 
+#create a screen instance with a given name
 function createScreen()
 {
     if [ -z "$1" ]
@@ -10,6 +11,18 @@ function createScreen()
 
 	screen -q -S "$1"
 }
+
+function getIp()
+{
+    if [ -z "$1" ]
+    then
+      echo -e "get Ip from domain\n Example: getIp example.com"
+      return 1;
+    fi
+    dig $1 +short
+
+}
+
 # finds and then open a file with nano
 locateNano()
 {
