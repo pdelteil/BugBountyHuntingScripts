@@ -12,7 +12,7 @@ showLogs()
 
 axiomModule=$1
 #find latest folder of given axiomModule
-log_path=$(ls -t ~/.axiom/tmp/$axiomModule* | head -n 1|sed 's/://g')
+log_path=$(ls -td ~/.axiom/tmp/$axiomModule* | head -n 1|sed 's/://g')
 log_path=$log_path/logs
 cd $log_path
 #TODO add more grep especific rules for other modules
