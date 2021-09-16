@@ -131,17 +131,6 @@ getDomains()
             else
                 echo "$scopeIn"|assetfinder|dnsx -t 200 -silent|bbrf domain add - -s assetfinder --show-new;
             fi
-            #chaos is included in subfinder
-            #echo -ne "${RED} Running chaos ${ENDCOLOR}\n"
-            #if [ "$fileMode" = true ] ; then
-            #    echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent| tee --append "$tempFile-chaos"
-            #    echo -ne "${YELLOW} Removing duplicates from file ${ENDCOLOR}\n"
-            #    cat "$tempFile-*" > "$file"
-                #rm "$tempFile"
-            #    echo "Done getDomains for "|notify -silent
-            #else
-            #    echo "$scopeIn"|chaos -silent -key $chaosKey |dnsx -silent|bbrf domain add - -s chaos --show-new;
-            #fi
    fi
 }
 
@@ -272,7 +261,7 @@ addInCHUNKS()
 {
  if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains source"
+      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains source (optional)"
       echo "To add urls use ${FUNCNAME[0]} fileWithUrls urls"
       return 1
     fi
@@ -352,25 +341,6 @@ checkProgram()
     text="$1"
     output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
     if [ ${#output} -gt 0 ] 
-    then
-        echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
-    else    
-        echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
-    fi
-}
-#Checks if a program exists using h1's api
-checkProgramH1()
-{
-    if [ -z "$1" ]
-    then
-      echo "Use ${FUNCNAME[0]} text"
-      return 1;
-    fi
-    text="$1"
-    #textAlt=$(echo "$text"|tr -d '.' | tr -d ',')
-    programs=$(bbrf programs --show-disabled --show-empty-scope)
-    result=$(echo "$programs"|tr -cd '[:alnum:]'| grep -i "$text")
-    if [ ${#result} -gt 0 ] 
     then
         echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
     else    
@@ -476,4 +446,3 @@ debugMode()
  fi
 
 } 
-
