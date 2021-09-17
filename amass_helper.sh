@@ -3,7 +3,7 @@ filterByWhoisParam()
  if [ -z "$1" ]  | [ -z "$2" ] | [ -z "$3" ]
     then
       echo -en "\nUse ${FUNCNAME[0]} whoisParam valueParam outputfile\n\n"
-      echo "Example  ${FUNCNAME[0]} \"Tech Organization\" \"Starbucks\" output.txt" 
+      echo "Example  ${FUNCNAME[0]} \"Tech Organization\" \"Starbucks\" inputDomains.txt" 
       return 1;
     fi
 
@@ -18,7 +18,7 @@ filterByWhoisParam()
             whoisResult=$(whois "$value"|grep "$whoisParam"|grep "$valueParam")
             if [ ${#whoisResult} -gt 0 ]
             then
-                echo "$value"   >> "$file"
+                echo "$value"
             fi
             sleep 1 
     done
