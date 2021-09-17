@@ -49,6 +49,7 @@ getStats()
     for program in $(bbrf programs --show-disabled --show-empty-scope);
         do 
             echo "Getting stats of program $program"
+            #fields/columns
             description=$(bbrf show "$program")
             site=$(echo "$description"    |jq -r '.tags.site')
             reward=$(echo "$description"  |jq -r '.tags.reward')
@@ -179,7 +180,8 @@ addPrograms()
         echo -en "${YELLOW}Url? ${ENDCOLOR} "
         # TODO create tentative url combining site + program name
         read url
-        #recon means the scope is not bounded or clear
+        #recon true means the scope is not bounded or clear
+        # So you could spend more time/resources doing more specific recon
         echo -en "${YELLOW}Recon? ${ENDCOLOR} (0:false, 1:true) "
         read recon
         case $recon in 
@@ -224,16 +226,21 @@ addPrograms()
             then
                 bbrf inscope add $inscope_input -p "$program"
                 echo -ne "${RED} inscope: \n"
+                #just to check everything went well
                 bbrf scope in -p "$program"
                 echo -ne "${ENDCOLOR}\n"
                 
         fi         
-        echo -en "${YELLOW} Add OUT scope: ${ENDCOLOR}" 
+        echo -en "${YELLOW} Add OUT scope: ${ENDCOLOR}\n" 
         read -r outscope_input
+        #if empty skip
         if [ ! -z "$outscope_input" ]
            then
-               bbrf outscope add $outscope_input #-p "$program"
-               echo -ne "${YELLOW}out Scope added${ENDCOLOR}\n"  
+               bbrf outscope add $outscope_input -p "$program"
+               echo -ne "${RED} outscope: \n"
+               #just to check everything went well
+               bbrf scope out -p "$program"
+               echo -ne "${ENDCOLOR}\n"  
         fi
     echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getDomains  
     echo -ne "${RED}Getting urls ${ENDCOLOR}\n"; getUrls  
@@ -257,43 +264,59 @@ removeURLsInChunks()
 
 # 1. ADD Domains IN CHUNKS from FILE containing domains 
 # 2. Add URLs to program probing domains from FILE containing domains
-addInCHUNKS()
+addInChunks()
 {
  if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains source (optional)"
-      echo "To add urls use ${FUNCNAME[0]} fileWithUrls urls"
+      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains chuckSize (optional:default 1000) source (optional)"
+      echo "To add urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)"
       return 1
-    fi
- if [ "$2" ==  "domains" ] || [ "$2" == "urls" ]
+ fi
+ #input vars
+ file="$1"
+ type="$2"
+ chunkSize="$3"
+ source="$4"
+
+ if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]
     then
         echo "" 
     else
         echo " use domains or urls "
         return 1
     fi
- source="$3"
- file="$1"
+
  size=$(cat "$file" |wc -l)
  echo "Size "$size
- chunk=1000
- echo "Chunk size "$chunk
- parts=$((size%chunk?size/chunk+1:size/chunk))
+ #default value for chunk size
+ if [ -z "$chunkSize" ]
+ then
+     chunkSize=1000
+ fi
+ echo "Chunk size "$chunkSize
+ parts=$((size%chunkSize?size/chunkSize+1:size/chunkSize))
  echo "Chunks "$parts
  init=1
- end=$chunk
+ end=$chunkSize
+
+ if [ -z "$source" ]
+ then
+    source=""
+ fi
+
  for i in $(seq 1 $parts);
     do
         echo "Adding chunk $i/$parts"
         urls="${init},${end}p"; 
+
         if [ "$2" == "urls" ]
         then
-            sed -n "$urls" "$file"|bbrf url add - -s httpx --show-new -p@INFER
+            sed -n "$urls" "$file"|bbrf url add - -s "$source" --show-new -p@INFER
         else
             sed -n "$urls" "$file"|bbrf domain add - -s "$source" --show-new -p@INFER
         fi
-        init=$(( $init + $chunk ))
-        end=$(( $end + $chunk ))
+        init=$(( $init + $chunkSize ))
+        end=$(( $end + $chunkSize ))
     done
 } 
 #resolve domains IN CHUNKS
@@ -349,7 +372,7 @@ checkProgram()
 }
 
 #finds the program name from a domain or a URL 
-#Useful when you found a bug but you don't know where to report it. 
+#Useful when you find a bug but you don't know where to report it (what programs it belongs to). 
 findProgram()
 {
 
@@ -362,6 +385,8 @@ findProgram()
     program=$(bbrf show "$INPUT" |jq -r '.program')
     if [ ${#program} -gt 0 ] 
     then
+        #This tags are specific for my way of storing data
+        #If you use addPrograms to inpput your programs this will work just fine
         site=".tags.site"
         author=".tags.author"
         reward=".tags.reward"
