@@ -34,6 +34,9 @@ echo "source $location/general_helper.sh " >> $shellConfig
 echo "Adding bbrf_helper.sh to $shellConfig"
 echo "source $location/axiom_helper.sh " >> $shellConfig
 
+echo "Adding amass_helper.sh to $shellConfig"
+echo "source $location/amass_helper.sh " >> $shellConfig
+
 source $shellConfig
 
 
