@@ -21,7 +21,7 @@ cd Bug-bounty-hunting-scripts
 
 ./setup.sh 
 
-(you might need to source .bashrc or relogin)
+(**you might need to source .bashrc or relogin**)
 
 You can check them running `declare -F` 
 You can also use tab to autocomplete them. 
