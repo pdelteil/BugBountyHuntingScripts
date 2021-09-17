@@ -17,10 +17,29 @@ log_path=$log_path/logs
 cd $log_path
 #TODO add more grep especific rules for other modules
 #nuclei especific grep rules 
+year=$(date +"%Y-")
 if [ $axiomModule = "nuclei" ] 
     then
-        cat $log_path/*|grep "2021-"|grep -v Unsolicited
+        cat $log_path/*|grep $year|grep -v Unsolicited
     else    
         cat $log_path/*
 fi
 }
+
+#find all stranded scan+* files and move them to a given folder 
+#only if they are not already on the folder. 
+findAndMoveScans()
+{
+    #input 
+    folder="$1"
+    echo "Updating locate db (could take a while)"
+    sudo updatedb
+    files=$(locate scan+|grep -v "$folder")
+    for file in $(echo $files);
+        do 
+            echo "Moving  $file to $folder"
+            mv -i "$file" "$folder"
+    done
+
+}
+
