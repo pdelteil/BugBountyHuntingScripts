@@ -1,17 +1,24 @@
 filterByWhoisParam()
 {
+ if [ -z "$1" ]  | [ -z "$2" ] | [ -z "$3" ]
+    then
+      echo -en "\nUse ${FUNCNAME[0]} whoisParam valueParam outputfile\n\n"
+      echo "Example  ${FUNCNAME[0]} \"Tech Organization\" \"Starbucks\" output.txt" 
+      return 1;
+    fi
+
     #input params
     whoisParam="$1"
     valueParam="$2"
     file="$3"
 
     IFS=$'\n';
-    for value in $(cat ~/results/starbucks.amass.txt );
-        do  #echo -n "$value "; 
-            whoisResult=$(whois "$value"|grep "Tech Organization"|grep Starbucks)
+    for value in $(cat $file );
+        do 
+            whoisResult=$(whois "$value"|grep "$whoisParam"|grep "$valueParam")
             if [ ${#whoisResult} -gt 0 ]
             then
-                echo "$value"   
+                echo "$value"   >> "$file"
             fi
             sleep 1 
     done
