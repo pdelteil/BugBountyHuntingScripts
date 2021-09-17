@@ -15,11 +15,13 @@
 
 ## How to install
 
+```
 git clone https://github.com/pdelteil/Bug-bounty-hunting-scripts.git
 
 cd Bug-bounty-hunting-scripts
 
 ./setup.sh 
+```
 
 (**you might need to source .bashrc or relogin**)
 
