@@ -1,7 +1,7 @@
 # Bug bounty hunting scripts (helpers)
 
 
-## Requiered software 
+## Required software 
 
 ##### subfinder
 
