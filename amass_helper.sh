@@ -30,8 +30,15 @@ filterByWhoisParam()
 # try using filterByWhoisParam
 getMoreInscope()
 {
+ if [ -z "$1" ] 
+    then
+      echo -en "\nUse ${FUNCNAME[0]} programName\n\n"
+      return 1;
+    fi
+
     program="$1";
-    domain=$(bbrf scope in --wildcard -p "$program"|grep -v DEBUG|head -n 1)
+    domain=$(bbrf scope in -p "$program"|sed 's/\*\.//g'| grep -v DEBUG|head -n 1)
+    echo "Using $domain as domain"
     amass intel -config ~/amass_config.ini -d $domain -whois #|awk '{print  "*."$1}
 }
 
