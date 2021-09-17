@@ -1,4 +1,4 @@
-#nuclei heler
+#nuclei helper
 
 # function to manually test results from nuclei
 
