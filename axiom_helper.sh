@@ -30,9 +30,16 @@ fi
 #only if they are not already on the folder. 
 findAndMoveScans()
 {
+    if [ -z "$1" ]
+    then
+      echo "Use ${FUNCNAME[0]} outputFolder"
+      return 1;
+    fi
+
     #input 
     folder="$1"
     echo "Updating locate db (could take a while)"
+    #TODO check if db is old enough or ask the user if update is required
     sudo updatedb
     files=$(locate scan+|grep -v "$folder")
     for file in $(echo $files);
