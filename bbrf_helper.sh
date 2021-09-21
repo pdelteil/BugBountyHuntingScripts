@@ -5,12 +5,43 @@ RED="\e[31m"
 YELLOW="\e[33m"
 ENDCOLOR="\e[0m"
 
+#update program data after outscope change 
+#When you add a new outscope rule(s) you'd like that the program data gets updated
+#this means removing domains and urls that now are outscope
+updateProgram()
+{
+    program="$1"
+    rule="$2"
+    bbrf outscope remove "$2" 
+    #iterate over rules
+
+    #case with wildcard
+
+    #case without wildcar
+
+}
+# getData only from disabled programs 
+# Use getOnlyDisabledPrograms urls/domains
+getOnlyDisabledPrograms()
+{
+    if [ -z "$1" ]
+    then
+        echo "Use ${FUNCNAME[0]} urls/domains"
+        return 1;
+    fi
+    if [[  "$2" == "urls" ]] 
+    then
+        echo "ok"        
+    fi
+    
+
+}
+
 #disable all programs from a given list (file)
 #example of use, disable all for points/thanks programs
 #  use cat programs| disablePrograms
 disablePrograms()
 {
-
     while read -r data; do
         echo  "disabling $data"
         bbrf disable "$data" 
@@ -426,11 +457,15 @@ listTagValues()
 
     tag="$1"
     IFS=$'\n'
-    for program in $(bbrf programs --show-disabled --show-empty-scope);
+    for program in $(bbrf programs --show-disabled);
         do 
-            #tags='tags.site'
-            echo "$program " $(bbrf show "$program"|jq '.tags.site')
+            key=$(bbrf show "$program"|jq '.tags.site')
+            #echo $program ", "$key
+            keys+=("$key") 
+
     done
+    #show unique key values
+    echo "${keys[@]}" | tr ' ' '\n' | sort -u
     
 }
 
