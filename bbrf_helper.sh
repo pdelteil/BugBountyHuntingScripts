@@ -29,9 +29,22 @@ getOnlyDisabledPrograms()
         echo "Use ${FUNCNAME[0]} urls/domains"
         return 1;
     fi
-    if [[  "$2" == "urls" ]] 
+    if [[  "$1" == "urls" ]] 
     then
-        echo "ok"        
+        for program in $(bbrf programs --show-disabled|grep -v DEBUG);
+            do 
+                #echo "Programs: $program"
+                bbrf urls -p "$program"
+        done
+
+    fi
+    if [[  "$1" == "domains" ]] 
+    then
+        for program in $(bbrf programs --show-disabled|grep -v DEBUG);
+            do 
+                #echo "Programs: $program"
+                bbrf domains -p "$program"
+        done
     fi
     
 
@@ -104,19 +117,6 @@ getStats()
         done
 }
 
-# displays all the disabled programs in BBRF
-# DEPRECATED due to BBRF update
-getDisabledPrograms()
-{
-    for program in $(bbrf programs --show-disabled 2>/dev/null);
-        do 
-            disabled=$(bbrf show "$program" 2>/dev/null| jq '.disabled')
-            if [ "$disabled" == "true" ]
-            then
-                echo -e $program
-            fi
-    done
-}
 # This function allows to find the difference between to input/output files (containing domains or urls)
 # Example if you ran bbrf urls multiple times and you want to output only the new urls
 #1. bbrf urls > file1.txt
