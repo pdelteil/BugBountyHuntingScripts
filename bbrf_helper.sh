@@ -5,6 +5,18 @@ RED="\e[31m"
 YELLOW="\e[33m"
 ENDCOLOR="\e[0m"
 
+#disable all programs from a given list (file)
+#example of use, disable all for points/thanks programs
+#  use cat programs| disablePrograms
+disablePrograms()
+{
+
+    while read -r data; do
+        echo  "disabling $data"
+        bbrf disable "$data" 
+    done
+
+}
 #get inscope of all programs 
 getInScope()
 {
