@@ -1,9 +1,10 @@
 filterByWhoisParam()
 {
- if [ -z "$1" ]  | [ -z "$2" ] | [ -z "$3" ]
+ if [ -z "$1" ]  | [ -z "$2" ] 
     then
-      echo -en "\nUse ${FUNCNAME[0]} whoisParam valueParam outputfile\n\n"
+      echo -en "\nUse ${FUNCNAME[0]} whoisParam [optional] valueParam outputfile\n\n"
       echo "Example  ${FUNCNAME[0]} \"Tech Organization\" \"Starbucks\" inputDomains.txt" 
+      echo "Example  ${FUNCNAME[0]} \"Starbucks\" inputDomains.txt" 
       return 1;
     fi
 
@@ -15,12 +16,13 @@ filterByWhoisParam()
     IFS=$'\n';
     for value in $(cat $file );
         do 
-            whoisResult=$(whois "$value"|grep "$whoisParam"|grep "$valueParam")
+            #echo "$value"
+            whoisResult=$(whois "$value"|grep "$whoisParam"|grep -i "$valueParam")
             if [ ${#whoisResult} -gt 0 ]
             then
                 echo "$value"
             fi
-            sleep 1 
+            sleep 0.35
     done
 }
 
