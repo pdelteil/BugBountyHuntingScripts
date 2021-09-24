@@ -7,17 +7,45 @@ ENDCOLOR="\e[0m"
 
 #update program data after outscope change 
 #When you add a new outscope rule(s) you'd like that the program data gets updated
-#this means removing domains and urls that now are outscope
+#this means removing domains and urls that now are out of scope
+#This is something I need to do when I'm invited to a BBP that also has a VDP
 updateProgram()
 {
+
+  if [ -z "$1" ]
+    then
+        echo "Use ${FUNCNAME[0]} program rule"
+        return 1;
+    fi
+
+    #this should work for adding/removing a inscope rule 
     program="$1"
     rule="$2"
-    bbrf outscope remove "$2" 
-    #iterate over rules
+    #bbrf outscope remove "$2" 
+
+    #check if the program has that rule 
+    check=$(bbrf show "$program" | grep -i "$rule")
+
+    if [[ ${#check} -gt 0 ]]
+    then
+        echo "rule in progrm"
+    else
+        echo "rule not in program"
+        return -1
+    fi
+
+
+    #show stats before removing anything
 
     #case with wildcard
+        #remove domains 
+        #remove urls
 
-    #case without wildcar
+    #case without wildcard
+        #remove domain
+        #remove url 
+
+   #show stats after removing urls and domains
 
 }
 # getData only from disabled programs 
@@ -243,7 +271,7 @@ addPrograms()
             then
             echo "Program already on BBRF!"
             bbrf show "$program"
-            exit
+            return -1
         fi
         echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
         read -r inscope_input
