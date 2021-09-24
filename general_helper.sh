@@ -74,3 +74,21 @@ sortByDomain()
     sed -e 's/^\([^.]*\.[^.]*\)$/.\1/'|sort -t . -k2|sed -e 's/^\.//'
 } 
 
+
+# This function allows to find the difference between to input/output files (containing domains or urls)
+# Example if you ran bbrf urls multiple times and you want to output only the new urls
+#1. bbrf urls > file1.txt
+#some programs/urls were added
+#2. bbrf urls > file2.txt
+#using the function we can output only the new added content to the file
+
+#diffFiles file1.txt file2.txt output.txt
+diffFiles()
+{
+    if [ -z "$1" ] | [ -z "$2" ] | [ -z "$3" ]
+    then
+      echo "Use ${FUNCNAME[0]} file1.txt file2.txt output.txt"
+      return 1;
+    fi
+    comm -3 <(sort $1) <(sort $2) > $3
+}
