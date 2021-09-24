@@ -21,21 +21,35 @@ updateProgram()
     #this should work for adding/removing a inscope rule 
     program="$1"
     rule="$2"
-    #bbrf outscope remove "$2" 
 
     #check if the program has that rule 
     check=$(bbrf show "$program" | grep -i "$rule")
 
+
+    #careful when the remove url is a subdomain of a wildcard rule
+
     if [[ ${#check} -gt 0 ]]
     then
-        echo "rule in progrm"
+        echo "rule in program"
+        #removing rule from program
+        #stats before removing
+        inscopeRules=$(bbrf show "$program"|jq '.inscope'|grep '"'|wc -l)
+        domains=$(bbrf domains -p "$program"|wc -l)
+        urls=$(bbrf urls -p "$program"|wc -l)
+        echo "Stats before update inscope rules: $inscopeRules, domains: $domains,  urls: $urls"
+
+        bbrf inscope remove "$2" -p "$program"
+        #removing wildcard
+        rule=$(echo $rule|sed 's/*\.//g' )
+        #removing domains
+        bbrf domains -p "$program"|grep -i "$rule" | bbrf domain remove - -p "$program"
+        #remove urls
+        bbrf urls -p "$program"|grep -i "$rule" |bbrf url remove -  #we don t need program here
+    
     else
-        echo "rule not in program"
+        echo "rule not in program $program"
         return -1
     fi
-
-
-    #show stats before removing anything
 
     #case with wildcard
         #remove domains 
@@ -44,9 +58,11 @@ updateProgram()
     #case without wildcard
         #remove domain
         #remove url 
-
-   #show stats after removing urls and domains
-
+    #show stats after removing urls and domains
+    inscopeRules=$(bbrf show "$program"|jq '.inscope'|grep '"'|wc -l)
+    domains=$(bbrf domains -p "$program"|wc -l)
+    urls=$(bbrf urls -p "$program"|wc -l)
+    echo "Stats after update  inscope rules: $inscopeRules, domains: $domains,  urls: $urls"
 }
 # getData only from disabled programs 
 # Use getOnlyDisabledPrograms urls/domains
