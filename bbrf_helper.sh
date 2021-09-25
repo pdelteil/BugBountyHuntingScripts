@@ -145,7 +145,7 @@ getStats()
     IFS=$'\n'
     filename=$1
     #headers
-    echo -e  "Program, Site, disabled, reward, author, #domains, #urls" >> $filename
+    echo -e  "Program, Site, disabled, reward, author, notes, #domains, #urls" >> $filename
     for program in $(bbrf programs --show-disabled --show-empty-scope);
         do 
             echo "Getting stats of program $program"
@@ -155,9 +155,10 @@ getStats()
             reward=$(echo "$description"  |jq -r '.tags.reward')
             disabled=$(echo "$description"|jq -r '.disabled')
             author=$(echo "$description"|jq -r '.tags.author')
+            notes=$(echo "$description" |jq -r '.tags.notes') 
             numUrls=$(bbrf urls -p "$program"|wc -l)
             numDomains=$(bbrf domains -p "$program"|wc -l)
-            echo -e "$program, $site, $disabled, $reward, $author, $numDomains, $numUrls" >> $filename
+            echo -e "$program, $site, $disabled, $reward, $author, $notes, $numDomains, $numUrls" >> $filename
         done
 }
 
@@ -277,11 +278,13 @@ addPrograms()
         case $source in 
             0)    val_source="false";;
             1)    val_source="true";;
-            "")    val_source="false";;
+            "")   val_source="false";;
         esac
+        echo -en "${YELLOW}Notes/Comments? ${ENDCOLOR} (press enter if empty) "
+        read notes
         
         result=$(bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
-                 -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" -t author:"$author")
+                 -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" -t author:"$author" -t notes:"$notes")
         #echo $result
         if [[ $result == *"conflict"* ]] 
             then
@@ -443,8 +446,8 @@ checkProgram()
 
 #finds the program name from a domain or a URL 
 #Useful when you find a bug but you don't know where to report it (what programs it belongs to). 
-findProgram()
-{
+ findProgram()
+    {
 
     INPUT=$(echo "$1"|sed -e 's|^[^/]*//||' -e 's|/.*$||') #in case the input has a trailing / 
     if [ -z "$INPUT" ]
@@ -465,8 +468,12 @@ findProgram()
         disabled="(.disabled|tostring)"
         recon="(.tags.recon|tostring)"
         source="(.tags.sourceCode|tostring)"
-        tags="$site"'+", "+._id+", "+'"$author"'+", "+'"$reward"'+", "+'"$url"'+", disabled:"+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon:"+'"$recon"'+", source code: "+'"$source"
-        bbrf show "$program" | jq "$tags"
+        notes=".tags.notes"
+        #this part is hard.
+        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"
+        output=$(bbrf show "$program" | jq "$tags" |tr -d '"'| sed 's/,/\n/g')
+        echo -ne "\n$output\n\n"
+        
     else
         echo -ne "${RED}No program found!${ENDCOLOR}\n\n"
     fi
@@ -544,4 +551,4 @@ debugMode()
         sed -i 's/"debug": false/"debug": true/g' $configFile
  fi
 
-} 
+}
