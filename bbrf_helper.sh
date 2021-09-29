@@ -368,7 +368,6 @@ removeInChunks()
         then
             sed -n "$element" "$file"|bbrf url remove - 
         else
-            echo "removing domain $element"
             sed -n "$element" "$file"|bbrf domain remove - 
         fi
         init=$(( $init + $chunkSize ))
@@ -421,7 +420,7 @@ addInChunks()
      for i in $(seq 1 $parts);
      do
         echo "Adding chunk $i/$parts"
-        element="${init},${end}p"; 
+        elements="${init},${end}p"; 
 
         if [ "$type" == "urls" ]
         then
