@@ -352,6 +352,8 @@ removeInChunks()
     then
         chunkSize=1000
     fi
+    parts=$((size%chunkSize?size/chunkSize+1:size/chunkSize))
+
     echo "Chunk size "$chunkSize
     echo "Chunks "$parts
     init=1
@@ -359,7 +361,7 @@ removeInChunks()
 
     for i in $(seq 1 $parts);
     do
-        echo "Adding chunk $i/$parts"
+        echo "Removing chunk $i/$parts"
         element="${init},${end}p"; 
 
         if [ "$type" == "urls" ]
