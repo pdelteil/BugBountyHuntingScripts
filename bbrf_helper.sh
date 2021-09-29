@@ -366,10 +366,10 @@ removeInChunks()
 
         if [ "$type" == "urls" ]
         then
-            sed -n "$elements" "$file"|bbrf url remove - 
+            sed -n "$element" "$file"|bbrf url remove - 
         else
-            echo "removing domain $elements"
-            sed -n "$elements" "$file"|bbrf domain remove - 
+            echo "removing domain $element"
+            sed -n "$element" "$file"|bbrf domain remove - 
         fi
         init=$(( $init + $chunkSize ))
         end=$(( $end + $chunkSize ))
