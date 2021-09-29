@@ -58,6 +58,7 @@ updateProgram()
     #case without wildcard
         #remove domain
         #remove url 
+
     #show stats after removing urls and domains
     inscopeRules=$(bbrf show "$program"|jq '.inscope'|grep '"'|wc -l)
     domains=$(bbrf domains -p "$program"|wc -l)
@@ -320,38 +321,23 @@ addPrograms()
     done
 } 
 
-# is faster to remove urls in chunks than directly 
+# It is faster to remove urls in chunks than directly 
 # works for the current active program
-removeURLsInChunks()
+removeInChunks()
 {
-    size=$(bbrf urls|wc -l); 
-    chunk=5000; 
-    urls="1,${chunk}p" 
-    parts=$((size%chunk?size/chunk+1:size/chunk)) 
-    echo $parts ; 
-    for i in $(seq 1 $parts)
-        do echo "try $i"
-        bbrf urls|sed -n "$urls"|bbrf url remove -
-    done
-}
-
-# 1. ADD Domains IN CHUNKS from FILE containing domains 
-# 2. Add URLs to program probing domains from FILE containing domains
-addInChunks()
-{
- if [ -z "$1" ] || [ -z "$2" ]
+    if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains chuckSize (optional:default 1000) source (optional)"
-      echo "To add urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)"
+      echo "To remove domains use ${FUNCNAME[0]} fileWithDomains domains chuckSize (optional:default 1000)"
+      echo "To remove urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000)"
       return 1
- fi
- #input vars
- file="$1"
- type="$2"
- chunkSize="$3"
- source="$4"
+    fi
+    
+    #input vars
+    file="$1"
+    type="$2"
+    chunkSize="$3"
 
- if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]
+    if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]
     then
         echo "" 
     else
@@ -359,34 +345,86 @@ addInChunks()
         return 1
     fi
 
- size=$(cat "$file" |wc -l)
- echo "Size "$size
- #default value for chunk size
- if [ -z "$chunkSize" ]
- then
-     chunkSize=1000
- fi
- echo "Chunk size "$chunkSize
- parts=$((size%chunkSize?size/chunkSize+1:size/chunkSize))
- echo "Chunks "$parts
- init=1
- end=$chunkSize
+    size=$(cat "$file"|wc -l); 
+    echo "Size "$size
+    #default value for chunk size
+    if [ -z "$chunkSize" ]
+    then
+        chunkSize=1000
+    fi
+    echo "Chunk size "$chunkSize
+    echo "Chunks "$parts
+    init=1
+    end=$chunkSize
 
- if [ -z "$source" ]
- then
-    source=""
- fi
-
- for i in $(seq 1 $parts);
+    for i in $(seq 1 $parts);
     do
         echo "Adding chunk $i/$parts"
-        urls="${init},${end}p"; 
+        element="${init},${end}p"; 
 
-        if [ "$2" == "urls" ]
+        if [ "$type" == "urls" ]
         then
-            sed -n "$urls" "$file"|bbrf url add - -s "$source" --show-new -p@INFER
+            sed -n "$elements" "$file"|bbrf url remove - 
         else
-            sed -n "$urls" "$file"|bbrf domain add - -s "$source" --show-new -p@INFER
+            sed -n "$elements" "$file"|bbrf domain remove - 
+        fi
+        init=$(( $init + $chunkSize ))
+        end=$(( $end + $chunkSize ))
+    done
+}
+
+# 1. ADD Domains IN CHUNKS from FILE containing domains 
+# 2. Add URLs to program probing domains from FILE containing domains
+addInChunks()
+{
+    if [ -z "$1" ] || [ -z "$2" ]
+    then
+      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains chuckSize (optional:default 1000) source (optional)"
+      echo "To add urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)"
+      return 1
+    fi
+    #input vars
+    file="$1"
+    type="$2"
+    chunkSize="$3"
+    source="$4"
+
+    if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]
+    then
+        echo "" 
+    else
+        echo " use domains or urls "
+        return 1
+    fi
+
+    size=$(cat "$file" |wc -l)
+    echo "Size "$size
+    #default value for chunk size
+    if [ -z "$chunkSize" ]
+    then
+        chunkSize=1000
+    fi
+    echo "Chunk size "$chunkSize
+    parts=$((size%chunkSize?size/chunkSize+1:size/chunkSize))
+    echo "Chunks "$parts
+    init=1
+    end=$chunkSize
+
+     if [ -z "$source" ]
+     then
+        source=""
+     fi
+
+     for i in $(seq 1 $parts);
+     do
+        echo "Adding chunk $i/$parts"
+        element="${init},${end}p"; 
+
+        if [ "$type" == "urls" ]
+        then
+            sed -n "$elements" "$file"|bbrf url add - -s "$source" --show-new -p@INFER
+        else
+            sed -n "$elements" "$file"|bbrf domain add - -s "$source" --show-new -p@INFER
         fi
         init=$(( $init + $chunkSize ))
         end=$(( $end + $chunkSize ))
