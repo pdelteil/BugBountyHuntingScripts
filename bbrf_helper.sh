@@ -327,7 +327,7 @@ removeInChunks()
 {
     if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "To remove domains use ${FUNCNAME[0]} fileWithDomains domains chuckSize (optional:default 1000)"
+      echo "To remove domains use ${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000)"
       echo "To remove urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000)"
       return 1
     fi
@@ -377,11 +377,12 @@ removeInChunks()
 
 # 1. ADD Domains IN CHUNKS from FILE containing domains 
 # 2. Add URLs to program probing domains from FILE containing domains
+# the chunk size depends on your bbrf (couchdb) server capacity 
 addInChunks()
 {
     if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains chuckSize (optional:default 1000) source (optional)"
+      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional)"
       echo "To add urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)"
       return 1
     fi
