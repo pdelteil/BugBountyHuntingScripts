@@ -146,7 +146,8 @@ getStats()
     IFS=$'\n'
     filename=$1
     #headers
-    echo -e  "Program, Site, disabled, reward, author, notes, #domains, #urls" >> $filename
+    headers="Program, Site, disabled, reward, author, notes, #domains, #urls, #IPS" 
+    echo -e $headers >> $filename
     for program in $(bbrf programs --show-disabled --show-empty-scope);
         do 
             echo "Getting stats of program $program"
@@ -159,7 +160,9 @@ getStats()
             notes=$(echo "$description" |jq -r '.tags.notes') 
             numUrls=$(bbrf urls -p "$program"|wc -l)
             numDomains=$(bbrf domains -p "$program"|wc -l)
-            echo -e "$program, $site, $disabled, $reward, $author, $notes, $numDomains, $numUrls" >> $filename
+            numIPs=$(bbrf ips -p "$program"|wc -l)
+            values="$program, $site, $disabled, $reward, $author, $notes, $numDomains, $numUrls, $numIPs"
+            echo -e $values >> $filename
         done
 }
 
@@ -485,7 +488,7 @@ checkProgram()
     fi
 }
 
-#finds the program name from a domain or a URL 
+#finds the program name from a domain, URL or IP Adress. 
 #Useful when you find a bug but you don't know where to report it (what programs it belongs to). 
  findProgram()
     {
@@ -493,7 +496,7 @@ checkProgram()
     INPUT=$(echo "$1"|sed -e 's|^[^/]*//||' -e 's|/.*$||') #in case the input has a trailing / 
     if [ -z "$INPUT" ]
     then
-      echo "Use ${FUNCNAME[0]} URL or domain"
+      echo "Use ${FUNCNAME[0]} URL, domain or IP Address"
       return 1;
     fi
     program=$(bbrf show "$INPUT" |jq -r '.program')
