@@ -324,12 +324,14 @@ addPrograms()
 
 # It is faster to remove urls in chunks than directly 
 # works for the current active program
+# in the case of URLs and IP the program is not mandatory, it will delete everything in the input file
 removeInChunks()
 {
     if [ -z "$1" ] || [ -z "$2" ]
     then
       echo "To remove domains use ${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000)"
       echo "To remove urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000)"
+      echo "To remove ips use ${FUNCNAME[0]} fileWithIPs ips chunkSize (optional:default 1000)"
       return 1
     fi
     
@@ -338,11 +340,11 @@ removeInChunks()
     type="$2"
     chunkSize="$3"
 
-    if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]
+    if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]  || [ "$type" == "ips" ]
     then
         echo "" 
     else
-        echo " use domains or urls "
+        echo " use domains, ips or urls "
         return 1
     fi
 
@@ -368,8 +370,12 @@ removeInChunks()
         if [ "$type" == "urls" ]
         then
             sed -n "$element" "$file"|bbrf url remove - 
-        else
-            sed -n "$element" "$file"|bbrf domain remove - 
+        elif [ "$type" == "domains" ]
+        then
+           sed -n "$element" "$file"|bbrf domain remove - 
+        elif [ "$type" == "ips" ]
+        then
+           sed -n "$element" "$file"|bbrf ip remove -
         fi
         init=$(( $init + $chunkSize ))
         end=$(( $end + $chunkSize ))
