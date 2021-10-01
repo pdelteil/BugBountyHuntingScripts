@@ -132,7 +132,7 @@ getInScope()
             bbrf scope in -p "$program" >> $outputFile
         done
 }
-# creates a file with BBRF stats 
+# creates a file with BBRF stats in CSV format
 # The output is in the form  program1, #domains, #urls
 # Input parameter: filename
 getStats()
@@ -148,9 +148,15 @@ getStats()
     #headers
     headers="Program, Site, disabled, reward, author, notes, #domains, #urls, #IPS" 
     echo -e $headers >> $filename
-    for program in $(bbrf programs --show-disabled --show-empty-scope);
+    echo "Getting stats of programs"
+    
+    allPrograms=$(bbrf programs --show-disabled --show-empty-scope)
+    numberPrograms=$(echo "$allPrograms"|wc -l)
+    #counter
+    i=1
+    for program in $(echo "$allPrograms");
         do 
-            echo "Getting stats of program $program"
+            echo -en "${YELLOW}($i/$numberPrograms)${ENDCOLOR} $program\n"
             #fields/columns
             description=$(bbrf show "$program")
             site=$(echo "$description"    |jq -r '.tags.site')
@@ -163,6 +169,7 @@ getStats()
             numIPs=$(bbrf ips -p "$program"|wc -l)
             values="$program, $site, $disabled, $reward, $author, $notes, $numDomains, $numUrls, $numIPs"
             echo -e $values >> $filename
+            i=$(( $i + 1))
         done
 }
 
