@@ -51,14 +51,6 @@ updateProgram()
         return -1
     fi
 
-    #case with wildcard
-        #remove domains 
-        #remove urls
-
-    #case without wildcard
-        #remove domain
-        #remove url 
-
     #show stats after removing urls and domains
     inscopeRules=$(bbrf show "$program"|jq '.inscope'|grep '"'|wc -l)
     domains=$(bbrf domains -p "$program"|wc -l)
@@ -91,7 +83,6 @@ getOnlyDisabledPrograms()
                 bbrf domains -p "$program"
         done
     fi
-    
 
 }
 
@@ -497,16 +488,26 @@ checkProgram()
 
 #finds the program name from a domain, URL or IP Adress. 
 #Useful when you find a bug but you don't know where to report it (what programs it belongs to). 
- findProgram()
-    {
-
+findProgram()
+{
     INPUT=$(echo "$1"|sed -e 's|^[^/]*//||' -e 's|/.*$||') #in case the input has a trailing / 
     if [ -z "$INPUT" ]
     then
       echo "Use ${FUNCNAME[0]} URL, domain or IP Address"
       return 1;
     fi
-    program=$(bbrf show "$INPUT" |jq -r '.program')
+    show=$(bbrf show "$INPUT") 
+    program=$(echo "$show" |jq -r '.program')
+    #case input is an IP
+    if [[ $INPUT =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        domains=$(echo $show |jq -r '.domains'|grep "\.")
+        domains=$(echo $domains|tr -d '"')
+        echo -en "\n${YELLOW} Domains: $domains${ENDCOLOR}\n"
+        show=$(bbrf show "$program")
+        #return 1
+        
+    fi
+
     if [ ${#program} -gt 0 ] 
     then
         #This tags are specific for my way of storing data
@@ -520,9 +521,10 @@ checkProgram()
         recon="(.tags.recon|tostring)"
         source="(.tags.sourceCode|tostring)"
         notes=".tags.notes"
-        #this part is hard.
+        #detect if input is an IP address 
+        #this part is hard -> need to find a way to simplify it
         tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"
-        output=$(bbrf show "$program" | jq "$tags" |tr -d '"'| sed 's/,/\n/g')
+        output=$(echo "$show" | jq "$tags" |tr -d '"'| sed 's/,/\n/g')
         echo -ne "\n$output\n\n"
         
     else
