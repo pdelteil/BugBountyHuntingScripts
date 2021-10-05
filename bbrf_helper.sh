@@ -389,8 +389,8 @@ addInChunks()
 {
     if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo "To add domains use ${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional)"
-      echo "To add urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)"
+      echo -ne "To add domains use ${YELLOW}${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional)${ENDCOLOR}\n"
+      echo -ne "To add urls use ${YELLOW}${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)${ENDCOLOR}\n"
       return 1
     fi
     #input vars
@@ -434,7 +434,7 @@ addInChunks()
         then
             sed -n "$elements" "$file"|bbrf url add - -s "$source" --show-new -p@INFER
         else
-            sed -n "$elements" "$file"|bbrf domain add - -s "$source" --show-new -p@INFER
+            sed -n "$elements" "$file"|dnsx -silent|bbrf domain add - -s "$source" --show-new -p@INFER
         fi
         init=$(( $init + $chunkSize ))
         end=$(( $end + $chunkSize ))
@@ -504,6 +504,7 @@ findProgram()
     fi
     show=$(bbrf show "$INPUT") 
     program=$(echo "$show" |jq -r '.program')
+    echo "$program"
     #case input is an IP
     if [[ $INPUT =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         domains=$(echo $show |jq -r '.domains'|grep "\.")
@@ -555,7 +556,6 @@ listTagValues()
             key=$(bbrf show "$program"|jq '.tags.site')
             #echo $program ", "$key
             keys+=("$key") 
-
     done
     #show unique key values
     echo "${keys[@]}" | tr ' ' '\n' | sort -u
