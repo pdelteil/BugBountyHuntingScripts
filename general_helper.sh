@@ -99,7 +99,6 @@ diffFiles()
     comm -3 <(sort $1) <(sort $2) > $3
 }
 #retreive the ORGs names in SSL Certs 
-
 getOrgsFromCerts()
 {
     if [ -z "$1" ] 
@@ -111,8 +110,24 @@ getOrgsFromCerts()
     names=( $@ )
     for file in "${names[@]}"
     do
-    echo "$file"
-    cat "$file" |grep -a subject |awk -F"O=" '{print $2}'|awk -F";" '{print $1}'|sort -u
+        echo "$file"
+        cat "$file" |grep -a subject |awk -F"O=" '{print $2}'|awk -F";" '{print $1}'|sort -u
+    done
+}
+#retreive the ORGs names in SSL Certs 
+getCNFromCerts()
+{
+    if [ -z "$1" ] 
+    then
+      echo "Use ${FUNCNAME[0]} file.with.ssl.output.txt"
+      return 1;
+    fi
+
+    names=( $@ )
+    for file in "${names[@]}"
+    do
+        echo "$file"
+        cat "$file" |grep -a subject|awk -F"CN=" '{print $2}'|awk -F";" '{print $1}'|sort -u
     done
 }
 
