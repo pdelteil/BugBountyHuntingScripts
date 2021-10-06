@@ -63,11 +63,17 @@ locateCat()
     fi
 }
 #use getField n (where n is the nth column)
+# example:  cat file.txt | getField 4 
 getField() 
 {
-  awk  -v number=$1 '{print $number}'
+  awk -v number=$1 '{print $number}'
 }
-
+#get domain From URL
+getDomainFromURL()
+{
+    url="$1"
+    awk -F'/' <<<"$1" #'{print $1}' # | sed 's/http:\/\///;s|\/.*||'
+}
 #sort urls by TLD domain
 sortByDomain()
 {
@@ -92,3 +98,21 @@ diffFiles()
     fi
     comm -3 <(sort $1) <(sort $2) > $3
 }
+#retreive the ORGs names in SSL Certs 
+
+getOrgsFromCerts()
+{
+    if [ -z "$1" ] 
+    then
+      echo "Use ${FUNCNAME[0]} file.with.ssl.output.txt"
+      return 1;
+    fi
+
+    names=( $@ )
+    for file in "${names[@]}"
+    do
+    echo "$file"
+    cat "$file" |grep -a subject |awk -F"O=" '{print $2}'|awk -F";" '{print $1}'|sort -u
+    done
+}
+
