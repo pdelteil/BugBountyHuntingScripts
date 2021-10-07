@@ -617,7 +617,7 @@ showActiveProgram()
 {
  configFile="$HOME/.bbrf/config.json"
 
- program=$(cat $configFile|jq|grep "program"|awk -F":" '{print $2}'|tr -d ","|tr -d '"'|tr -d ' ')
+ program=$(cat $configFile|jq|grep "program"|awk -F":" '{print $2}'|tr -d ","|tr -d '"'|sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
  
  echo "$program" 
 
