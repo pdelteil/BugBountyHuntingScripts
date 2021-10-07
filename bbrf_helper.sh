@@ -531,6 +531,7 @@ findProgram()
         #detect if input is an IP address 
         #this part is hard -> need to find a way to simplify it
         tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"
+        echo "$show"
         output=$(echo "$show" | jq "$tags" |tr -d '"'| sed 's/,/\n/g')
         echo -ne "\n$output\n\n"
         
@@ -609,5 +610,15 @@ debugMode()
         echo "Setting BBRF debug mode on"
         sed -i 's/"debug": false/"debug": true/g' $configFile
  fi
+
+}
+# displays active program
+showActiveProgram()
+{
+ configFile="$HOME/.bbrf/config.json"
+
+ program=$(cat $configFile|jq|grep "program"|awk -F":" '{print $2}'|tr -d ","|tr -d '"'|tr -d ' ')
+ 
+ echo "$program" 
 
 }
