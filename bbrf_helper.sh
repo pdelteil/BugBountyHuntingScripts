@@ -255,11 +255,12 @@ addPrograms()
         read url
         #recon true means the scope is not bounded or clear
         # So you could spend more time/resources doing more specific recon
-        echo -en "${YELLOW}Recon? ${ENDCOLOR} (0:false, 1:true) "
+        echo -en "${YELLOW}Recon? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
         read recon
         case $recon in 
             0)    val_recon="false";;
             1)    val_recon="true";;
+           "")    val_recon="false";;
         esac
         echo -en "${YELLOW}Android app? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
         read android
