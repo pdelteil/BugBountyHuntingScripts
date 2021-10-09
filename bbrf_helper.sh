@@ -605,12 +605,15 @@ debugMode()
     then
         echo "Setting BBRF debug mode off"
         sed -i 's/"debug": true/"debug": false/g' $configFile
- fi
- if [ "true" == "$1" ]
+ elif [ "true" == "$1" ]
     then
         echo "Setting BBRF debug mode on"
         sed -i 's/"debug": false/"debug": true/g' $configFile
- fi
+ else  
+        echo "Use ${FUNCNAME[0]} false/true"   
+    
+ 
+ fi  
 
 }
 # displays active program
