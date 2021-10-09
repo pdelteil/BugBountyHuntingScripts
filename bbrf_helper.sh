@@ -611,8 +611,6 @@ debugMode()
         sed -i 's/"debug": false/"debug": true/g' $configFile
  else  
         echo "Use ${FUNCNAME[0]} false/true"   
-    
- 
  fi  
 
 }
