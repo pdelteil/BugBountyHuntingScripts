@@ -622,3 +622,41 @@ showActiveProgram()
  echo "$program" 
 
 }
+# displays details a given program
+showProgram()
+{
+    if [ -z "$1" ] 
+    then
+        echo "Use ${FUNCNAME[0]} programName -stats [optional, displays number of urls and domains]"
+        return 1;
+    fi
+    program="$1"
+    output=$(bbrf show "$program"|jq)
+
+    if [ ${#output} -gt 0 ] 
+    then
+        echo "$output" 
+    else    
+        echo -ne "${RED}$program not found! ${ENDCOLOR}\n\n"
+        return 1
+        
+    fi
+    
+    flag="$2" 
+    if [ -z "$flag" ]
+    then    
+        return 1
+    fi
+   
+    if [ "$flag" == "-stats" ]
+    then
+        domains=$(bbrf domains -p "$program"|wc -l)
+        urls=$(bbrf urls -p "$program"|wc -l) 
+        echo "#domains "$domains
+        echo "#urls "$urls
+         
+    else
+        echo "Use ${FUNCNAME[0]} programName -stats [optional, displays number of urls and domains] "
+        return 1
+    fi
+}
