@@ -62,6 +62,7 @@ updateProgram()
 getOnlyDisabledPrograms()
 {
     INPUT="$1" 
+    COND="$2"
     if [ -z "$INPUT" ] 
     then
         echo "Use ${FUNCNAME[0]} urls/domains"
@@ -75,10 +76,9 @@ getOnlyDisabledPrograms()
     fi
     if [[  "$INPUT" == "urls" ]] | [[  "$INPUT" == "domains" ]]
     then
-        all=$(bbrf programs --show-disabled)
-        enabled=$(bbrf programs)
+        all=$(bbrf programs --show-disabled $COND)
+        enabled=$(bbrf programs $COND)
         listr=$(comm -3 <(echo "$enabled"|sort) <(echo "$all"|sort)|tr -d '\t')
-
     fi
     if [[  "$INPUT" == "urls" ]] 
     then
