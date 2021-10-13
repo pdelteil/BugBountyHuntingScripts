@@ -61,26 +61,38 @@ updateProgram()
 # Use getOnlyDisabledPrograms urls/domains
 getOnlyDisabledPrograms()
 {
-    if [ -z "$1" ]
+    INPUT="$1" 
+    if [ -z "$INPUT" ] 
     then
         echo "Use ${FUNCNAME[0]} urls/domains"
         return 1;
     fi
-    if [[  "$1" == "urls" ]] 
+    IFS=$'\n'
+    if [[  "$INPUT" != "urls"  &&  "$INPUT" != "domains" ]]
     then
-        for program in $(bbrf programs --show-disabled|grep -v DEBUG);
-            do 
-                #echo "Programs: $program"
-                bbrf urls -p "$program"
+        echo "Use ${FUNCNAME[0]} urls/domains"
+        return 1;
+    fi
+    if [[  "$INPUT" == "urls" ]] | [[  "$INPUT" == "domains" ]]
+    then
+        all=$(bbrf programs --show-disabled)
+        enabled=$(bbrf programs)
+        listr=$(comm -3 <(echo "$enabled"|sort) <(echo "$all"|sort)|tr -d '\t')
+
+    fi
+    if [[  "$INPUT" == "urls" ]] 
+    then
+        for program in $(echo "$listr");
+        do 
+            bbrf urls -p "$program"
         done
 
     fi
-    if [[  "$1" == "domains" ]] 
+    if [[  "$INPUT" == "domains" ]] 
     then
-        for program in $(bbrf programs --show-disabled|grep -v DEBUG);
-            do 
-                #echo "Programs: $program"
-                bbrf domains -p "$program"
+        for program in $(echo "$listr");
+        do 
+            bbrf domains -p "$program"
         done
     fi
 
@@ -660,3 +672,4 @@ showProgram()
         return 1
     fi
 }
+
