@@ -26,15 +26,15 @@ testNucleiTemplate()
 #TODO: use several tagvalues
 searchTemplateByTag()
 {
-    configFile="$HOME/.config/nuclei/.templates-config.json"
-    property="nuclei-templates-directory"
-    folder=$(cat $configFile| jq | grep $property|awk '{print $2}'|tr -d '"'|tr -d ',')
-    
     if [ -z "$1" ] | [ -z "$2" ]
     then
       echo "Use ${FUNCNAME[0]} tagName tagValue"
       return 1;
     fi
+    configFile="$HOME/.config/nuclei/.templates-config.json"
+    property="nuclei-templates-directory"
+    folder=$(cat $configFile| jq | grep $property|awk '{print $2}'|tr -d '"'|tr -d ',')
+
     tag="$1"
     value="$2"
     condition="$tag.*$value"
