@@ -40,3 +40,27 @@ searchTemplateByTag()
     condition="$tag.*$value"
     grep -Ri "$condition" --include="*.yaml" $folder
 }
+
+#Use runScanTemplateVersion v8.5.8 urls.txt
+runScanTemplateVersion()
+{
+    if [ -z "$1" ] | [ -z "$2" ]
+    then
+      echo "Use ${FUNCNAME[0]} version urls.txt"
+      return 1;
+    fi
+    #git repo
+    gitURL="https://github.com/projectdiscovery/nuclei-templates.git"
+    branch="$1"
+    file="$2"
+    folder="/tmp/nuclei-templates-$branch"
+
+    if [ -d "$folder" ] 
+    then
+        echo "Directory $folder exists. Skipping git clone" 
+    else
+        git clone --depth=1 --branch $branch $gitURL $folder
+    fi
+
+    nuclei -update-directory $folder -no-update-templates -l $file
+}
