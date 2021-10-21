@@ -673,3 +673,18 @@ showProgram()
     fi
 }
 
+# adds IPs from a CIDR to a program
+#example addIPsFromCIDR 128.177.123.72/29 program
+addIPsFromCIDR()
+{
+    if [ -z "$1" ] | [ -z "$2" ]
+    then
+        echo "Use ${FUNCNAME[0]} 128.177.123.72/29 program"
+        return 1;
+    fi
+
+    CIDR="$1"
+    program="$2"
+    #params are just to speed up ping
+    fping -t 5 -r 1  -b 1 -g $CIDR 2> /dev/null|awk '{print $1}'|bbrf ip add - -p $program --show-new
+}
