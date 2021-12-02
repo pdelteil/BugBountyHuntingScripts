@@ -58,7 +58,11 @@ updateProgram()
     echo "Stats after update  inscope rules: $inscopeRules, domains: $domains,  urls: $urls"
 }
 # getData only from disabled programs 
-# Use getOnlyDisabledPrograms urls/domains
+# Use getOnlyDisabledPrograms urls/domains condition (optional)
+# ex 1 getting all urls from disabled programs
+#  getOnlyDisabledPrograms urls 
+# ex 2 getting all domains from disabled programs with condition (from BugCrowd)
+#  getOnlyDisabledPrograms urls where site is bugcrowd
 getOnlyDisabledPrograms()
 {
     INPUT="$1" 
@@ -78,7 +82,9 @@ getOnlyDisabledPrograms()
     then
         all=$(bbrf programs --show-disabled $COND)
         enabled=$(bbrf programs $COND)
+        # difference between all and enabled programs = disabled programs
         listr=$(comm -3 <(echo "$enabled"|sort) <(echo "$all"|sort)|tr -d '\t')
+        echo "${#listr}"
     fi
     if [[  "$INPUT" == "urls" ]] 
     then

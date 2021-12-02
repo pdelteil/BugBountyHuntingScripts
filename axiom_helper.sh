@@ -43,18 +43,17 @@ findAndMoveScans()
       echo "Use ${FUNCNAME[0]} outputFolder"
       return 1;
     fi
-
+    IFS=$'\n'
     #input 
     folder="$1"
     echo "Updating locate db (could take a while)"
     #TODO check if db is old enough or ask the user if update is required
     sudo updatedb
     files=$(locate scan+|grep -v "$folder")
-    for file in $(echo $files);
+    for file in $(echo "$files");
         do 
-            echo "Moving  $file to $folder"
+            echo "Moving $file to $folder"
             mv -i "$file" "$folder"
     done
-
 }
 
