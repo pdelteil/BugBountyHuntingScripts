@@ -18,12 +18,20 @@ cd $log_path
 #TODO add more grep especific rules for other modules
 #nuclei especific grep rules 
 year=$(date +"%Y-")
+
+#nuclei 
 if [ $axiomModule = "nuclei" ] 
     then
         cat $log_path/*|grep $year|grep -v Unsolicited
-    else    
-        cat $log_path/*
 fi
+
+#shuffledns
+if [ $axiomModule = "shuffledns" ] 
+    then
+        cat $log_path/*|grep -v 'INF\|WRN\|projectdiscovery'|grep '\.'
+fi
+
+
 }
 
 #find all stranded scan+* files and move them to a given folder 
