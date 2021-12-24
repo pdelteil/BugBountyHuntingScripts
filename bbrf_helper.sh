@@ -694,3 +694,21 @@ addIPsFromCIDR()
     #params are just to speed up ping
     fping -t 5 -r 1  -b 1 -g $CIDR 2> /dev/null|awk '{print $1}'|bbrf ip add - -p $program --show-new
 }
+getBugBountyUrls()
+{
+    allPrograms=$(bbrf programs --show-disabled)
+    IFS=$'\n'
+    for program in $(echo "$allPrograms");
+        do
+            description=$(bbrf show "$program")
+            gob=$(echo "$description"  |jq -r '.tags.gov')
+            if [ "$gob" == "true" ]
+            then
+                echo ""
+            else
+                bbrf urls -p "$program"
+            fi   
+        done
+
+
+}
