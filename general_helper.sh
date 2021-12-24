@@ -163,11 +163,11 @@ getTLDs()
 
     target="$1"
     #do with com 
-    tlds=$(grep country-code "$file" |awk -F "," '{print $1}'|grep -Pv '[^\x00-\x7F]'|awk -v target=$target '{print target$1}' |dnsx | awk '{print "*."$1}')
-    echo "$tlds"
+    tlds=$(grep country-code "$FILE" |awk -F "," '{print $1}'|grep -Pv '[^\x00-\x7F]'|awk -v target=$target '{print target$1}' |dnsx -silent| awk '{print "*."$1}')
+    echo "$tlds" | tr '\n' ' '
 
     # test them with com 
     target="$target".com
-    tlds=$(grep country-code "$file" |awk -F "," '{print $1}'|grep -Pv '[^\x00-\x7F]'|awk -v target=$target '{print target$1}' |dnsx | awk '{print "*."$1}')
-    echo "$tlds"
+    tlds=$(grep country-code "$FILE" |awk -F "," '{print $1}'|grep -Pv '[^\x00-\x7F]'|awk -v target=$target '{print target$1}' |dnsx -silent| awk '{print "*."$1}')
+    echo "$tlds"| tr '\n' ' '
 }
