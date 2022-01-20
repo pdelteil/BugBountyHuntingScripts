@@ -1,4 +1,4 @@
-# shell script functions to be loaded on your bashrc file 
+# shell script functions to be loaded on your bashrc file
 
 #Global variables
 RED="\e[31m"
@@ -320,25 +320,6 @@ checkProgram()
     text="$1"
     output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
     if [ ${#output} -gt 0 ] 
-    then
-        echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
-    else    
-        echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
-    fi
-}
-#Checks if a program exists using h1's api
-checkProgramH1()
-{
-    if [ -z "$1" ]
-    then
-      echo "Use ${FUNCNAME[0]} text"
-      return 1;
-    fi
-    text="$1"
-    #textAlt=$(echo "$text"|tr -d '.' | tr -d ',')
-    programs=$(bbrf programs --show-disabled --show-empty-scope)
-    result=$(echo "$programs"|tr -cd '[:alnum:]'| grep -i "$text")
-    if [ ${#result} -gt 0 ] 
     then
         echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
     else    
