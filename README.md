@@ -1,56 +1,35 @@
-# BBRF & nuclei bash helpers 
+# Bug bounty hunting scripts (helpers)
 
 
-### Depencencies 
+## Required software 
 
-TODO : installation script
+##### subfinder
 
-#### subfinder
-``GO111MODULE=on go get -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder``
+##### httpx 
 
-#### httpx 
-``GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx``
+##### dnsx 
 
-#### dnsx 
-``GO111MODULE=on go get -v github.com/projectdiscovery/dnsx/cmd/dnsx``
+##### assetfinder 
 
-#### assetfinder 
-``GO111MODULE=on go get -u github.com/tomnomnom/assetfinder`` 
-
-#### httprobe
-``go get -u github.com/tomnomnom/httprobe``
+##### httprobe
 
 ## How to install
 
 ```
-git clone https://github.com/pdelteil/BBRF-maintenance.git
+git clone https://github.com/pdelteil/Bug-bounty-hunting-scripts.git
 
-location=$(pwd); echo "source $location/BBRF-maintenance/bbrf_helper.sh " >> ~/.bashrc
+cd Bug-bounty-hunting-scripts
 
-location=$(pwd); echo "source $location/BBRF-maintenance/nuclei_helper.sh " >> ~/.bashrc
-
-source ~/.bashrc 
+./setup.sh 
 ```
 
-Loaded from the .bashrc file. 
+(**you might need to source .bashrc or relogin**)
+
 You can check them running `declare -F` 
 You can also use tab to autocomplete them. 
 
 
-## BBRF helpers 
+## How to use BBH script helpers 
 
+[How to use (Wiki)](https://github.com/pdelteil/Bug-bounty-hunting-scripts/wiki/How-to-use-the-scripts)
 
-1. AddPrograms() 
-
-This function is intented to be use while manually adding several programs to BBRF 
-
-Example of use:
-
-` addPrograms h1 `
-
-Then you will be prompted to add information about the program:
-
-![Screenshot from 2021-06-21 01-49-29](https://user-images.githubusercontent.com/20244863/122713055-173d7200-d233-11eb-8298-a7f3c86882f3.png)
-
-
-#PENDING MORE EXAMPLES 
