@@ -697,6 +697,13 @@ getBugBountyUrls()
 # USe getUrlsWithProgramTag 
 getUrlsWithProgramTag()
 {   
+    if [ -z "$1" ] | [ -z "$2" ]
+    then
+        echo "Use ${FUNCNAME[0]} tag value"
+        echo "Example ${FUNCNAME[0]} site intigriti"
+        return 1;
+    fi
+
     TAG="$1"
     VALUE="$2"
     allPrograms=$(bbrf programs where $TAG is $VALUE)
