@@ -106,7 +106,7 @@ getOnlyDisabledPrograms()
 
 #disable all programs from a given list (file)
 #example of use, disable all for points/thanks programs
-#  use cat programs| disablePrograms
+#  use > cat programs| disablePrograms
 disablePrograms()
 {
     while read -r data; do
@@ -115,7 +115,7 @@ disablePrograms()
     done
 
 }
-#get inscope of all programs 
+#get inscope of all programs
 getInScope()
 {
     if [ -z "$1" ] || [[ "$1" == "-h"* ]] 
@@ -173,10 +173,11 @@ getStats()
             disabled=$(echo "$description"|jq -r '.disabled')
             author=$(echo "$description"|jq -r '.tags.author')
             notes=$(echo "$description" |jq -r '.tags.notes') 
+            addedDate=$(echo "$description" |jq -r '.tags.addedDate')
             numUrls=$(bbrf urls -p "$program"|wc -l)
             numDomains=$(bbrf domains -p "$program"|wc -l)
             numIPs=$(bbrf ips -p "$program"|wc -l)
-            values="$program, $site, $disabled, $reward, $author, $notes, $numDomains, $numUrls, $numIPs"
+            values="$program, $site, $disabled, $reward, $author, $notes, $addedDate, $numDomains, $numUrls, $numIPs"
             echo -e $values >> $filename
             i=$(( $i + 1))
         done
@@ -674,6 +675,8 @@ addIPsFromCIDR()
     #params are just to speed up ping
     fping -t 5 -r 1  -b 1 -g $CIDR 2> /dev/null|awk '{print $1}'|bbrf ip add - -p $program --show-new
 }
+#this function is especific for my implementation. 
+#the output if all urls but urls from programs with tag gov
 getBugBountyUrls()
 {
     allPrograms=$(bbrf programs --show-disabled)
@@ -689,6 +692,4 @@ getBugBountyUrls()
                 bbrf urls -p "$program"
             fi   
         done
-
-
 }
