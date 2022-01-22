@@ -1,5 +1,9 @@
 
 #TODO: prompt which helper to install
+location=$(pwd); echo "source $location/bbrf_helper.sh " >> ~/.bashrc
+location=$(pwd); echo "source $location/nuclei_helper.sh " >> ~/.bashrc
+location=$(pwd); echo "source $location/general_helper.sh " >> ~/.bashrc
+location=$(pwd); echo "source $location/axiom_helper.sh " >> ~/.bashrc
 #change this if you don't use bash
 shellConfig="$HOME/.bashrc"
 location=$(pwd)
@@ -38,5 +42,4 @@ echo "Adding amass_helper.sh to $shellConfig"
 echo "source $location/amass_helper.sh " >> $shellConfig
 
 source $shellConfig
-
 

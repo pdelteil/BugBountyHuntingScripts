@@ -1,4 +1,4 @@
-# shell script functions to be loaded on your bashrc file 
+# shell script functions to be loaded on your bashrc file
 
 #Global variables
 RED="\e[31m"
