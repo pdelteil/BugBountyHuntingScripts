@@ -693,3 +693,18 @@ getBugBountyUrls()
             fi   
         done
 }
+
+# USe getUrlsWithProgramTag 
+getUrlsWithProgramTag()
+{   
+    TAG="$1"
+    VALUE="$2"
+    allPrograms=$(bbrf programs where $TAG is $VALUE)
+  
+    for program in $(echo "$allPrograms");
+        do
+            bbrf urls -p "$program"
+        done
+
+}
+
