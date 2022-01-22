@@ -580,26 +580,6 @@ listTagValues()
     
 }
 
-#get all domains and try to find more subdomains using chaos project  
-#DEPRECATED
-addDomainsAndUrls()
-{
-    IFS=$'\n'  
-    echo  "Getting domains from subfinder"
-
-    for prog in $(bbrf programs)
-        do
-         echo " $prog"
-         bbrf scope in -p "$prog" \
-                                | subfinder -t 60 -silent \
-                                | dnsx -silent \
-                                | bbrf domain add - -s subfinder --show-new -p "$prog" \
-                                | grep -v DEBUG| notify -silent
-        #urls
-        bbrf urls -p "$prog" |httpx -silent -threads 120|bbrf url add - -s httpx --show-new -p "$prog" \
-                             |grep -v DEBUG|notify -silent 
-        done 
-}
 # sets debug mode on or off
 debugMode()
 {
