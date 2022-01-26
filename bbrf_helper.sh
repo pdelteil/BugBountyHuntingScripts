@@ -106,7 +106,7 @@ getOnlyDisabledPrograms()
 
 #disable all programs from a given list (file)
 #example of use, disable all for points/thanks programs
-#  use cat programs| disablePrograms
+#  use > cat programs| disablePrograms
 disablePrograms()
 {
     while read -r data; do
@@ -115,7 +115,7 @@ disablePrograms()
     done
 
 }
-#get inscope of all programs 
+#get inscope of all programs
 getInScope()
 {
     if [ -z "$1" ] || [[ "$1" == "-h"* ]] 
@@ -173,10 +173,11 @@ getStats()
             disabled=$(echo "$description"|jq -r '.disabled')
             author=$(echo "$description"|jq -r '.tags.author')
             notes=$(echo "$description" |jq -r '.tags.notes') 
+            addedDate=$(echo "$description" |jq -r '.tags.addedDate')
             numUrls=$(bbrf urls -p "$program"|wc -l)
             numDomains=$(bbrf domains -p "$program"|wc -l)
             numIPs=$(bbrf ips -p "$program"|wc -l)
-            values="$program, $site, $disabled, $reward, $author, $notes, $numDomains, $numUrls, $numIPs"
+            values="$program, $site, $disabled, $reward, $author, $notes, $addedDate, $numDomains, $numUrls, $numIPs"
             echo -e $values >> $filename
             i=$(( $i + 1))
         done
@@ -580,26 +581,6 @@ listTagValues()
     
 }
 
-#get all domains and try to find more subdomains using chaos project  
-#DEPRECATED
-addDomainsAndUrls()
-{
-    IFS=$'\n'  
-    echo  "Getting domains from subfinder"
-
-    for prog in $(bbrf programs)
-        do
-         echo " $prog"
-         bbrf scope in -p "$prog" \
-                                | subfinder -t 60 -silent \
-                                | dnsx -silent \
-                                | bbrf domain add - -s subfinder --show-new -p "$prog" \
-                                | grep -v DEBUG| notify -silent
-        #urls
-        bbrf urls -p "$prog" |httpx -silent -threads 120|bbrf url add - -s httpx --show-new -p "$prog" \
-                             |grep -v DEBUG|notify -silent 
-        done 
-}
 # sets debug mode on or off
 debugMode()
 {
@@ -694,8 +675,9 @@ addIPsFromCIDR()
     #params are just to speed up ping
     fping -t 5 -r 1  -b 1 -g $CIDR 2> /dev/null|awk '{print $1}'|bbrf ip add - -p $program --show-new
 }
-# outputs all the urls related to BB programs 
 # TODO add flag to include disabled programs
+#this function is especific for my implementation. 
+#the output if all urls but urls from programs with tag gov
 getBugBountyUrls()
 {
     allPrograms=$(bbrf programs)
@@ -711,6 +693,26 @@ getBugBountyUrls()
                 bbrf urls -p "$program"
             fi   
         done
+}
 
+# USe getUrlsWithProgramTag 
+getUrlsWithProgramTag()
+{   
+    if [ -z "$1" ] | [ -z "$2" ]
+    then
+        echo "Use ${FUNCNAME[0]} tag value"
+        echo "Example ${FUNCNAME[0]} site intigriti"
+        return 1;
+    fi
+
+    TAG="$1"
+    VALUE="$2"
+    allPrograms=$(bbrf programs where $TAG is $VALUE)
+  
+    for program in $(echo "$allPrograms");
+        do
+            bbrf urls -p "$program"
+        done
 
 }
+
