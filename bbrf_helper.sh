@@ -675,11 +675,12 @@ addIPsFromCIDR()
     #params are just to speed up ping
     fping -t 5 -r 1  -b 1 -g $CIDR 2> /dev/null|awk '{print $1}'|bbrf ip add - -p $program --show-new
 }
+# TODO add flag to include disabled programs
 #this function is especific for my implementation. 
 #the output if all urls but urls from programs with tag gov
 getBugBountyUrls()
 {
-    allPrograms=$(bbrf programs --show-disabled)
+    allPrograms=$(bbrf programs)
     IFS=$'\n'
     for program in $(echo "$allPrograms");
         do
