@@ -1,6 +1,11 @@
 
+#Global variables
+RED="\e[31m"
+YELLOW="\e[33m"
+ENDCOLOR="\e[0m"
+
 #TODO: prompt which helper to install
-echo "Starting setup script"
+echo -ne "${RED}\nStarting setup script${ENDCOLOR}\n\n"
 
 #change this if you don't use bash
 shellConfig="$HOME/.bashrc"
@@ -8,42 +13,41 @@ shellConfig="$HOME/.bashrc"
 location=$(pwd)
 
 #installing dependencies 
-echo "Installing dependencies..."
+echo -ne "${YELLOW}Installing dependencies...${ENDCOLOR}\n\n"
 
-echo "Installing subfinder"
+echo -ne "${YELLOW}Installing subfinder ${ENDCOLOR}\n"
 #subfinder
-GO111MODULE=on go get -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 
-echo "Installing httpx" 
+echo -ne "${YELLOW}Installing httpx ${ENDCOLOR}\n" 
 #httpx
-GO111MODULE=on go get -v github.com/projectdiscovery/httpx/cmd/httpx
+go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
 
-echo "Installing dnsx" 
+echo -ne "${YELLOW}Installing dnsx ${ENDCOLOR}\n" 
 #dnsx
-GO111MODULE=on go get -v github.com/projectdiscovery/dnsx/cmd/dnsx
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
 
-echo "Installing assetfinder" 
+echo -ne "${YELLOW}Installing assetfinder ${ENDCOLOR}\n" 
 #assetfinder
-GO111MODULE=on go get -u github.com/tomnomnom/assetfinder
+go get -u github.com/tomnomnom/assetfinder
 
-echo "Installing httprobe" 
+echo -ne "${YELLOW}Installing httprobe ${ENDCOLOR}\n" 
 #httprobe
-go get -u github.com/tomnomnom/httprobe@master
+go install github.com/tomnomnom/httprobe@master
 
-echo "Adding bbrf_helper.sh to $shellConfig"
+echo -ne "${YELLOW}Adding bbrf_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/bbrf_helper.sh " >> $shellConfig
 
-echo "Adding nuclei_helper.sh to $shellConfig"
+echo -ne "${YELLOW}Adding nuclei_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/nuclei_helper.sh " >> $shellConfig
 
-echo "Adding general_helper.sh to $shellConfig"
+echo -ne "${YELLOW}Adding general_helper.sh to $shellConfig{ENDCOLOR}\n"
 echo "source $location/general_helper.sh " >> $shellConfig
 
-echo "Adding bbrf_helper.sh to $shellConfig"
+echo -ne "${YELLOW}Adding bbrf_helper.sh to $shellConfig{ENDCOLOR}\n"
 echo "source $location/axiom_helper.sh " >> $shellConfig
 
-echo "Adding amass_helper.sh to $shellConfig"
+echo -ne "${YELLOW}Adding amass_helper.sh to $shellConfig{ENDCOLOR}\n"
 echo "source $location/amass_helper.sh " >> $shellConfig
 
 source $shellConfig
-
