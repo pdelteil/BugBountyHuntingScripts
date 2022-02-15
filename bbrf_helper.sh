@@ -559,9 +559,10 @@ findProgram()
         recon="(.tags.recon|tostring)"
         source="(.tags.sourceCode|tostring)"
         notes=".tags.notes"
-        #detect if input is an IP address 
+        api=".tags.api"
         #this part is hard -> need to find a way to simplify it
-        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"
+        #tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"
+        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"'+ ", api: "+'"$api"
         #echo "show: $show"
         output=$(bbrf show "$program" | jq "$tags" |tr -d '"'| sed 's/,/\n/g')
         echo -ne "\n$output\n\n"
