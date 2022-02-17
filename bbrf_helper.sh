@@ -286,7 +286,7 @@ addPrograms()
         case $android in 
              0)    val_android="false";;
              1)    val_android="true";;
-             "")    val_android="false";;
+             "")   val_android="false";;
         esac
         echo -en "${YELLOW}iOS app? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
         read iOS
@@ -302,11 +302,24 @@ addPrograms()
             1)    val_source="true";;
             "")   val_source="false";;
         esac
+        echo -en "${YELLOW}Has API? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
+        read api
+        case $api in 
+            0)    val_api="false";;
+            1)    val_api="true";;
+            "")   val_api="false";;
+        esac
+        if $val_api; 
+            then
+                echo -en "${YELLOW}APi endpoints? ${ENDCOLOR} "
+                read api_endpoints
+        fi
         echo -en "${YELLOW}Notes/Comments? ${ENDCOLOR} (press enter if empty) "
         read notes
-        
+
         result=$(bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
-                 -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" -t author:"$author" -t notes:"$notes")
+                 -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" \
+                 -t author:"$author" -t notes:"$notes" -t api:"$val_api" -t api_endpoints:"$api_endpoints")
         #echo $result
         if [[ $result == *"conflict"* ]] 
             then
@@ -555,9 +568,10 @@ findProgram()
         recon="(.tags.recon|tostring)"
         source="(.tags.sourceCode|tostring)"
         notes=".tags.notes"
-        #detect if input is an IP address 
+        api=".tags.api"
         #this part is hard -> need to find a way to simplify it
-        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"
+        #tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"
+        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"'+ ", api: "+'"$api"
         #echo "show: $show"
         output=$(bbrf show "$program" | jq "$tags" |tr -d '"'| sed 's/,/\n/g')
         echo -ne "\n$output\n\n"
