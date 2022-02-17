@@ -402,6 +402,7 @@ removeInChunks()
     done
 }
 
+# This function solves the problem of adding a big amount of urls or domains, often times the couchdb server will crash with an 'unknown_error'
 # 1. ADD Domains IN CHUNKS from FILE containing domains 
 # 2. Add URLs to program probing domains from FILE containing domains
 # the chunk size depends on your bbrf (couchdb) server capacity 
@@ -409,7 +410,7 @@ addInChunks()
 {
     if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo -ne "To add domains use ${YELLOW}${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional)${ENDCOLOR}\n"
+      echo -ne "To add domains use ${YELLOW}${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional) dnsx (optional, if you want to resolve the domains first${ENDCOLOR}\n"
       echo -ne "To add urls use ${YELLOW}${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)${ENDCOLOR}\n"
       return 1
     fi
@@ -418,6 +419,7 @@ addInChunks()
     type="$2"
     chunkSize="$3"
     source="$4"
+    resolve="$5"
 
     if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]
     then
@@ -427,8 +429,9 @@ addInChunks()
         return 1
     fi
 
-    size=$(cat "$file" |wc -l)
+    size=$(wc -l "$file")
     echo "Size "$size
+    
     #default value for chunk size
     if [ -z "$chunkSize" ]
     then
@@ -454,13 +457,19 @@ addInChunks()
         then
             sed -n "$elements" "$file"|bbrf url add - -s "$source" --show-new -p@INFER
         else
-            sed -n "$elements" "$file"|dnsx -silent|bbrf domain add - -s "$source" --show-new -p@INFER
+	    if [ "$resolve" == "dnsx" ]
+            then 
+	        sed -n "$elements" "$file"|dnsx -silent|bbrf domain add - -s "$source" --show-new -p@INFER
+	    else 
+	        sed -n "$elements" "$file"|bbrf domain add - -s "$source" --show-new -p@INFER
+	    fi 
         fi
         init=$(( $init + $chunkSize ))
         end=$(( $end + $chunkSize ))
     done
 } 
 #resolve domains IN CHUNKS
+#This function allows to add ip addresses in chunks. 
 resolveDomainsInChunks()
 {
  if [ -z "$1" ] || [ -z "$2" ]
