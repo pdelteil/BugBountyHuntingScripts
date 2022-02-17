@@ -425,6 +425,9 @@ addInChunks()
     then
       echo -ne "To add domains use ${YELLOW}${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional) resolve ${ENDCOLOR}\n"
       echo -ne "To add urls use ${YELLOW}${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)${ENDCOLOR}\n"
+      echo -ne "Examples\n"
+      echo "addInChunks domains.txt domains "" "" resolve"
+      echo "addInChunks domains.txt domains "" source resolve"
       return 1
     fi
     #input vars
