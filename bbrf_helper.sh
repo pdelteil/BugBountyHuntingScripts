@@ -423,17 +423,18 @@ addInChunks()
 {
     if [ -z "$1" ] || [ -z "$2" ]
     then
-      echo -ne "To add domains use ${YELLOW}${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional) dnsx (optional, if you want to resolve the domains first${ENDCOLOR}\n"
+      echo -ne "To add domains use ${YELLOW}${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional) resolve ${ENDCOLOR}\n"
       echo -ne "To add urls use ${YELLOW}${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)${ENDCOLOR}\n"
       return 1
     fi
     #input vars
     file="$1"
     type="$2"
-    chunkSize="$3"
-    source="$4"
-    resolve="$5"
+    chunkSize=${3:-1000}
+    source=${4:-" no source "}
+    resolve=${5:-"no"}
 
+ 	
     if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]
     then
         echo "" 
@@ -442,26 +443,15 @@ addInChunks()
         return 1
     fi
 
-    size=$(wc -l "$file")
+    size=$(cat "$file"|wc -l)
     echo "Size "$size
-    
-    #default value for chunk size
-    if [ -z "$chunkSize" ]
-    then
-        chunkSize=1000
-    fi
     echo "Chunk size "$chunkSize
     parts=$((size%chunkSize?size/chunkSize+1:size/chunkSize))
     echo "Chunks "$parts
     init=1
     end=$chunkSize
 
-     if [ -z "$source" ]
-     then
-        source=""
-     fi
-
-     for i in $(seq 1 $parts);
+    for i in $(seq 1 $parts);
      do
         echo "Adding chunk $i/$parts"
         elements="${init},${end}p"; 
@@ -470,7 +460,7 @@ addInChunks()
         then
             sed -n "$elements" "$file"|bbrf url add - -s "$source" --show-new -p@INFER
         else
-	    if [ "$resolve" == "dnsx" ]
+	    if [ "$resolve" == "resolve" ]
             then 
 	        sed -n "$elements" "$file"|dnsx -silent|bbrf domain add - -s "$source" --show-new -p@INFER
 	    else 
