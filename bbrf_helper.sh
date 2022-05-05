@@ -711,7 +711,8 @@ getBugBountyUrls()
         done
 }
 
-# USe getUrlsWithProgramTag 
+#Get all urls from programs with a specific tag value
+# getUrlsWithProgramTag site intigriti will get all urls from Intigriti programs
 getUrlsWithProgramTag()
 {   
     if [ -z "$1" ] | [ -z "$2" ]
@@ -729,6 +730,76 @@ getUrlsWithProgramTag()
         do
             bbrf urls -p "$program"
         done
+}
+#remove urls from a program
+removeUrls()
+{
+    if [ -z "$1" ] 
+    then
+        echo "Use ${FUNCNAME[0]} program"
+        echo "Example ${FUNCNAME[0]} IBM"
+        return 1;
+    fi
 
+    PROGRAM="$1"
+    bbrf urls -p "$PROGRAM"|bbrf url remove -
+}
+#remove domains from a program
+#
+removeDomains()
+{
+    if [ -z "$1" ] 
+    then
+        echo "Use ${FUNCNAME[0]} program"
+        echo "Example ${FUNCNAME[0]} IBM"
+        return 1;
+    fi
+
+    PROGRAM="$1"
+    bbrf domains -p "$PROGRAM"|bbrf domain remove -
 }
 
+#remove inscope from a program
+removeInScope()
+{
+    if [ -z "$1" ] 
+    then
+        echo "Use ${FUNCNAME[0]} program"
+        echo "Example ${FUNCNAME[0]} IBM"
+        return 1;
+    fi
+
+    PROGRAM="$1"
+    bbrf scope in -p "$PROGRAM"|bbrf inscope remove -
+}
+
+#remove outscope from a program
+removeOutScope()
+{
+    if [ -z "$1" ] 
+    then
+        echo "Use ${FUNCNAME[0]} program"
+        echo "Example ${FUNCNAME[0]} IBM"
+        return 1;
+    fi
+
+    PROGRAM="$1"
+    bbrf scope out -p "$PROGRAM"|bbrf outscope remove -
+}
+
+#clear all data of a program without removing it
+clearProgramData()
+{
+    if [ -z "$1" ] 
+    then
+        echo "Use ${FUNCNAME[0]} program"
+        echo "Example ${FUNCNAME[0]} IBM"
+        return 1;
+    fi
+
+    PROGRAM="$1"
+    removeUrls $PROGRAM
+    removeDomains $PROGRAM
+    removeInScope $PROGRAM
+    removeOutScope $PROGRAM
+}
