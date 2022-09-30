@@ -7,30 +7,40 @@ showLogs()
  if [ -z "$1" ]
     then
       echo "Use ${FUNCNAME[0]} axiomModule"
+      echo -e "Supported modules\n nuclei\n shuffledns\n puredns"
       return 1;
     fi
 
 axiomModule=$1
 #find latest folder of given axiomModule
-log_path=$(ls -td ~/.axiom/tmp/$axiomModule* | head -n 1|sed 's/://g')
+log_path=$(ls -td ~/.axiom/tmp/$axiomModule* 2>/dev/null| head -n 1|sed 's/://g')
 log_path=$log_path/logs
-cd $log_path
+
 #TODO add more grep especific rules for other modules
 #nuclei especific grep rules 
 year=$(date +"%Y-")
 
 #nuclei 
-if [ $axiomModule = "nuclei" ] 
+if [ $axiomModule = "nuclei" ]
     then
+        cd $log_path
         cat $log_path/*|grep $year|grep -v Unsolicited
-fi
-
 #shuffledns
-if [ $axiomModule = "shuffledns" ] 
+elif [ $axiomModule = "shuffledns" ] 
     then
+        cd $log_path
         cat $log_path/*|grep -v 'INF\|WRN\|projectdiscovery'|grep '\.'
-fi
 
+#puredns
+elif [ $axiomModule = "puredns" ] 
+    then
+        cd $log_path
+        cat $log_path/*|grep -v 'INF\|WRN\|projectdiscovery'|grep '\.'
+
+else 
+    echo "module $axiomModule not supported"
+
+fi
 
 }
 
