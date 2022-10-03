@@ -15,7 +15,6 @@ axiomModule=$1
 #find latest folder of given axiomModule
 log_path=$(ls -td ~/.axiom/tmp/$axiomModule* 2>/dev/null| head -n 1|sed 's/://g')
 log_path=$log_path/logs
-echo "size ${#log_path}"
 
 #TODO add more grep especific rules for other modules
 year=$(date +"%Y-")
@@ -82,4 +81,3 @@ findAndMoveScans()
             mv -i "$file" "$folder"
     done
 }
-
