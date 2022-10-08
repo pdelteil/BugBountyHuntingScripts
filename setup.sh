@@ -38,6 +38,9 @@ go install github.com/tomnomnom/httprobe@master
 #gau 
 go install github.com/lc/gau/v2/cmd/gau@latest
 
+#waybackurls
+go install github.com/tomnomnom/waybackurls@latest
+
 echo -ne "${YELLOW}Adding bbrf_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/bbrf_helper.sh " >> $shellConfig
 
