@@ -25,7 +25,6 @@ updateProgram()
     #check if the program has that rule 
     check=$(bbrf show "$program" | grep -i "$rule")
 
-
     #careful when the remove url is a subdomain of a wildcard rule
 
     if [[ ${#check} -gt 0 ]]
@@ -69,7 +68,7 @@ getOnlyDisabledPrograms()
     COND="$2"
     if [ -z "$INPUT" ] 
     then
-        echo "Use ${FUNCNAME[0]} urls/domains"
+w        echo "Use ${FUNCNAME[0]} urls/domains"
         return 1;
     fi
     IFS=$'\n'
@@ -188,8 +187,12 @@ getStats()
 # it requires dnsx, subfinder and assetfinder
 # dnsx will get rid of dead subdomains
 # optional parameter is a file to output the data 
+# The objetive is to get subdomains using different tools and adding the results to BBRF 
 getDomains()
 {
+    dnsxThreads=200
+    subfinderThreads=100
+    gauThreads=10
     #no params
     file="$1"
     
@@ -208,22 +211,30 @@ getDomains()
     echo "$wild"|bbrf domain add - --show-new
     scopeIn=$(bbrf scope in)
     echo "$scopeIn"|bbrf domain add - --show-new
-    # when theres no wildcard we dont need the next steps
+    # when there's no wildcard we don't need the next steps
     if [ ${#wild} -gt 0 ]
         then
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|subfinder -t 100 -silent |dnsx -t 200 -silent |tee --append "$tempFile-subfinder"
+                echo "$scopeIn"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
             else
-                echo "$scopeIn"|subfinder -t 100 -silent |dnsx -t 200 -silent|bbrf domain add - -s subfinder  --show-new;
+                echo "$scopeIn"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder  --show-new;
             fi
-            echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
 
+            echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|assetfinder|dnsx -t 200 -silent|tee --append "$tempFile-assetfinder"
+                echo "$scopeIn"|assetfinder|dnsx -t $dnsxThreads -silent|tee --append "$tempFile-assetfinder.txt"
             else
-                echo "$scopeIn"|assetfinder|dnsx -t 200 -silent|bbrf domain add - -s assetfinder --show-new;
+                echo "$scopeIn"|assetfinder|dnsx -t $dnsxThreads -silent|bbrf domain add - -s assetfinder --show-new;
             fi
+
+            echo -ne "${RED} Running gau ${ENDCOLOR}\n"
+            if [ "$fileMode" = true ] ; then
+                gau --subs "$scopeIn" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| tee --append "$tempFile-gau.txt"
+             else
+                gau --subs "$scopeIn" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| bbrf domain add - -s gau --show-new;
+            fi
+
    fi
 }
 
@@ -463,12 +474,12 @@ addInChunks()
         then
             sed -n "$elements" "$file"|bbrf url add - -s "$source" --show-new -p@INFER
         else
-	    if [ "$resolve" == "resolve" ]
-            then 
-	        sed -n "$elements" "$file"|dnsx -silent|bbrf domain add - -s "$source" --show-new -p@INFER
-	    else 
-	        sed -n "$elements" "$file"|bbrf domain add - -s "$source" --show-new -p@INFER
-	    fi 
+    	    if [ "$resolve" == "resolve" ]
+                then 
+    	        sed -n "$elements" "$file"|dnsx -silent|bbrf domain add - -s "$source" --show-new -p@INFER
+    	    else 
+    	        sed -n "$elements" "$file"|bbrf domain add - -s "$source" --show-new -p@INFER
+    	    fi 
         fi
         init=$(( $init + $chunkSize ))
         end=$(( $end + $chunkSize ))
