@@ -35,6 +35,9 @@ echo -ne "${YELLOW}Installing httprobe ${ENDCOLOR}\n"
 #httprobe
 go install github.com/tomnomnom/httprobe@master
 
+#gau 
+go install github.com/lc/gau/v2/cmd/gau@latest
+
 echo -ne "${YELLOW}Adding bbrf_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/bbrf_helper.sh " >> $shellConfig
 
