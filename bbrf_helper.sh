@@ -235,6 +235,15 @@ getDomains()
                 gau --subs "$scopeIn" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| bbrf domain add - -s gau --show-new;
             fi
 
+            echo -ne "${RED} Running waybackurls ${ENDCOLOR}\n"
+            # we just remove the leading wildcard *.
+            scopeIn=$(echo $scopeIn | tr -d '*.')
+            if [ "$fileMode" = true ] ; then
+                echo $scopeIn| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| tee --append "$tempFile-waybackurls.txt"
+             else
+                echo $scopeIn| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| bbrf domain add - -s waybackurls --show-new;
+            fi
+
    fi
 }
 
