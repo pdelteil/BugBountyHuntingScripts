@@ -154,7 +154,7 @@ getStats()
     IFS=$'\n'
     filename=$1
     #headers
-    headers="Program; Site; disabled; reward; author; notes; added Date; #domains; #urls; #IPS" 
+    headers="Program; Site; Program url; disabled; reward; author; notes; added Date; #domains; #urls; #IPS" 
     echo -e $headers >> $filename
     echo "Getting stats of programs"
     
@@ -167,16 +167,18 @@ getStats()
             echo -en "${YELLOW}($i/$numberPrograms)${ENDCOLOR} $program\n"
             #fields/columns
             description=$(bbrf show "$program")
-            site=$(echo "$description"    |jq -r '.tags.site')
-            reward=$(echo "$description"  |jq -r '.tags.reward')
-            disabled=$(echo "$description"|jq -r '.disabled')
-            author=$(echo "$description"|jq -r '.tags.author')
+            site=$(echo "$description" |jq -r '.tags.site')
+            reward=$(echo "$description" |jq -r '.tags.reward')
+            programUrl=$(echo "$description" |jq -r 'tags.url')
+            disabled=$(echo "$description" |jq -r '.disabled')
+            author=$(echo "$description" |jq -r '.tags.author')
             notes=$(echo "$description" |jq -r '.tags.notes') 
             addedDate=$(echo "$description" |jq -r '.tags.addedDate')
+            #metrics 
             numUrls=$(bbrf urls -p "$program"|wc -l)
             numDomains=$(bbrf domains -p "$program"|wc -l)
             numIPs=$(bbrf ips -p "$program"|wc -l)
-            values="$program; $site; $disabled; $reward; $author; $notes; $addedDate; $numDomains; $numUrls; $numIPs"
+            values="$program; $site; $programUrl; $disabled; $reward; $author; $notes; $addedDate; $numDomains; $numUrls; $numIPs"
             echo -e $values >> $filename
             i=$(( $i + 1))
         done
