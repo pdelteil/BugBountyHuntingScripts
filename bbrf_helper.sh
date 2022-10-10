@@ -716,7 +716,18 @@ addIPsFromCIDR()
 #the output if all urls but urls from programs with tag gov
 getBugBountyUrls()
 {
-    allPrograms=$(bbrf programs)
+    if [ "$1" == "-d" ]
+        then
+            param="--show-disabled"
+    elif [ -z "$1" ]
+        then
+            param=""
+    else
+        echo "Use ${FUNCNAME[0]} -d to include disabled programs"
+        return 1;
+        
+    fi
+    allPrograms=$(bbrf programs $param)
     IFS=$'\n'
     for program in $(echo "$allPrograms");
         do
