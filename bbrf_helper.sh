@@ -717,9 +717,9 @@ addIPsFromCIDR()
 getBugBountyData()
 {
     param=""
-    if [[ "$1" != "domains"  &&  "$1" != "urls" ]] || [[ "$2" != "-d"  &&  -n "$2" ]] 
+    if [[ "$1" != "domains"  &&  "$1" != "urls" && "$1" != "ips" ]] || [[ "$2" != "-d"  &&  -n "$2" ]] 
         then
-            echo "Use ${FUNCNAME[0]} domains/urls "
+            echo "Use ${FUNCNAME[0]} domains/urls/ips "
             echo "Add -d to include disabled programs"
             return 1 
     elif [ "$2" == "-d" ]
@@ -738,7 +738,7 @@ getBugBountyData()
             if [ "$gov" == "true" ]
             then
                 echo ""
-            else
+            else    
                 bbrf $data -p "$program"
             fi   
         done
