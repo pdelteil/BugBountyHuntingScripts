@@ -15,7 +15,7 @@ updateProgram()
   if [ -z "$1" ]
     then
         echo "Use ${FUNCNAME[0]} program rule"
-        return 1;
+        return 1
     fi
 
     #this should work for adding/removing a inscope rule 
@@ -68,14 +68,14 @@ getOnlyDisabledPrograms()
     COND="$2"
     if [ -z "$INPUT" ] 
     then
-w        echo "Use ${FUNCNAME[0]} urls/domains"
-        return 1;
+        echo "Use ${FUNCNAME[0]} urls/domains"
+        return 1
     fi
     IFS=$'\n'
     if [[  "$INPUT" != "urls"  &&  "$INPUT" != "domains" ]]
     then
         echo "Use ${FUNCNAME[0]} urls/domains"
-        return 1;
+        return 1
     fi
     if [[  "$INPUT" == "urls" ]] | [[  "$INPUT" == "domains" ]]
     then
@@ -121,7 +121,7 @@ getInScope()
     then
        echo "Use ${FUNCNAME[0]} outputfile.txt"
        echo "Use ${FUNCNAME[0]} -disabled outputfile.txt (to include disabled programs)"
-       return 1;
+       return 1
     fi
     outputFile="$1"
     IFS=$'\n' 
@@ -148,7 +148,7 @@ getStats()
      if [ -z "$1" ]
       then
        echo "Use ${FUNCNAME[0]} outputfile.txt"
-       return 1;
+       return 1
     fi
 
     IFS=$'\n'
@@ -269,7 +269,7 @@ addPrograms()
     if [ -z "$1" ] || [ -z "$2" ]
     then
       echo -ne "Use ${FUNCNAME[0]} site author\nExample ${FUNCNAME[0]} h1 hunter\nExample ${FUNCNAME[0]} bugcrowd hunter\n"
-      return 1;
+      return 1
     fi
     unset IFS
     while true;
@@ -401,7 +401,7 @@ removeInChunks()
         return 1
     fi
 
-    size=$(cat "$file"|wc -l); 
+    size=$(cat "$file"|wc -l) 
     echo "Size "$size
     #default value for chunk size
     if [ -z "$chunkSize" ]
@@ -415,7 +415,7 @@ removeInChunks()
     init=1
     end=$chunkSize
 
-    for i in $(seq 1 $parts);
+    for i in $(seq 1 $parts)
     do
         echo "Removing chunk $i/$parts"
         element="${init},${end}p"; 
@@ -474,10 +474,10 @@ addInChunks()
     init=1
     end=$chunkSize
 
-    for i in $(seq 1 $parts);
+    for i in $(seq 1 $parts)
      do
         echo "Adding chunk $i/$parts"
-        elements="${init},${end}p"; 
+        elements="${init},${end}p" 
 
         if [ "$type" == "urls" ]
         then
@@ -501,18 +501,18 @@ resolveDomainsInChunks()
  if [ -z "$1" ] || [ -z "$2" ]
     then
       echo "Use ${FUNCNAME[0]} fileUnresolvedDomains"
-      return 1;
+      return 1
     fi
 
  file=$1
- size=$(cat $file |wc -l); 
+ size=$(cat $file |wc -l) 
  echo $size
  chunk=100
  parts=$((size%chunk?size/chunk+1:size/chunk))
  echo $parts
  init=1
  end=$chunk
- for i in $(seq 1 $parts) ; 
+ for i in $(seq 1 $parts)  
     do
         echo "try $i"
         
@@ -535,7 +535,7 @@ checkProgram()
     if [ -z "$1" ]
     then
       echo "Use ${FUNCNAME[0]} text"
-      return 1;
+      return 1
     fi
     text="$1"
     output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
@@ -555,7 +555,7 @@ findProgram()
     if [ -z "$INPUT" ]
     then
       echo "Use ${FUNCNAME[0]} URL, domain or IP Address"
-      return 1;
+      return 1
     fi
     show=$(bbrf show "$INPUT") 
     program=$(echo "$show" |jq -r '.program')
@@ -601,12 +601,12 @@ listTagValues()
     if [ -z "$1" ]
     then
         echo "Use ${FUNCNAME[0]} TagName"
-        return 1;
+        return 1
     fi
 
     tag="$1"
     IFS=$'\n'
-    for program in $(bbrf programs --show-disabled);
+    for program in $(bbrf programs --show-disabled)
         do 
             key=$(bbrf show "$program"|jq '.tags.site')
             #echo $program ", "$key
@@ -632,7 +632,7 @@ debugMode()
  if [ -z "$1" ]
     then
         echo "Use ${FUNCNAME[0]} false/true"
-        return 1;
+        return 1
  fi
  if [ "false" == "$1" ]
     then
@@ -663,7 +663,7 @@ showProgram()
     if [ -z "$1" ] 
     then
         echo "Use ${FUNCNAME[0]} programName -stats [optional, displays number of urls and domains]"
-        return 1;
+        return 1
     fi
     program="$1"
     output=$(bbrf show "$program"|jq)
@@ -703,7 +703,7 @@ addIPsFromCIDR()
     if [ -z "$1" ] | [ -z "$2" ]
     then
         echo "Use ${FUNCNAME[0]} 128.177.123.72/29 program"
-        return 1;
+        return 1
     fi
 
     CIDR="$1"
@@ -714,30 +714,32 @@ addIPsFromCIDR()
 # TODO add flag to include disabled programs
 #this function is especific for my implementation. 
 #the output if all urls but urls from programs with tag gov
-getBugBountyUrls()
+getBugBountyData()
 {
-    if [ "$1" == "-d" ]
+    param=""
+    if [[ "$1" != "domains"  &&  "$1" != "urls" ]] || [[ "$2" != "-d"  &&  -n "$2" ]] 
+        then
+            echo "Use ${FUNCNAME[0]} domains/urls "
+            echo "Add -d to include disabled programs"
+            return 1 
+    elif [ "$2" == "-d" ]
         then
             param="--show-disabled"
-    elif [ -z "$1" ]
-        then
-            param=""
     else
-        echo "Use ${FUNCNAME[0]} -d to include disabled programs"
-        return 1;
-        
+      data="$1"
     fi
     allPrograms=$(bbrf programs $param)
+
     IFS=$'\n'
     for program in $(echo "$allPrograms");
         do
             description=$(bbrf show "$program")
-            gob=$(echo "$description"  |jq -r '.tags.gov')
-            if [ "$gob" == "true" ]
+            gov=$(echo "$description"  |jq -r '.tags.gov')
+            if [ "$gov" == "true" ]
             then
                 echo ""
             else
-                bbrf urls -p "$program"
+                bbrf $data -p "$program"
             fi   
         done
 }
@@ -750,7 +752,7 @@ getUrlsWithProgramTag()
     then
         echo "Use ${FUNCNAME[0]} tag value"
         echo "Example ${FUNCNAME[0]} site intigriti"
-        return 1;
+        return 1
     fi
 
     TAG="$1"
@@ -769,7 +771,7 @@ removeUrls()
     then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
-        return 1;
+        return 1
     fi
 
     PROGRAM="$1"
@@ -783,7 +785,7 @@ removeDomains()
     then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
-        return 1;
+        return 1
     fi
 
     PROGRAM="$1"
@@ -797,7 +799,7 @@ removeInScope()
     then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
-        return 1;
+        return 1
     fi
 
     PROGRAM="$1"
@@ -811,7 +813,7 @@ removeOutScope()
     then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
-        return 1;
+        return 1
     fi
 
     PROGRAM="$1"
@@ -825,7 +827,7 @@ clearProgramData()
     then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
-        return 1;
+        return 1
     fi
 
     PROGRAM="$1"
