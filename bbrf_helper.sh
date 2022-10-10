@@ -563,7 +563,7 @@ checkProgram()
     else    
         echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
     fi
-    #TODO: call showProgram from here, showing numeric options
+    #TODO: call wshowProgram from here, showing numeric options
 }
 
 #finds the program name from a domain, URL or IP Adress. 
@@ -709,8 +709,8 @@ showProgram()
     then
         domains=$(bbrf domains -p "$program"|wc -l)
         urls=$(bbrf urls -p "$program"|wc -l) 
-        echo "${YELLOW}#domains: "$domains
-        echo "#urls: "$urls"${ENDCOLOR}"
+        echo -en "${YELLOW}#domains: "$domains "\n"
+        echo -en "#urls: "$urls"${ENDCOLOR}\n"
          
     else
         echo "Use ${FUNCNAME[0]} programName -stats [optional, displays number of urls and domains] "
