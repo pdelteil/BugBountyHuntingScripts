@@ -719,8 +719,8 @@ getBugBountyData()
     param=""
     if [[ "$1" != "domains"  &&  "$1" != "urls" && "$1" != "ips" ]] || [[ "$2" != "-d"  &&  -n "$2" ]] 
         then
-            echo "Use ${FUNCNAME[0]} domains/urls/ips "
-            echo "Add -d to include disabled programs"
+            echo -en "${YELLOW}Use ${FUNCNAME[0]} domains/urls/ips "
+            echo -en "(Add -d to include disabled programs)${ENDCOLOR}\n"
             return 1 
     elif [ "$2" == "-d" ]
         then
