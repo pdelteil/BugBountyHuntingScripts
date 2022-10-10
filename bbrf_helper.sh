@@ -140,25 +140,35 @@ getInScope()
             bbrf scope in -p "$program" >> $outputFile
         done
 }
-# creates a file with BBRF stats in CSV format
-# The output is in the form  program1, #domains, #urls
-# Input parameter: filename
+# creates a file with BBRF stats in CSV format (using ; as separator)
+# By default outputs all programs including the ones with no defined inscope.
+# Use the -nd flag to output only enabled programs
+
+# Examples 
+# > getStats bbrf.stats.csv  #all programs 
+# > getStats bbrf.stats.enabled.csv -nd #all programs excluding disabled ones
+
 getStats()
 {   
-     if [ -z "$1" ]
-      then
-       echo "Use ${FUNCNAME[0]} outputfile.csv"
-       return 1
+    if [[ -z "$1" ]] || [[ "$2" != "-nd"  &&  -n "$2" ]] 
+        then
+            echo "Use ${FUNCNAME[0]} outputfile.csv -nd (not to include disabled programs)"
+            return 1
     fi
-
+    if [[ "$2" == "-nd" ]]
+        then
+            param=""
+        else 
+            param="--show-disabled"
+    fi
     IFS=$'\n'
-    filename=$1
+    filename="$1"
     #headers
     headers="Program; Site; Program url; disabled; reward; author; notes; added Date; #domains; #urls; #IPS" 
     echo -e $headers >> $filename
-    echo "Getting stats of programs"
+    echo "Getting stats of programs $param"
     
-    allPrograms=$(bbrf programs --show-disabled --show-empty-scope)
+    allPrograms=$(bbrf programs $param --show-empty-scope)
     numberPrograms=$(echo "$allPrograms"|wc -l)
     #counter
     i=1
@@ -185,11 +195,13 @@ getStats()
 }
 
 
-# This function is used when adding a new program 
-# it requires dnsx, subfinder and assetfinder
+# This function it's an interactive program to add new bbh programs 
+# it requires dnsx, subfinder, gau, waybackurls, httprobe and assetfinder
 # dnsx will get rid of dead subdomains
 # optional parameter is a file to output the data 
 # The objetive is to get subdomains using different tools and adding the results to BBRF 
+# The taget program is the BBRF active program
+# TODO: add flag -p to run getDomains to an especific program
 getDomains()
 {
     dnsxThreads=200
@@ -253,13 +265,14 @@ getDomains()
 # it requires httpx and httprobe
 getUrls()
 {
+    threads=150
     doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n')
     if [ ${#doms} -gt 0 ]
         then
             echo -en "${RED} httpx domains ${ENDCOLOR}\n"
-            echo "$doms"|httpx -silent -threads 150|bbrf url add - -s httpx --show-new
+            echo "$doms"|httpx -silent -threads $threads|bbrf url add - -s httpx --show-new
             echo -en "${RED} httprobe domains ${ENDCOLOR}\n"
-            echo "$doms"|httprobe -c 150 --prefer-https|bbrf url add - -s httprobe --show-new
+            echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new
     fi
 }
 # Use this function if you need to add several programs from a site
@@ -276,7 +289,7 @@ addPrograms()
     unset IFS
     while true;
     do
-        # Read the user input
+        # Read user's input
         site="$1"
         author="$2"
         addedDate=$(date +%D-%H:%M)
@@ -295,7 +308,7 @@ addPrograms()
         # TODO create tentative url combining site + program name
         read url
         #recon true means the scope is not bounded or clear
-        # So you could spend more time/resources doing more specific recon
+        #If you could spend more time/resources doing more specific recon
         echo -en "${YELLOW}Recon? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
         read recon
         case $recon in 
@@ -532,6 +545,9 @@ resolveDomainsInChunks()
   done
 } 
 #Checks if a program exists based on part of the name
+# Example
+# checkProgram hackerone 
+# checkProgram hacker  #all programs containing hacker in the program's name
 checkProgram()
 {
     if [ -z "$1" ]
@@ -547,10 +563,16 @@ checkProgram()
     else    
         echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
     fi
+    #TODO: call showProgram from here, showing numeric options
 }
 
 #finds the program name from a domain, URL or IP Adress. 
 #Useful when you find a bug but you don't know where to report it (what programs it belongs to). 
+# Examples
+# findProgram http://www.hackerone.com 
+# findProgram www.hackerone.com 
+# findProgram 104.16.99.52
+
 findProgram()
 {
     INPUT=$(echo "$1"|sed -e 's|^[^/]*//||' -e 's|/.*$||') #in case the input has a trailing / 
@@ -584,10 +606,8 @@ findProgram()
         source="(.tags.sourceCode|tostring)"
         notes=".tags.notes"
         api=".tags.api"
-        #this part is hard -> need to find a way to simplify it
-        #tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"
+        #this part is hard to update -> need to find a way to simplify it
         tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"'+ ", api: "+'"$api"
-        #echo "show: $show"
         output=$(bbrf show "$program" | jq "$tags" |tr -d '"'| sed 's/,/\n/g')
         echo -ne "\n$output\n\n"
         
@@ -689,8 +709,8 @@ showProgram()
     then
         domains=$(bbrf domains -p "$program"|wc -l)
         urls=$(bbrf urls -p "$program"|wc -l) 
-        echo "#domains "$domains
-        echo "#urls "$urls
+        echo "${YELLOW}#domains: "$domains
+        echo "#urls: "$urls"${ENDCOLOR}"
          
     else
         echo "Use ${FUNCNAME[0]} programName -stats [optional, displays number of urls and domains] "
