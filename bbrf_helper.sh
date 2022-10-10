@@ -147,14 +147,14 @@ getStats()
 {   
      if [ -z "$1" ]
       then
-       echo "Use ${FUNCNAME[0]} outputfile.txt"
+       echo "Use ${FUNCNAME[0]} outputfile.csv"
        return 1
     fi
 
     IFS=$'\n'
     filename=$1
     #headers
-    headers="Program, Site, disabled, reward, author, notes, #domains, #urls, #IPS" 
+    headers="Program; Site; disabled; reward; author; notes; added Date; #domains; #urls; #IPS" 
     echo -e $headers >> $filename
     echo "Getting stats of programs"
     
@@ -176,7 +176,7 @@ getStats()
             numUrls=$(bbrf urls -p "$program"|wc -l)
             numDomains=$(bbrf domains -p "$program"|wc -l)
             numIPs=$(bbrf ips -p "$program"|wc -l)
-            values="$program, $site, $disabled, $reward, $author, $notes, $addedDate, $numDomains, $numUrls, $numIPs"
+            values="$program; $site; $disabled; $reward; $author; $notes; $addedDate; $numDomains; $numUrls; $numIPs"
             echo -e $values >> $filename
             i=$(( $i + 1))
         done
