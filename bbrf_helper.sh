@@ -147,7 +147,6 @@ getInScope()
 # Examples 
 # > getStats bbrf.stats.csv  #all programs 
 # > getStats bbrf.stats.enabled.csv -nd #all programs excluding disabled ones
-
 getStats()
 {   
     if [[ -z "$1" ]] || [[ "$2" != "-nd"  &&  -n "$2" ]] 
@@ -187,7 +186,7 @@ getStats()
             #metrics 
             numUrls=$(bbrf urls -p "$program"|wc -l)
             numDomains=$(bbrf domains -p "$program"|wc -l)
-            numIPs=$(bbrf ips -p "$program"|wc -l)
+            #numIPs=$(bbrf ips -p "$program"|wc -l)
             values="$program; $site; $programUrl; $disabled; $reward; $author; $notes; $addedDate; $numDomains; $numUrls; $numIPs"
             echo -e $values >> $filename
             i=$(( $i + 1))
@@ -296,13 +295,20 @@ addPrograms()
         echo -en "${YELLOW}Program name: ${ENDCOLOR}"
         read program
         program=$(echo $program|sed 's/^ *//;s/ *$//')
-        echo -en "${YELLOW}Reward? (1:money[default:press Enter], 2:points, 3:thanks) ${ENDCOLOR} "
+        echo -en "${YELLOW}Reward? (1:money[default:press Enter], 2:points, 3:thanks) ${ENDCOLOR}"
         read reward
         case $reward in
             1 )    val="money";;
             2 )    val="points";;
             3 )    val="thanks";;
             "")    val="money";;
+        esac
+        echo -en "${YELLOW}Public or private? (1:public[default:press Enter], 2:private)${ENDCOLOR}"
+        read public
+        case $public in 
+            1)    val_public="true";;
+            2)    val_public="false";;
+           "")    val_public="true";;
         esac
         echo -en "${YELLOW}Url? ${ENDCOLOR} "
         # TODO create tentative url combining site + program name
@@ -349,12 +355,12 @@ addPrograms()
                 echo -en "${YELLOW}APi endpoints? ${ENDCOLOR} "
                 read api_endpoints
         fi
-        echo -en "${YELLOW}Notes/Comments? ${ENDCOLOR} (press enter if empty) "
+        echo -en "${YELLOW}Notes/Comments? ${ENDCOLOR} (press enter if empty)"
         read notes
 
         result=$(bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
                  -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" \
-                 -t author:"$author" -t notes:"$notes" -t api:"$val_api" -t api_endpoints:"$api_endpoints")
+                 -t author:"$author" -t notes:"$notes" -t api:"$val_api" -t api_endpoints:"$api_endpoints" -t public:"$public")
         #echo $result
         if [[ $result == *"conflict"* ]] 
             then
