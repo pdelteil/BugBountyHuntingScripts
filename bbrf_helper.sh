@@ -360,7 +360,7 @@ addPrograms()
 
         result=$(bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
                  -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" \
-                 -t author:"$author" -t notes:"$notes" -t api:"$val_api" -t api_endpoints:"$api_endpoints" -t public:"$public")
+                 -t author:"$author" -t notes:"$notes" -t api:"$val_api" -t api_endpoints:"$api_endpoints" -t public:"$val_public")
         #echo $result
         if [[ $result == *"conflict"* ]] 
             then
@@ -391,8 +391,15 @@ addPrograms()
                bbrf scope out -p "$program"
                echo -ne "${ENDCOLOR}\n"  
         fi
-    echo -ne "${RED}Getting domains${ENDCOLOR}\n"; getDomains  
-    echo -ne "${RED}Getting urls ${ENDCOLOR}\n"; getUrls  
+        if [ ${#inscope_input} -gt 0 ]
+            then
+                echo -ne "${RED}Getting domains${ENDCOLOR}\n"
+                getDomains  
+                echo -ne "${RED}Getting urls ${ENDCOLOR}\n"
+                getUrls  
+
+        fi
+
     done
 } 
 
