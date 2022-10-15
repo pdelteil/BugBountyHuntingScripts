@@ -6,12 +6,13 @@ showLogs()
 {
  if [ -z "$1" ]
     then
-      echo "Use ${FUNCNAME[0]} axiomModule"
-      echo -e "Supported modules\n nuclei\n shuffledns\n puredns-bruteforce"
+      echo "Use ${FUNCNAME[0]} axiomModule -stats (optional, will show only number of output values)"
+      echo -e "Supported modules\n nuclei\n shuffledns\n puredns-bruteforce\n httpx"
       return 1;
     fi
 
 axiomModule=$1
+stats=$2
 #find latest folder of given axiomModule
 log_path=$(ls -td ~/.axiom/tmp/$axiomModule* 2>/dev/null| head -n 1|sed 's/://g')
 log_path=$log_path/logs
@@ -20,7 +21,6 @@ log_path=$log_path/logs
 year=$(date +"%Y-")
 
 #nuclei 
-
 if [ $axiomModule = "nuclei" ]
     then
         if [ ${#log_path} -gt 5 ]
@@ -51,7 +51,22 @@ elif [ $axiomModule = "puredns-bruteforce" ];
               echo "No logs"
 
         fi
-
+#httpx
+elif [ $axiomModule = "httpx" ]
+    echo "ok "$2
+    then
+        if [ ${#log_path} -gt 5 ]
+           then
+               cd $log_path
+               if [ "$stats" == "-stats" ]
+                   then
+                       wc -l *
+                   else
+                       tail -f *
+              fi
+        else 
+              echo "No logs"
+        fi
 else 
     echo "module $axiomModule not supported"
 
