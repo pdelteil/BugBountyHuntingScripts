@@ -53,7 +53,6 @@ elif [ $axiomModule = "puredns-bruteforce" ];
         fi
 #httpx
 elif [ $axiomModule = "httpx" ]
-    echo "ok "$2
     then
         if [ ${#log_path} -gt 5 ]
            then
