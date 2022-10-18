@@ -147,6 +147,7 @@ getInScope()
 # Examples 
 # > getStats bbrf.stats.csv  #all programs 
 # > getStats bbrf.stats.enabled.csv -nd #all programs excluding disabled ones
+# TODO Include flags to choose whether to include #domains, #urls or #ips
 getStats()
 {   
     if [[ -z "$1" ]] || [[ "$2" != "-nd"  &&  -n "$2" ]] 
@@ -195,57 +196,87 @@ getStats()
 
 
 # This function it's an interactive program to add new bbh programs 
-# it requires dnsx, subfinder, gau, waybackurls, httprobe and assetfinder
+# it requires dnsx, subfinder, gau, waybackurls, httprobe and assetfinder.
 # dnsx will get rid of dead subdomains
 # optional parameter is a file to output the data 
 # The objetive is to get subdomains using different tools and adding the results to BBRF 
-# The taget program is the BBRF active program
+# The target program is the BBRF active program
 # TODO: add flag -p to run getDomains to an especific program
+# Examples 
+# Recon subdomains for active BBRF program
+# > getDomains 
+# Recon subdomains for testProgram
+# > getDomains -p testProgram 
+# Output results to file instead of BBRF.
+# > getDomains -f outputFile.txt 
 getDomains()
 {
+    #thread configs
     dnsxThreads=200
     subfinderThreads=100
     gauThreads=10
     #no params
-    file="$1"
+    flag="$1"
     
-    if [ -z "$file" ]
+    if [ -z $flag ] 
     then
         echo -ne "${YELLOW} Running bbrf mode ${ENDCOLOR}\n"
-    else
-        echo -ne "${YELLOW} Running filemode ${ENDCOLOR}\n"
-        fileMode=true
-        tempFile="/tmp/$file.temp"
+    elif [ $flag == "-f" ]
+    then
+        if [ -n "$2" ]
+        then
+            file="$2"
+            tempFile="/tmp/$file.temp"
+            echo -ne "${YELLOW} Running filemode ${ENDCOLOR}\n"
+            echo -ne "${YELLOW}    Writing results to $tempFile  ${ENDCOLOR}\n"
+            fileMode=true
+        else
+            echo -ne "${YELLOW} filename needed!${ENDCOLOR}\n"
+            echo -ne "${YELLOW} Use getDomains -f filename.ext ${ENDCOLOR}\n"
+
+            return -1
+        fi
+    elif [ $flag == "-p" ] 
+    then
+        if [ -n "$2" ]
+        then           
+            params="-p $2"
+        else
+            echo "add ProgramName"
+            return -1
+        fi
     fi
 
     IFS=$'\n'
-    wild=$(bbrf scope in --wildcard|grep -v DEBUG)
-    echo "$wild"|bbrf inscope add -
-    echo "$wild"|bbrf domain add - --show-new
-    scopeIn=$(bbrf scope in)
-    echo "$scopeIn"|bbrf domain add - --show-new
+    echo "params $params"
+    scopeIn=$(bbrf scope in $params)
+    echo "$scopeIn"|bbrf domain add - $params --show-new
+    wild=$(bbrf scope in --wildcard $params| grep -v DEBUG)
     # when there's no wildcard we don't need the next steps
     if [ ${#wild} -gt 0 ]
         then
+            echo "$wild"|bbrf inscope add - $params
+            echo "$wild"|bbrf domain add - $params --show-new
+
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
                 echo "$scopeIn"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
             else
-                echo "$scopeIn"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder  --show-new;
+                echo "$scopeIn"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
             fi
 
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
                 echo "$scopeIn"|assetfinder|dnsx -t $dnsxThreads -silent|tee --append "$tempFile-assetfinder.txt"
             else
-                echo "$scopeIn"|assetfinder|dnsx -t $dnsxThreads -silent|bbrf domain add - -s assetfinder --show-new;
+                echo "$scopeIn"|assetfinder|dnsx -t $dnsxThreads -silent|bbrf domain add - -s assetfinder $params --show-new
             fi
 
             echo -ne "${RED} Running gau ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
                 gau --subs "$scopeIn" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| tee --append "$tempFile-gau.txt"
              else
-                gau --subs "$scopeIn" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| bbrf domain add - -s gau --show-new;
+                gau --subs "$scopeIn" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| bbrf domain add - -s gau $params --show-new
             fi
 
             echo -ne "${RED} Running waybackurls ${ENDCOLOR}\n"
@@ -254,9 +285,8 @@ getDomains()
             if [ "$fileMode" = true ] ; then
                 echo $scopeIn| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| tee --append "$tempFile-waybackurls.txt"
              else
-                echo $scopeIn| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| bbrf domain add - -s waybackurls --show-new;
+                echo $scopeIn| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| bbrf domain add - -s waybackurls $params --show-new
             fi
-
    fi
 }
 
