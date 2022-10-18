@@ -777,9 +777,20 @@ addIPsFromCIDR()
     #params are just to speed up ping
     fping -t 5 -r 1  -b 1 -g $CIDR 2> /dev/null|awk '{print $1}'|bbrf ip add - -p $program --show-new
 }
-# TODO add flag to include disabled programs
 #this function is especific for my implementation. 
-#the output if all urls but urls from programs with tag gov
+# Examples
+
+# get domains from enabled programs and not gov programs
+# > getBugBountyData domains
+
+# get domains from enabled and disabled programs and not gov programs
+# > getBugBountyData domains -d
+
+# get urls from enabled programs and not gov programs
+# > getBugBountyData urls
+
+# get IPs from enabled programs and not gov programs
+# > getBugBountyData ip
 getBugBountyData()
 {
     param=""
