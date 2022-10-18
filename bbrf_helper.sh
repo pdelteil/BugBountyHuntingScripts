@@ -248,7 +248,6 @@ getDomains()
     fi
 
     IFS=$'\n'
-    echo "params $params"
     scopeIn=$(bbrf scope in $params)
     echo "$scopeIn"|bbrf domain add - $params --show-new
     wild=$(bbrf scope in --wildcard $params| grep -v DEBUG)
