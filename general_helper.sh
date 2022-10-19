@@ -171,3 +171,13 @@ getTLDs()
     tlds=$(grep country-code "$FILE" |awk -F "," '{print $1}'|grep -Pv '[^\x00-\x7F]'|awk -v target=$target '{print target$1}' |dnsx -silent| awk '{print "*."$1}')
     echo "$tlds"| tr '\n' ' '
 }
+#finds the words that repeat the most in subdomains names
+sortByDomainCount()
+{
+    cat $1 | tr '\.' '\n'|sort| uniq -c |sort -nr
+}
+
+findIpsInDomains()
+{
+    cat $1 |  grep -E '[0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3}'
+}
