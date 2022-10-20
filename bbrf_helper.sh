@@ -264,15 +264,14 @@ getDomains()
                 for scope in $(echo "$wild")
                     do                
                         echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                        amass enum -d $domain -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
+                        amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
                 done
             else
                 for domain in $(echo "$wild")
                     do
                         echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                        amass enum -d $domain -passive 2>/dev/null | dnsx -t $dnsxThreads -silent | bbrf domain add - -s amass $params --show-new
+                        amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent | bbrf domain add - -s amass $params --show-new
                 done
-                #echo "$scopeIn"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
             fi
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
@@ -296,8 +295,6 @@ getDomains()
             fi
 
             echo -ne "${RED} Running waybackurls ${ENDCOLOR}\n"
-            # we just remove the leading wildcard *.
-            #scopeIn=$(echo $scopeIn | tr -d '*.')
             if [ "$fileMode" = true ] ; then
                 echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| tee --append "$tempFile-waybackurls.txt"
              else
