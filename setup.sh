@@ -35,11 +35,17 @@ echo -ne "${YELLOW}Installing httprobe ${ENDCOLOR}\n"
 #httprobe
 go install github.com/tomnomnom/httprobe@master
 
+echo -ne "${YELLOW}Installing gau ${ENDCOLOR}\n" 
 #gau 
 go install github.com/lc/gau/v2/cmd/gau@latest
 
+echo -ne "${YELLOW}Installing waybackurls ${ENDCOLOR}\n" 
 #waybackurls
 go install github.com/tomnomnom/waybackurls@latest
+
+echo -ne "${YELLOW}Installing amass ${ENDCOLOR}\n" 
+#amass 
+go install -v github.com/OWASP/Amass/v3/...@master
 
 echo -ne "${YELLOW}Adding bbrf_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/bbrf_helper.sh " >> $shellConfig
