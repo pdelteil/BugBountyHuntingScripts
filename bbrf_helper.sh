@@ -231,7 +231,7 @@ getDomains()
             echo -ne "${YELLOW}    Writing results to $tempFile  ${ENDCOLOR}\n"
             fileMode=true
         else
-            echo -ne "${YELLOW} filename needed!${ENDCOLOR}\n"
+            echo -ne "${YELLOW} Filename needed!${ENDCOLOR}\n"
             echo -ne "${YELLOW} Use getDomains -f filename.ext ${ENDCOLOR}\n"
 
             return -1
@@ -241,8 +241,10 @@ getDomains()
         if [ -n "$2" ]
         then           
             params="-p $2"
+            echo "$params"
         else
-            echo "add ProgramName"
+            echo "add Program name!"
+            echo "> getDomains -p program "
             return -1
         fi
     fi
@@ -257,34 +259,49 @@ getDomains()
             echo "$wild"|bbrf inscope add - $params
             echo "$wild"|bbrf domain add - $params --show-new
 
+            echo -ne "${RED} Running amass ${ENDCOLOR}\n"
+            if [ "$fileMode" = true ] ; then
+                for scope in $(echo "$wild")
+                    do                
+                        echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
+                        amass enum -d $domain -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
+                done
+            else
+                for domain in $(echo "$wild")
+                    do
+                        echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
+                        amass enum -d $domain -passive 2>/dev/null | dnsx -t $dnsxThreads -silent | bbrf domain add - -s amass $params --show-new
+                done
+                #echo "$scopeIn"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
+            fi
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
+                echo "$wild"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
             else
-                echo "$scopeIn"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
+                echo "$wild"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
             fi
-
+ 
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
-                echo "$scopeIn"|assetfinder|dnsx -t $dnsxThreads -silent|tee --append "$tempFile-assetfinder.txt"
+                echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent|tee --append "$tempFile-assetfinder.txt"
             else
-                echo "$scopeIn"|assetfinder|dnsx -t $dnsxThreads -silent|bbrf domain add - -s assetfinder $params --show-new
+                echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent|bbrf domain add - -s assetfinder $params --show-new
             fi
 
             echo -ne "${RED} Running gau ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
-                gau --subs "$scopeIn" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| tee --append "$tempFile-gau.txt"
+                gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| tee --append "$tempFile-gau.txt"
              else
-                gau --subs "$scopeIn" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| bbrf domain add - -s gau $params --show-new
+                gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| bbrf domain add - -s gau $params --show-new
             fi
 
             echo -ne "${RED} Running waybackurls ${ENDCOLOR}\n"
             # we just remove the leading wildcard *.
-            scopeIn=$(echo $scopeIn | tr -d '*.')
+            #scopeIn=$(echo $scopeIn | tr -d '*.')
             if [ "$fileMode" = true ] ; then
-                echo $scopeIn| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| tee --append "$tempFile-waybackurls.txt"
+                echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| tee --append "$tempFile-waybackurls.txt"
              else
-                echo $scopeIn| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| bbrf domain add - -s waybackurls $params --show-new
+                echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| bbrf domain add - -s waybackurls $params --show-new
             fi
    fi
 }
