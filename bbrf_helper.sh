@@ -836,7 +836,13 @@ getBugBountyData()
 }
 
 #Get all urls from programs with a specific tag value
-# getUrlsWithProgramTag site intigriti will get all urls from Intigriti programs
+# Examples
+# get all urls from Intigriti programs
+# > getUrlsWithProgramTag intigriti  
+
+# get all urls from bugcrowd programs
+# > getUrlsWithProgramTag bugcrowd
+
 getUrlsWithProgramTag()
 {   
     if [ -z "$1" ] | [ -z "$2" ]
@@ -855,7 +861,10 @@ getUrlsWithProgramTag()
             bbrf urls -p "$program"
         done
 }
-#remove urls from a program
+#remove all urls from a program
+# Examples
+# removes all urls from AT&T program
+# > removeUrls ATT  
 removeUrls()
 {
     if [ -z "$1" ] 
@@ -869,7 +878,9 @@ removeUrls()
     bbrf urls -p "$PROGRAM"|bbrf url remove -
 }
 #remove domains from a program
-#
+# Examples
+# removes all domains from AT&T program
+# > removeDomains ATT
 removeDomains()
 {
     if [ -z "$1" ] 
@@ -912,6 +923,9 @@ removeOutScope()
 }
 
 #clear all data of a program without removing it
+# Examples
+# removes all data from AT&T program
+# > clearProgramData ATT  
 clearProgramData()
 {
     if [ -z "$1" ] 
