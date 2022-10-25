@@ -688,6 +688,7 @@ listTagValues()
     for program in $(bbrf programs --show-disabled)
         do 
             key=$(bbrf show "$program"|jq '.tags.site')
+            echo -n '.'
             #echo $program ", "$key
             keys+=("$key") 
     done
