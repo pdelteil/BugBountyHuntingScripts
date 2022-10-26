@@ -264,7 +264,7 @@ getDomains()
                 for scope in $(echo "$wild")
                     do                
                         echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                        amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
+                        amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-amass.txt"
                 done
             else
                 for domain in $(echo "$wild")
