@@ -214,7 +214,7 @@ getDomains()
     #thread configs
     dnsxThreads=200
     subfinderThreads=100
-    gauThreads=10
+    gauThreads=30
     #no params
     flag="$1"
     
@@ -275,9 +275,9 @@ getDomains()
             fi
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [ "$fileMode" = true ] ; then
-                echo "$wild"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
+                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
             else
-                echo "$wild"|subfinder -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
+                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
             fi
  
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
@@ -408,7 +408,7 @@ addPrograms()
         if [[ $result == *"conflict"* ]] 
             then
             echo "Program already on BBRF!"
-            bbrf show "$program"|jq
+            bbrf show "$proWgram"|jq
             return -1
         fi
         echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
@@ -440,7 +440,26 @@ addPrograms()
                 getDomains  
                 echo -ne "${RED}Getting urls ${ENDCOLOR}\n"
                 getUrls  
-
+                #getIPs
+                #scanPorts
+                #run nuclei
+                numUrls=$(bbrf urls|wc -l) 
+                echo -ne "${YELLOW} Run nuclei? [urls: $numUrls] (y/n)[default:no, press Enter]${ENDCOLOR} "
+                read runNuclei
+                case $runNuclei in
+                    "yes")    valRunNuclei="true";;
+                    "y"  )    valRunNuclei="true";;
+                    "n"  )    valRunNuclei="false";;
+                    "no" )    valRunNuclei="false";;
+                    ""   )    valRunNuclei="false";;
+                esac
+                if [ "$valRunNuclei" == "true" ]
+                    then
+                        echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
+                        bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos
+                else
+                        return 1; 
+                fi
         fi
 
     done
@@ -674,6 +693,8 @@ findProgram()
 }
 
 # Lists all key values of a given tag 
+# Examples
+# > listTagValues program
 # TODO list all tags and select one 
 listTagValues()
 {   
@@ -688,6 +709,7 @@ listTagValues()
     for program in $(bbrf programs --show-disabled)
         do 
             key=$(bbrf show "$program"|jq '.tags.site')
+            echo -n '.'
             #echo $program ", "$key
             keys+=("$key") 
     done
