@@ -849,7 +849,7 @@ getBugBountyData()
             gov=$(echo "$description"  |jq -r '.tags.gov')
             if [ "$gov" != "true" ]
             then
-                echo "bbrf $data -p $program"
+                bbrf $data -p $program
             fi   
         done
 }
