@@ -835,11 +835,11 @@ getBugBountyData()
             echo -en "(Add -d to include disabled programs)${ENDCOLOR}\n"
             return 1 
     elif [ "$2" == "-d" ]
-        then
-            param="--show-disabled"
-    else
-      data="$1"
+    then
+        param="--show-disabled"
     fi
+    data="$1"
+
     allPrograms=$(bbrf programs $param)
 
     IFS=$'\n'
@@ -847,11 +847,9 @@ getBugBountyData()
         do
             description=$(bbrf show "$program")
             gov=$(echo "$description"  |jq -r '.tags.gov')
-            if [ "$gov" == "true" ]
+            if [ "$gov" != "true" ]
             then
-                echo ""
-            else    
-                bbrf $data -p "$program"
+                echo "bbrf $data -p $program"
             fi   
         done
 }
