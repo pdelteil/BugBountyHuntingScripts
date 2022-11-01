@@ -12,8 +12,7 @@ ENDCOLOR="\e[0m"
 updateProgram()
 {
 
-  if [ -z "$1" ]
-    then
+  if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} program rule"
         return 1
     fi
@@ -27,8 +26,7 @@ updateProgram()
 
     #careful when the remove url is a subdomain of a wildcard rule
 
-    if [[ ${#check} -gt 0 ]]
-    then
+    if [[ ${#check} -gt 0 ]]; then
         echo "rule in program"
         #removing rule from program
         #stats before removing
@@ -66,37 +64,30 @@ getOnlyDisabledPrograms()
 {
     INPUT="$1" 
     COND="$2"
-    if [ -z "$INPUT" ] 
-    then
+    if [[ -z "$INPUT" ]]; then
         echo "Use ${FUNCNAME[0]} urls/domains"
         return 1
     fi
     IFS=$'\n'
-    if [[  "$INPUT" != "urls"  &&  "$INPUT" != "domains" ]]
-    then
+    if [[  "$INPUT" != "urls"  &&  "$INPUT" != "domains" ]]; then
         echo "Use ${FUNCNAME[0]} urls/domains"
         return 1
     fi
-    if [[  "$INPUT" == "urls" ]] | [[  "$INPUT" == "domains" ]]
-    then
+    if [[  "$INPUT" == "urls" ]] | [[  "$INPUT" == "domains" ]]; then
         all=$(bbrf programs --show-disabled $COND)
         enabled=$(bbrf programs $COND)
         # difference between all and enabled programs = disabled programs
         listr=$(comm -3 <(echo "$enabled"|sort) <(echo "$all"|sort)|tr -d '\t')
         echo "${#listr}"
     fi
-    if [[  "$INPUT" == "urls" ]] 
-    then
-        for program in $(echo "$listr");
-        do 
+    if [[  "$INPUT" == "urls" ]]; then
+        for program in $(echo "$listr"); do 
             bbrf urls -p "$program"
         done
 
     fi
-    if [[  "$INPUT" == "domains" ]] 
-    then
-        for program in $(echo "$listr");
-        do 
+    if [[  "$INPUT" == "domains" ]]; then
+        for program in $(echo "$listr"); do 
             bbrf domains -p "$program"
         done
     fi
@@ -117,28 +108,25 @@ disablePrograms()
 #get inscope of all programs
 getInScope()
 {
-    if [ -z "$1" ] || [[ "$1" == "-h"* ]] 
-    then
+    if [ -z "$1" ] || [[ "$1" == "-h"* ]]; then
        echo "Use ${FUNCNAME[0]} outputfile.txt"
        echo "Use ${FUNCNAME[0]} -disabled outputfile.txt (to include disabled programs)"
        return 1
     fi
     outputFile="$1"
     IFS=$'\n' 
-    if [[ "$1" == "-disabled" ]]
-        then
-            outputFile="$2"
-            command=$(bbrf programs --show-disabled)
-            echo -ne "${RED} Getting inscope of enabled and disabled programs ${ENDCOLOR}\n"
-        else
-            command=$(bbrf programs)
-            echo -ne "${RED} Getting inscope of only enabled programs ${ENDCOLOR}\n"
+    if [[ "$1" == "-disabled" ]]; then
+        outputFile="$2"
+        command=$(bbrf programs --show-disabled)
+        echo -ne "${RED} Getting inscope of enabled and disabled programs ${ENDCOLOR}\n"
+    else
+        command=$(bbrf programs)
+        echo -ne "${RED} Getting inscope of only enabled programs ${ENDCOLOR}\n"
     fi
-     for program in $command;
-        do 
-            echo "$program" 
-            bbrf scope in -p "$program" >> $outputFile
-        done
+     for program in $command; do 
+        echo "$program" 
+        bbrf scope in -p "$program" >> $outputFile
+    done
 }
 # creates a file with BBRF stats in CSV format (using ; as separator)
 # By default outputs all programs including the ones with no defined inscope.
@@ -150,16 +138,14 @@ getInScope()
 # TODO Include flags to choose whether to include #domains, #urls or #ips
 getStats()
 {   
-    if [[ -z "$1" ]] || [[ "$2" != "-nd"  &&  -n "$2" ]] 
-        then
-            echo "Use ${FUNCNAME[0]} outputfile.csv -nd (not to include disabled programs)"
-            return 1
+    if [[ -z "$1" ]] || [[ "$2" != "-nd"  &&  -n "$2" ]]; then
+        echo "Use ${FUNCNAME[0]} outputfile.csv -nd (not to include disabled programs)"
+        return 1
     fi
-    if [[ "$2" == "-nd" ]]
-        then
-            param=""
-        else 
-            param="--show-disabled"
+    if [[ "$2" == "-nd" ]]; then
+        param=""
+    else 
+        param="--show-disabled"
     fi
     IFS=$'\n'
     filename="$1"
@@ -172,26 +158,25 @@ getStats()
     numberPrograms=$(echo "$allPrograms"|wc -l)
     #counter
     i=1
-    for program in $(echo "$allPrograms");
-        do 
-            echo -en "${YELLOW}($i/$numberPrograms)${ENDCOLOR} $program\n"
-            #fields/columns
-            description=$(bbrf show "$program")
-            site=$(echo "$description" |jq -r '.tags.site')
-            reward=$(echo "$description" |jq -r '.tags.reward')
-            programUrl=$(echo "$description" |jq -r '.tags.url')
-            disabled=$(echo "$description" |jq -r '.disabled')
-            author=$(echo "$description" |jq -r '.tags.author')
-            notes=$(echo "$description" |jq -r '.tags.notes') 
-            addedDate=$(echo "$description" |jq -r '.tags.addedDate')
-            #metrics 
-            numUrls=$(bbrf urls -p "$program"|wc -l)
-            numDomains=$(bbrf domains -p "$program"|wc -l)
-            #numIPs=$(bbrf ips -p "$program"|wc -l)
-            values="$program; $site; $programUrl; $disabled; $reward; $author; $notes; $addedDate; $numDomains; $numUrls; $numIPs"
-            echo -e $values >> $filename
-            i=$(( $i + 1))
-        done
+    for program in $(echo "$allPrograms"); do 
+        echo -en "${YELLOW}($i/$numberPrograms)${ENDCOLOR} $program\n"
+        #fields/columns
+        description=$(bbrf show "$program")
+        site=$(echo "$description" |jq -r '.tags.site')
+        reward=$(echo "$description" |jq -r '.tags.reward')
+        programUrl=$(echo "$description" |jq -r '.tags.url')
+        disabled=$(echo "$description" |jq -r '.disabled')
+        author=$(echo "$description" |jq -r '.tags.author')
+        notes=$(echo "$description" |jq -r '.tags.notes') 
+        addedDate=$(echo "$description" |jq -r '.tags.addedDate')
+        #metrics 
+        numUrls=$(bbrf urls -p "$program"|wc -l)
+        numDomains=$(bbrf domains -p "$program"|wc -l)
+        #numIPs=$(bbrf ips -p "$program"|wc -l)
+        values="$program; $site; $programUrl; $disabled; $reward; $author; $notes; $addedDate; $numDomains; $numUrls; $numIPs"
+        echo -e $values >> $filename
+        i=$(( $i + 1))
+    done
 }
 
 
@@ -218,13 +203,11 @@ getDomains()
     #no params
     flag="$1"
     
-    if [ -z $flag ] 
-    then
+    if [[ -z $flag ]]; then
         echo -ne "${YELLOW} Running bbrf mode ${ENDCOLOR}\n"
     elif [ $flag == "-f" ]
     then
-        if [ -n "$2" ]
-        then
+        if [[ -n "$2" ]]; then
             file="$2"
             tempFile="/tmp/$file.temp"
             echo -ne "${YELLOW} Running filemode ${ENDCOLOR}\n"
@@ -236,10 +219,8 @@ getDomains()
 
             return -1
         fi
-    elif [ $flag == "-p" ] 
-    then
-        if [ -n "$2" ]
-        then           
+    elif [[ $flag == "-p" ]]; then
+        if [[ -n "$2" ]]; then           
             params="-p $2"
             echo "$params"
         else
@@ -254,48 +235,45 @@ getDomains()
     echo "$scopeIn"|bbrf domain add - $params --show-new
     wild=$(bbrf scope in --wildcard $params| grep -v DEBUG)
     # when there's no wildcard we don't need the next steps
-    if [ ${#wild} -gt 0 ]
-        then
-            echo "$wild"|bbrf inscope add - $params
-            echo "$wild"|bbrf domain add - $params --show-new
+    if [[ ${#wild} -gt 0 ]]; then
+        echo "$wild"|bbrf inscope add - $params
+        echo "$wild"|bbrf domain add - $params --show-new
 
-            echo -ne "${RED} Running amass ${ENDCOLOR}\n"
-            if [ "$fileMode" = true ] ; then
-                for scope in $(echo "$wild")
-                    do                
-                        echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                        amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-amass.txt"
-                done
+        echo -ne "${RED} Running amass ${ENDCOLOR}\n"
+        if [ "$fileMode" = true ] ; then
+            for scope in $(echo "$wild"); do                
+                echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
+                amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-amass.txt"
+            done
             else
-                for domain in $(echo "$wild")
-                    do
-                        echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                        amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent | bbrf domain add - -s amass $params --show-new
+                for domain in $(echo "$wild"); do
+                    echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
+                    amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent | bbrf domain add - -s amass $params --show-new
                 done
             fi
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
-            if [ "$fileMode" = true ] ; then
+            if [[ "$fileMode" = true ]]; then
                 echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
             else
                 echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
             fi
  
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
-            if [ "$fileMode" = true ] ; then
+            if [[ "$fileMode" = true ]]; then
                 echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent|tee --append "$tempFile-assetfinder.txt"
             else
                 echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent|bbrf domain add - -s assetfinder $params --show-new
             fi
 
             echo -ne "${RED} Running gau ${ENDCOLOR}\n"
-            if [ "$fileMode" = true ] ; then
+            if [[ "$fileMode" = true ]] ; then
                 gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| tee --append "$tempFile-gau.txt"
              else
                 gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| bbrf domain add - -s gau $params --show-new
             fi
 
             echo -ne "${RED} Running waybackurls ${ENDCOLOR}\n"
-            if [ "$fileMode" = true ] ; then
+            if [[ "$fileMode" = true ]] ; then
                 echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| tee --append "$tempFile-waybackurls.txt"
              else
                 echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| bbrf domain add - -s waybackurls $params --show-new
@@ -309,12 +287,11 @@ getUrls()
 {
     threads=150
     doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n')
-    if [ ${#doms} -gt 0 ]
-        then
-            echo -en "${RED} httpx domains ${ENDCOLOR}\n"
-            echo "$doms"|httpx -silent -threads $threads|bbrf url add - -s httpx --show-new
-            echo -en "${RED} httprobe domains ${ENDCOLOR}\n"
-            echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new
+    if [[ ${#doms} -gt 0 ]]; then
+        echo -en "${RED} httpx domains ${ENDCOLOR}\n"
+        echo "$doms"|httpx -silent -threads $threads|bbrf url add - -s httpx --show-new
+        echo -en "${RED} httprobe domains ${ENDCOLOR}\n"
+        echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new
     fi
 }
 # Use this function if you need to add several programs from a site
@@ -323,14 +300,12 @@ getUrls()
 # Example addPrograms intigriti hunter
 addPrograms()
 {
-    if [ -z "$1" ] || [ -z "$2" ]
-    then
+    if [[ -z "$1" ]] || [ -z "$2" ]]; then
       echo -ne "Use ${FUNCNAME[0]} site author\nExample ${FUNCNAME[0]} h1 hunter\nExample ${FUNCNAME[0]} bugcrowd hunter\n"
       return 1
     fi
     unset IFS
-    while true;
-    do
+    while true; do
         # Read user's input
         site="$1"
         author="$2"
@@ -393,10 +368,9 @@ addPrograms()
             1)    val_api="true";;
             "")   val_api="false";;
         esac
-        if $val_api; 
-            then
-                echo -en "${YELLOW}APi endpoints? ${ENDCOLOR} "
-                read api_endpoints
+        if $val_api; then
+            echo -en "${YELLOW}APi endpoints? ${ENDCOLOR} "
+            read api_endpoints
         fi
         echo -en "${YELLOW}Notes/Comments? ${ENDCOLOR} (press enter if empty)"
         read notes
@@ -405,8 +379,7 @@ addPrograms()
                  -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" \
                  -t author:"$author" -t notes:"$notes" -t api:"$val_api" -t api_endpoints:"$api_endpoints" -t public:"$val_public")
         #echo $result
-        if [[ $result == *"conflict"* ]] 
-            then
+        if [[ $result == *"conflict"* ]]; then
             echo "Program already on BBRF!"
             bbrf show "$proWgram"|jq
             return -1
@@ -414,54 +387,50 @@ addPrograms()
         echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
         read -r inscope_input
         #if empty skip
-        if [ ! -z "$inscope_input" ]
-            then
-                bbrf inscope add $inscope_input -p "$program"
-                echo -ne "${RED} inscope: \n"
-                #just to check everything went well
-                bbrf scope in -p "$program"
-                echo -ne "${ENDCOLOR}\n"
+        if [[ ! -z "$inscope_input" ]];   then
+            bbrf inscope add $inscope_input -p "$program"
+            echo -ne "${RED} inscope: \n"
+            #just to check everything went well
+            bbrf scope in -p "$program"
+            echo -ne "${ENDCOLOR}\n"
                 
         fi         
         echo -en "${YELLOW} Add OUT scope: ${ENDCOLOR}\n" 
         read -r outscope_input
         #if empty skip
-        if [ ! -z "$outscope_input" ]
-           then
-               bbrf outscope add $outscope_input -p "$program"
-               echo -ne "${RED} outscope: \n"
-               #just to check everything went well
-               bbrf scope out -p "$program"
-               echo -ne "${ENDCOLOR}\n"  
+        if [[ ! -z "$outscope_input" ]]; then
+           bbrf outscope add $outscope_input -p "$program"
+           echo -ne "${RED} outscope: \n"
+           #just to check everything went well
+           bbrf scope out -p "$program"
+           echo -ne "${ENDCOLOR}\n"  
         fi
-        if [ ${#inscope_input} -gt 0 ]
-            then
-                echo -ne "${RED}Getting domains${ENDCOLOR}\n"
-                getDomains  
-                echo -ne "${RED}Getting urls ${ENDCOLOR}\n"
-                getUrls  
-                #getIPs
-                #scanPorts
-                #run nuclei
-                numUrls=$(bbrf urls|wc -l) 
-                echo -ne "${YELLOW} Run nuclei? [urls: $numUrls] (y/n)[default:no, press Enter]${ENDCOLOR} "
-                read runNuclei
-                case $runNuclei in
-                    "yes")    valRunNuclei="true";;
-                    "y"  )    valRunNuclei="true";;
-                    "n"  )    valRunNuclei="false";;
-                    "no" )    valRunNuclei="false";;
-                    ""   )    valRunNuclei="false";;
-                esac
-                if [ "$valRunNuclei" == "true" ]
-                    then
-                        echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
-                        bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos
-                else
-                        return 1; 
-                fi
-        fi
+        if [[ ${#inscope_input} -gt 0 ]]; then
+            echo -ne "${RED}Getting domains${ENDCOLOR}\n"
+            getDomains  
+            echo -ne "${RED}Getting urls ${ENDCOLOR}\n"
+            getUrls  
+            #getIPs
+            #scanPorts
+            #run nuclei
+            numUrls=$(bbrf urls|wc -l) 
+            echo -ne "${YELLOW} Run nuclei? [urls: $numUrls] (y/n)[default:no, press Enter]${ENDCOLOR} "
+            read runNuclei
+            case $runNuclei in
+                "yes")    valRunNuclei="true";;
+                "y"  )    valRunNuclei="true";;
+                "n"  )    valRunNuclei="false";;
+                "no" )    valRunNuclei="false";;
+                ""   )    valRunNuclei="false";;
+            esac
 
+            if [[ "$valRunNuclei" == "true" ]]; then
+                echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
+                bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos
+            else
+                return 1; 
+            fi
+        fi
     done
 } 
 
@@ -470,12 +439,11 @@ addPrograms()
 # in the case of URLs and IP the program is not mandatory, it will delete everything in the input file
 removeInChunks()
 {
-    if [ -z "$1" ] || [ -z "$2" ]
-    then
-      echo "To remove domains use ${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000)"
-      echo "To remove urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000)"
-      echo "To remove ips use ${FUNCNAME[0]} fileWithIPs ips chunkSize (optional:default 1000)"
-      return 1
+    if [[ -z "$1" ] || [ -z "$2" ]]; then
+        echo "To remove domains use ${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000)"
+        echo "To remove urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000)"
+        echo "To remove ips use ${FUNCNAME[0]} fileWithIPs ips chunkSize (optional:default 1000)"
+        return 1
     fi
     
     #input vars
@@ -483,8 +451,7 @@ removeInChunks()
     type="$2"
     chunkSize="$3"
 
-    if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]  || [ "$type" == "ips" ]
-    then
+    if [[ "$type" ==  "domains" ]] || [[ "$type" == "urls" ]]  || [ "$type" == "ips" ]]; then
         echo "" 
     else
         echo " use domains, ips or urls "
@@ -494,8 +461,7 @@ removeInChunks()
     size=$(cat "$file"|wc -l) 
     echo "Size "$size
     #default value for chunk size
-    if [ -z "$chunkSize" ]
-    then
+    if [[ -z "$chunkSize" ]]; then
         chunkSize=1000
     fi
     parts=$((size%chunkSize?size/chunkSize+1:size/chunkSize))
@@ -505,19 +471,15 @@ removeInChunks()
     init=1
     end=$chunkSize
 
-    for i in $(seq 1 $parts)
-    do
+    for i in $(seq 1 $parts); do
         echo "Removing chunk $i/$parts"
         element="${init},${end}p"; 
 
-        if [ "$type" == "urls" ]
-        then
+        if [[ "$type" == "urls" ]]; then
             sed -n "$element" "$file"|bbrf url remove - 
-        elif [ "$type" == "domains" ]
-        then
+        elif [[ "$type" == "domains" ]]; then
            sed -n "$element" "$file"|bbrf domain remove - 
-        elif [ "$type" == "ips" ]
-        then
+        elif [ "$type" == "ips" ]]; then
            sed -n "$element" "$file"|bbrf ip remove -
         fi
         init=$(( $init + $chunkSize ))
@@ -531,14 +493,13 @@ removeInChunks()
 # the chunk size depends on your bbrf (couchdb) server capacity 
 addInChunks()
 {
-    if [ -z "$1" ] || [ -z "$2" ]
-    then
-      echo -ne "To add domains use ${YELLOW}${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional) resolve ${ENDCOLOR}\n"
-      echo -ne "To add urls use ${YELLOW}${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)${ENDCOLOR}\n"
-      echo -ne "Examples\n"
-      echo "addInChunks domains.txt domains "" "" resolve"
-      echo "addInChunks domains.txt domains "" source resolve"
-      return 1
+    if [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        echo -ne "To add domains use ${YELLOW}${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000) source (optional) resolve ${ENDCOLOR}\n"
+        echo -ne "To add urls use ${YELLOW}${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000) source (optional)${ENDCOLOR}\n"
+        echo -ne "Examples\n"
+        echo "addInChunks domains.txt domains "" "" resolve"
+        echo "addInChunks domains.txt domains "" source resolve"
+        return 1
     fi
     #input vars
     file="$1"
@@ -547,9 +508,8 @@ addInChunks()
     source=${4:-" no source "}
     resolve=${5:-"no"}
 
- 	
-    if [ "$type" ==  "domains" ] || [ "$type" == "urls" ]
-    then
+    #TODO reverse if logic 	
+    if [[ "$type" ==  "domains" ]] || [[ "$type" == "urls" ]]; then
         echo "" 
     else
         echo " use domains or urls "
@@ -564,18 +524,15 @@ addInChunks()
     init=1
     end=$chunkSize
 
-    for i in $(seq 1 $parts)
-     do
-        echo "Adding chunk $i/$parts"
+    for i in $(seq 1 $parts); do
+        echo -ne "{$YELLOW}Adding chunk $i/$parts{$ENDCOLOR}"
         elements="${init},${end}p" 
 
-        if [ "$type" == "urls" ]
-        then
+        if [[ "$type" == "urls" ]]; then
             sed -n "$elements" "$file"|bbrf url add - -s "$source" --show-new -p@INFER
         else
-    	    if [ "$resolve" == "resolve" ]
-                then 
-    	        sed -n "$elements" "$file"|dnsx -silent|bbrf domain add - -s "$source" --show-new -p@INFER
+    	    if [[ "$resolve" == "resolve" ]]; then 
+	            sed -n "$elements" "$file"|dnsx -silent|bbrf domain add - -s "$source" --show-new -p@INFER
     	    else 
     	        sed -n "$elements" "$file"|bbrf domain add - -s "$source" --show-new -p@INFER
     	    fi 
@@ -588,8 +545,7 @@ addInChunks()
 #This function allows to add ip addresses in chunks. 
 resolveDomainsInChunks()
 {
- if [ -z "$1" ] || [ -z "$2" ]
-    then
+ if [[ -z "$1" ]] || [[ -z "$2" ]]; then
       echo "Use ${FUNCNAME[0]} fileUnresolvedDomains"
       return 1
     fi
@@ -602,21 +558,20 @@ resolveDomainsInChunks()
  echo $parts
  init=1
  end=$chunk
- for i in $(seq 1 $parts)  
-    do
-        echo "try $i"
+ for i in $(seq 1 $parts); do
+    echo "try $i"
+    
+    urls="${init},${end}p"
+    #sed -n "$urls" $file    |dnsx -silent -a -resp | tr -d '[]' 
+    #sed -n  "$urls" $file|awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx 
+    #>(awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx) \
+    #sed -n  "$urls" $file |awk '{print $1":"$2}' |bbrf domain add - -p "$p" -s dnsx --show-new
+    sed -n  "$urls" $file| awk '{print $2":"$1}' |bbrf ip add - -p@INFER -s dnsx
+    #>(awk '{print $2":"$1}' |bbrf ip update - -p "$p" -s dnsx)
         
-        urls="${init},${end}p"
-        #sed -n "$urls" $file    |dnsx -silent -a -resp | tr -d '[]' 
-        #sed -n  "$urls" $file|awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx 
-        #>(awk '{print $1":"$2}' |bbrf domain update - -p "$p" -s dnsx) \
-        #sed -n  "$urls" $file |awk '{print $1":"$2}' |bbrf domain add - -p "$p" -s dnsx --show-new
-        sed -n  "$urls" $file| awk '{print $2":"$1}' |bbrf ip add - -p@INFER -s dnsx
-        #>(awk '{print $2":"$1}' |bbrf ip update - -p "$p" -s dnsx)
-        
-        #|httpx -silent -threads 500 |bbrf url add - -s httpx --show-new -p "$program"; 
-        init=$(( $init + $chunk ))
-        end=$(( $end + $chunk ))
+    #|httpx -silent -threads 500 |bbrf url add - -s httpx --show-new -p "$program"; 
+    init=$(( $init + $chunk ))
+    end=$(( $end + $chunk ))
   done
 } 
 #Checks if a program exists based on part of the name
@@ -625,15 +580,14 @@ resolveDomainsInChunks()
 # checkProgram hacker  #all programs containing hacker in the program's name
 checkProgram()
 {
-    if [ -z "$1" ]
+    if [[ -z "$1" ]];
     then
       echo "Use ${FUNCNAME[0]} text"
       return 1
     fi
     text="$1"
     output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
-    if [ ${#output} -gt 0 ] 
-    then
+    if [[ ${#output} -gt 0 ]]; then
         echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
     else    
         echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
@@ -651,8 +605,7 @@ checkProgram()
 findProgram()
 {
     INPUT=$(echo "$1"|sed -e 's|^[^/]*//||' -e 's|/.*$||') #in case the input has a trailing / 
-    if [ -z "$INPUT" ]
-    then
+    if [[ -z "$INPUT" ]]; then
       echo "Use ${FUNCNAME[0]} URL, domain or IP Address"
       return 1
     fi
@@ -667,8 +620,7 @@ findProgram()
         #return 1
     fi
 
-    if [ ${#program} -gt 0 ] 
-    then
+    if [[ ${#program} -gt 0 ]]; then
         #This tags are specific for my way of storing data
         #If you use addPrograms to inpput your programs this will work just fine
         site=".tags.site"
@@ -706,15 +658,15 @@ listTagValues()
 
     tag="$1"
     IFS=$'\n'
-    for program in $(bbrf programs --show-disabled)
-        do 
-            key=$(bbrf show "$program"|jq '.tags.site')
-            echo -n '.'
-            #echo $program ", "$key
-            keys+=("$key") 
+    for program in $(bbrf programs --show-disabled); do 
+        key=$(bbrf show "$program"|jq '.tags.site')
+        echo -n '.'
+        #echo $program ", "$key
+        keys+=("$key") 
     done
     #show unique key values
-    echo "${keys[@]}" | tr ' ' '\n' | sort -u
+    keyValues=$(echo "${keys[@]}" | tr ' ' '\n' | sort -u)
+    echo "$keyValues"
     
 }
 
@@ -725,26 +677,23 @@ debugMode()
 
  #detect if debug mode is not set in config file 
  debug=$(grep '"debug"' $configFile)
- 
- if [ ${#debug} == 0 ] #debug word not found in config file
-    then
-        sed -i 's/}/,"debug": true}/g' $configFile
+ #debug word not found in config file
+
+ if [[ ${#debug} == 0 ]]; then
+    sed -i 's/}/,"debug": true}/g' $configFile
  fi
- if [ -z "$1" ]
-    then
-        echo "Use ${FUNCNAME[0]} false/true"
-        return 1
+ if [[ -z "$1" ]]; then
+    echo "Use ${FUNCNAME[0]} false/true"
+    return 1
  fi
- if [ "false" == "$1" ]
-    then
-        echo "Setting BBRF debug mode off"
-        sed -i 's/"debug": true/"debug": false/g' $configFile
- elif [ "true" == "$1" ]
-    then
-        echo "Setting BBRF debug mode on"
-        sed -i 's/"debug": false/"debug": true/g' $configFile
+ if [[ "false" == "$1" ]]; then
+    echo "Setting BBRF debug mode off"
+    sed -i 's/"debug": true/"debug": false/g' $configFile
+ elif [[ "true" == "$1" ]]; then
+    echo "Setting BBRF debug mode on"
+    sed -i 's/"debug": false/"debug": true/g' $configFile
  else  
-        echo "Use ${FUNCNAME[0]} false/true"   
+    echo "Use ${FUNCNAME[0]} false/true"   
  fi  
 
 }
@@ -753,7 +702,8 @@ showActiveProgram()
 {
  configFile="$HOME/.bbrf/config.json"
 
- program=$(cat $configFile|jq|grep "program"|awk -F":" '{print $2}'|tr -d ","|tr -d '"'|sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+ program=$(cat $configFile | jq | grep "program"| awk -F":" '{print $2}'| tr -d "," | tr -d '"' \
+           |sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
  
  echo "$program" 
 
@@ -761,16 +711,14 @@ showActiveProgram()
 # displays details a given program
 showProgram()
 {
-    if [ -z "$1" ] 
-    then
+    if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} programName -stats [optional, displays number of urls and domains]"
         return 1
     fi
     program="$1"
     output=$(bbrf show "$program"|jq)
 
-    if [ ${#output} -gt 0 ] 
-    then
+    if [[ ${#output} -gt 0 ]]; then
         echo "$output" 
     else    
         echo -ne "${RED}$program not found! ${ENDCOLOR}\n\n"
@@ -779,18 +727,15 @@ showProgram()
     fi
     
     flag="$2" 
-    if [ -z "$flag" ]
-    then    
+    if [[ -z "$flag" ]]; then    
         return 1
     fi
    
-    if [ "$flag" == "-stats" ]
-    then
+    if [[ "$flag" == "-stats" ]]; then
         domains=$(bbrf domains -p "$program"|wc -l)
         urls=$(bbrf urls -p "$program"|wc -l) 
         echo -en "${YELLOW}#domains: "$domains "\n"
         echo -en "#urls: "$urls"${ENDCOLOR}\n"
-         
     else
         echo "Use ${FUNCNAME[0]} programName -stats [optional, displays number of urls and domains] "
         return 1
@@ -801,8 +746,7 @@ showProgram()
 #example addIPsFromCIDR 128.177.123.72/29 program
 addIPsFromCIDR()
 {
-    if [ -z "$1" ] | [ -z "$2" ]
-    then
+    if [[ -z "$1" ]] | [[ -z "$2" ]]; then
         echo "Use ${FUNCNAME[0]} 128.177.123.72/29 program"
         return 1
     fi
@@ -828,32 +772,28 @@ addIPsFromCIDR()
 # > getBugBountyData ip
 getBugBountyData()
 {
-    param=""
-    if [[ "$1" != "domains"  &&  "$1" != "urls" && "$1" != "ips" ]] || [[ "$2" != "-d"  &&  -n "$2" ]] 
-        then
-            echo -en "${YELLOW}Use ${FUNCNAME[0]} domains/urls/ips "
-            echo -en "(Add -d to include disabled programs)${ENDCOLOR}\n"
-            return 1 
-    elif [ "$2" == "-d" ]
-        then
-            param="--show-disabled"
+    local param=""
+    if [[ "$1" != "domains"  &&  "$1" != "urls" && "$1" != "ips" ]] || [[ "$2" != "-d"  &&  -n "$2" ]] ; then
+        echo -en "${YELLOW}Use ${FUNCNAME[0]} domains/urls/ips "
+        echo -en "(Add -d to include disabled programs)${ENDCOLOR}\n"
+        return 1 
+    elif [[ "$2" == "-d" ]]; then
+        param="--show-disabled"
     else
       data="$1"
     fi
     allPrograms=$(bbrf programs $param)
 
     IFS=$'\n'
-    for program in $(echo "$allPrograms");
-        do
-            description=$(bbrf show "$program")
-            gov=$(echo "$description"  |jq -r '.tags.gov')
-            if [ "$gov" == "true" ]
-            then
-                echo ""
-            else    
-                bbrf $data -p "$program"
-            fi   
-        done
+    for program in $(echo "$allPrograms"); do
+        description=$(bbrf show "$program")
+        gov=$(echo "$description"  |jq -r '.tags.gov')
+        if [[ "$gov" == "true" ]]; then
+            echo ""
+        else    
+            bbrf $data -p "$program"
+        fi   
+    done
 }
 
 #Get all urls from programs with a specific tag value
@@ -866,8 +806,7 @@ getBugBountyData()
 
 getUrlsWithProgramTag()
 {   
-    if [ -z "$1" ] | [ -z "$2" ]
-    then
+    if [[ -z "$1" ] | [ -z "$2" ]]; then
         echo "Use ${FUNCNAME[0]} tag value"
         echo "Example ${FUNCNAME[0]} site intigriti"
         return 1
@@ -877,10 +816,9 @@ getUrlsWithProgramTag()
     VALUE="$2"
     allPrograms=$(bbrf programs where $TAG is $VALUE)
   
-    for program in $(echo "$allPrograms");
-        do
-            bbrf urls -p "$program"
-        done
+    for program in $(echo "$allPrograms"); do
+        bbrf urls -p "$program"
+    done
 }
 #remove all urls from a program
 # Examples
@@ -888,8 +826,7 @@ getUrlsWithProgramTag()
 # > removeUrls ATT  
 removeUrls()
 {
-    if [ -z "$1" ] 
-    then
+    if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
         return 1
@@ -904,8 +841,7 @@ removeUrls()
 # > removeDomains ATT
 removeDomains()
 {
-    if [ -z "$1" ] 
-    then
+    if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
         return 1
@@ -918,8 +854,7 @@ removeDomains()
 #remove inscope from a program
 removeInScope()
 {
-    if [ -z "$1" ] 
-    then
+    if [[ -z "$1" ]];   then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
         return 1
@@ -932,8 +867,7 @@ removeInScope()
 #remove outscope from a program
 removeOutScope()
 {
-    if [ -z "$1" ] 
-    then
+    if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
         return 1
@@ -949,8 +883,7 @@ removeOutScope()
 # > clearProgramData ATT  
 clearProgramData()
 {
-    if [ -z "$1" ] 
-    then
+    if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
         return 1
