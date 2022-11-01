@@ -2,39 +2,33 @@
 #create a screen instance with a given name
 function createScreen()
 {
-    if [ -z "$1" ]
-    then
+    if [[ -z "$1" ]]; then
       echo -e "#Creates a screen session with given name \n Use ${FUNCNAME[0]} SCREEN_NAME"
-      return 1;
+      return 1
     fi
-
 	screen -q -S "$1"
 }
 
 function getIp()
 {
-    if [ -z "$1" ]
-    then
+    if [[ -z "$1" ]]; then
       echo -e "get Ip from domain\n Example: getIp example.com"
-      return 1;
+      return 1
     fi
     dig $1 +short
-
 }
 
 # finds and then open a file with nano
 locateNano()
 {
-    if [ -z "$1" ]
-    then
+    if [[ -z "$1" ]]; then
       echo -e "Use ${FUNCNAME[0]} filename"
-      return 1;
+      return 1
     fi
     search="$1"
     location=$(locate $search|head -n 1)
     #TODO choose from list when there are more than 1 result
-    if [ ${#location} -gt 0 ]
-    then
+    if [[ ${#location} -gt 0 ]]; then
         nano $location
     else    
         echo "Not found: $search"
@@ -43,17 +37,15 @@ locateNano()
 # finds and then open a file with nano
 locateCat()
 {
-    if [ -z "$1" ]
-    then
+    if [[ -z "$1" ]]; then
       echo -e "Use ${FUNCNAME[0]} filename"
-      return 1;
+      return 1
     fi
     search="$1"
-    location=$(locate $search|head -n 1 )
+    location=$(locate $search|head -n 1)
     #TODO choose from list when there are more than 1 result 
 
-    if [ ${#location} -gt 0 ]
-    then
+    if [[ ${#location} -gt 0 ]]; then
         echo $location
         cat $location
         echo ""
@@ -65,11 +57,10 @@ locateCat()
 # example:  cat file.txt | getField 4 
 getField() 
 {
-    if [ -z "$1" ]
-    then
+    if [[ -z "$1" ]]; then
       echo -e "Use ${FUNCNAME[0]} number (nth column)"
       echo "Example:  cat file.txt | getField 4"
-      return 1;
+      return 1
     fi
     awk -v number=$1 '{print $number}'
     #this is an attempt to receive the separator as a function parameter 
@@ -98,25 +89,22 @@ sortByDomain()
 #diffFiles file1.txt file2.txt output.txt
 diffFiles()
 {
-    if [ -z "$1" ] | [ -z "$2" ] | [ -z "$3" ]
-    then
-      echo "Use ${FUNCNAME[0]} file1.txt file2.txt output.txt"
-      return 1;
+    if [[ -z "$1" ]] | [[ -z "$2" ]] | [[ -z "$3" ]]; then
+        echo "Use ${FUNCNAME[0]} file1.txt file2.txt output.txt"
+        return 1
     fi
     comm -3 <(sort $1) <(sort $2) > $3
 }
 #retreive the ORGs names in SSL Certs 
 getOrgsFromCerts()
 {
-    if [ -z "$1" ] 
-    then
+    if [[ -z "$1" ]]; then
       echo "Use ${FUNCNAME[0]} file.with.ssl.output.txt"
-      return 1;
+      return 1
     fi
 
     names=( $@ )
-    for file in "${names[@]}"
-    do
+    for file in "${names[@]}"; do
         echo "$file"
         cat "$file" |grep -a subject |awk -F"O=" '{print $2}'|awk -F";" '{print $1}'|sort -u
     done
@@ -124,15 +112,13 @@ getOrgsFromCerts()
 #retreive the ORGs names in SSL Certs 
 getCNFromCerts()
 {
-    if [ -z "$1" ] 
-    then
+    if [[ -z "$1" ]]; then
       echo "Use ${FUNCNAME[0]} file.with.ssl.output.txt"
-      return 1;
+      return 1
     fi
 
     names=( $@ )
-    for file in "${names[@]}"
-    do
+    for file in "${names[@]}"; do
         echo "$file"
         cat "$file" |grep -a subject|awk -F"CN=" '{print $2}'|awk -F";" '{print $1}'|sort -u
     done
@@ -144,15 +130,15 @@ getCNFromCerts()
 getTLDs()
 {
     URL="https://raw.githubusercontent.com/datasets/top-level-domain-names/master/top-level-domain-names.csv"
-    if [ -z "$1" ] 
-    then
-        echo "Use ${FUNCNAME[0]} targetDomain"
-        echo "Example ${FUNCNAME[0]} testing-sites"
-        return 1;
-    fi
     FILE="top-level-domain-names.csv"
 
-    if [ -f "$FILE" ]; then
+    if [[ -z "$1" ]] ;    then
+        echo "Use ${FUNCNAME[0]} targetDomain"
+        echo "Example ${FUNCNAME[0]} testing-sites"
+        return 1
+    fi
+
+    if [[ -f "$FILE" ]]; then
         echo "$FILE exists."
     #if file not found download it 
     else 
@@ -177,6 +163,8 @@ sortByDomainCount()
     cat $1 | tr '\.' '\n'|sort| uniq -c |sort -nr
 }
 
+#find domains with IP address format to remove them
+# ie: 108-249-27-4.lightspeed.wlfrct.sbcglobal.net
 findIpsInDomains()
 {
     cat $1 |  grep -E '[0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3}'
