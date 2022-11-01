@@ -439,7 +439,7 @@ addPrograms()
 # in the case of URLs and IP the program is not mandatory, it will delete everything in the input file
 removeInChunks()
 {
-    if [[ -z "$1" ] || [ -z "$2" ]]; then
+    if [[ -z "$1" ]] || [[ -z "$2" ]]; then
         echo "To remove domains use ${FUNCNAME[0]} fileWithDomains domains chunckSize (optional:default 1000)"
         echo "To remove urls use ${FUNCNAME[0]} fileWithUrls urls chunkSize (optional:default 1000)"
         echo "To remove ips use ${FUNCNAME[0]} fileWithIPs ips chunkSize (optional:default 1000)"
@@ -779,18 +779,16 @@ getBugBountyData()
         return 1 
     elif [[ "$2" == "-d" ]]; then
         param="--show-disabled"
-    else
-      data="$1"
     fi
+
+    data="$1"
     allPrograms=$(bbrf programs $param)
 
     IFS=$'\n'
     for program in $(echo "$allPrograms"); do
         description=$(bbrf show "$program")
         gov=$(echo "$description"  |jq -r '.tags.gov')
-        if [[ "$gov" == "true" ]]; then
-            echo ""
-        else    
+        if [[ "$gov" != "true" ]]; then
             bbrf $data -p "$program"
         fi   
     done
