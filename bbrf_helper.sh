@@ -804,7 +804,7 @@ getBugBountyData()
 
 getUrlsWithProgramTag()
 {   
-    if [[ -z "$1" ] | [ -z "$2" ]]; then
+    if [[ -z "$1" ]] | [ -z "$2" ]]; then
         echo "Use ${FUNCNAME[0]} tag value"
         echo "Example ${FUNCNAME[0]} site intigriti"
         return 1
