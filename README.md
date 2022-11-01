@@ -3,19 +3,15 @@
 
 ## Required software 
 
-##### subfinder
-
-##### httpx 
-
-##### dnsx 
-
-##### assetfinder 
-
-##### httprobe
-
-##### gau
-
-##### amass 
+```
+subfinder
+httpx 
+dnsx 
+assetfinder 
+httprobe
+gau
+amass
+```
 
 ## How to install
 
