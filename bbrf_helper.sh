@@ -54,45 +54,6 @@ updateProgram()
     urls=$(bbrf urls -p "$program"|wc -l)
     echo "Stats after update  inscope rules: $inscopeRules, domains: $domains,  urls: $urls"
 }
-# getData only from disabled programs 
-# Use getOnlyDisabledPrograms urls/domains condition (optional)
-# ex 1 getting all urls from disabled programs
-#  getOnlyDisabledPrograms urls 
-# ex 2 getting all domains from disabled programs with condition (from BugCrowd)
-#  getOnlyDisabledPrograms urls where site is bugcrowd
-getOnlyDisabledPrograms()
-{
-    INPUT="$1" 
-    COND="$2"
-    if [[ -z "$INPUT" ]]; then
-        echo "Use ${FUNCNAME[0]} urls/domains"
-        return 1
-    fi
-    IFS=$'\n'
-    if [[  "$INPUT" != "urls"  &&  "$INPUT" != "domains" ]]; then
-        echo "Use ${FUNCNAME[0]} urls/domains"
-        return 1
-    fi
-    if [[  "$INPUT" == "urls" ]] | [[  "$INPUT" == "domains" ]]; then
-        all=$(bbrf programs --show-disabled $COND)
-        enabled=$(bbrf programs $COND)
-        # difference between all and enabled programs = disabled programs
-        listr=$(comm -3 <(echo "$enabled"|sort) <(echo "$all"|sort)|tr -d '\t')
-        echo "${#listr}"
-    fi
-    if [[  "$INPUT" == "urls" ]]; then
-        for program in $(echo "$listr"); do 
-            bbrf urls -p "$program"
-        done
-
-    fi
-    if [[  "$INPUT" == "domains" ]]; then
-        for program in $(echo "$listr"); do 
-            bbrf domains -p "$program"
-        done
-    fi
-
-}
 
 #disable all programs from a given list (file)
 #example of use, disable all for points/thanks programs
@@ -104,29 +65,6 @@ disablePrograms()
         bbrf disable "$data" 
     done
 
-}
-#get inscope of all programs
-getInScope()
-{
-    if [ -z "$1" ] || [[ "$1" == "-h"* ]]; then
-       echo "Use ${FUNCNAME[0]} outputfile.txt"
-       echo "Use ${FUNCNAME[0]} -disabled outputfile.txt (to include disabled programs)"
-       return 1
-    fi
-    outputFile="$1"
-    IFS=$'\n' 
-    if [[ "$1" == "-disabled" ]]; then
-        outputFile="$2"
-        command=$(bbrf programs --show-disabled)
-        echo -ne "${RED} Getting inscope of enabled and disabled programs ${ENDCOLOR}\n"
-    else
-        command=$(bbrf programs)
-        echo -ne "${RED} Getting inscope of only enabled programs ${ENDCOLOR}\n"
-    fi
-     for program in $command; do 
-        echo "$program" 
-        bbrf scope in -p "$program" >> $outputFile
-    done
 }
 # creates a file with BBRF stats in CSV format (using ; as separator)
 # By default outputs all programs including the ones with no defined inscope.
@@ -650,8 +588,7 @@ findProgram()
 # TODO list all tags and select one 
 listTagValues()
 {   
-    if [ -z "$1" ]
-    then
+    if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} TagName"
         return 1
     fi
@@ -673,39 +610,39 @@ listTagValues()
 # sets debug mode on or off
 debugMode()
 {
- configFile="$HOME/.bbrf/config.json"
+    configFile="$HOME/.bbrf/config.json"
 
- #detect if debug mode is not set in config file 
- debug=$(grep '"debug"' $configFile)
- #debug word not found in config file
+    #detect if debug mode is not set in config file 
+    debug=$(grep '"debug"' $configFile)
+    #debug word not found in config file
 
- if [[ ${#debug} == 0 ]]; then
-    sed -i 's/}/,"debug": true}/g' $configFile
- fi
- if [[ -z "$1" ]]; then
-    echo "Use ${FUNCNAME[0]} false/true"
-    return 1
- fi
- if [[ "false" == "$1" ]]; then
-    echo "Setting BBRF debug mode off"
-    sed -i 's/"debug": true/"debug": false/g' $configFile
- elif [[ "true" == "$1" ]]; then
-    echo "Setting BBRF debug mode on"
-    sed -i 's/"debug": false/"debug": true/g' $configFile
- else  
-    echo "Use ${FUNCNAME[0]} false/true"   
- fi  
+    if [[ ${#debug} == 0 ]]; then
+        sed -i 's/}/,"debug": true}/g' $configFile
+    fi
+    if [[ -z "$1" ]]; then
+        echo "Use ${FUNCNAME[0]} false/true"
+        return 1
+    fi
+    if [[ "false" == "$1" ]]; then
+        echo "Setting BBRF debug mode off"
+        sed -i 's/"debug": true/"debug": false/g' $configFile
+     elif [[ "true" == "$1" ]]; then
+        echo "Setting BBRF debug mode on"
+        sed -i 's/"debug": false/"debug": true/g' $configFile
+     else  
+        echo "Use ${FUNCNAME[0]} false/true"   
+     fi  
 
 }
 # displays active program
 showActiveProgram()
 {
- configFile="$HOME/.bbrf/config.json"
+    configFile="$HOME/.bbrf/config.json"
 
- program=$(cat $configFile | jq | grep "program"| awk -F":" '{print $2}'| tr -d "," | tr -d '"' \
-           |sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+    program=$(cat $configFile | jq | grep "program"| awk -F":" '{print $2}'| tr -d "," | tr -d '"' \
+                              |sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
  
- echo "$program" 
+    echo "$program" 
 
 }
 # displays details a given program
@@ -770,26 +707,43 @@ addIPsFromCIDR()
 
 # get IPs from enabled programs and not gov programs
 # > getBugBountyData ip
+
+# get in scope from enabled programs and not gov programs
+# > getBugBountyData inscope
+
+# get out scope from enabled programs and not gov programs
+# > getBugBountyData outscope
+
+# TODO: include flag to retrieve all programs, this is only useful for inscope or outscope
 getBugBountyData()
 {
     local param=""
-    if [[ "$1" != "domains"  &&  "$1" != "urls" && "$1" != "ips" ]] || [[ "$2" != "-d"  &&  -n "$2" ]] ; then
-        echo -en "${YELLOW}Use ${FUNCNAME[0]} domains/urls/ips "
+    if [[ "$1" != "domains"  &&  "$1" != "urls" && "$1" != "ips" && "$1" != "inscope" && "$1" != "outscope" ]] \
+       || [[ "$2" != "-d"  &&  -n "$2" ]] ; then
+        echo -en "${YELLOW}Use ${FUNCNAME[0]} domains/urls/ips/InScope/OutScope "
         echo -en "(Add -d to include disabled programs)${ENDCOLOR}\n"
         return 1 
     elif [[ "$2" == "-d" ]]; then
         param="--show-disabled"
     fi
 
-    data="$1"
+    data=("$1")
+
+    if [[ "$1" == "inscope" ]]; then
+        data=("scope" "in")    
+    fi
+    if [[ "$1" == "outscope" ]]; then
+        data=("scope" "out")
+    fi
     allPrograms=$(bbrf programs $param)
+    echo $param
 
     IFS=$'\n'
     for program in $(echo "$allPrograms"); do
         description=$(bbrf show "$program")
         gov=$(echo "$description"  |jq -r '.tags.gov')
         if [[ "$gov" != "true" ]]; then
-            bbrf $data -p "$program"
+            bbrf ${data[@]} -p "$program"
         fi   
     done
 }
