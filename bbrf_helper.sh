@@ -572,8 +572,9 @@ findProgram()
         notes=".tags.notes"
         api=".tags.api"
         public=".tags.public"
+        gov=".tags.gov"
         #this part is hard to update -> need to find a way to simplify it
-        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"'+ ", api: "+'"$api"'+", public: "+'"$public"
+        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"'+ ", api: "+'"$api"'+", public: "+'"$public"'+", gov: "+'"$gov"
         output=$(bbrf show "$program" | jq "$tags" |tr -d '"'| sed 's/,/\n/g')
         echo -ne "\n$output\n\n"
         
@@ -720,23 +721,24 @@ getBugBountyData()
     local param=""
     if [[ "$1" != "domains"  &&  "$1" != "urls" && "$1" != "ips" && "$1" != "inscope" && "$1" != "outscope" ]] \
        || [[ "$2" != "-d"  &&  -n "$2" ]] ; then
-        echo -en "${YELLOW}Use ${FUNCNAME[0]} domains/urls/ips/InScope/OutScope "
+        echo -en "${YELLOW}Use ${FUNCNAME[0]} domains, urls, ips, inscope, outscope "
         echo -en "(Add -d to include disabled programs)${ENDCOLOR}\n"
         return 1 
     elif [[ "$2" == "-d" ]]; then
         param="--show-disabled"
+        echo -ne "${RED}Including disabled programs${ENDCOLOR}\n"
     fi
 
     data=("$1")
 
     if [[ "$1" == "inscope" ]]; then
-        data=("scope" "in")    
+        #will output only inscope with a wildcard, ie *.domain.com
+        data=("scope" "in" "--wildcard")    
     fi
     if [[ "$1" == "outscope" ]]; then
         data=("scope" "out")
     fi
     allPrograms=$(bbrf programs $param)
-    echo $param
 
     IFS=$'\n'
     for program in $(echo "$allPrograms"); do
