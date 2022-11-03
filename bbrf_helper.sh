@@ -143,8 +143,7 @@ getDomains()
     
     if [[ -z $flag ]]; then
         echo -ne "${YELLOW} Running bbrf mode ${ENDCOLOR}\n"
-    elif [ $flag == "-f" ]
-    then
+    elif [[ $flag == "-f" ]]; then
         if [[ -n "$2" ]]; then
             file="$2"
             tempFile="/tmp/$file.temp"
@@ -154,11 +153,10 @@ getDomains()
         else
             echo -ne "${YELLOW} Filename needed!${ENDCOLOR}\n"
             echo -ne "${YELLOW} Use getDomains -f filename.ext ${ENDCOLOR}\n"
-
             return -1
         fi
     elif [[ $flag == "-p" ]]; then
-        if [[ -n "$2" ]]; then           
+        if [[ -n "$2" ]]; then
             params="-p $2"
             echo "$params"
         else
@@ -178,7 +176,7 @@ getDomains()
         echo "$wild"|bbrf domain add - $params --show-new
 
         echo -ne "${RED} Running amass ${ENDCOLOR}\n"
-        if [ "$fileMode" = true ] ; then
+        if [[ "$fileMode" = true ]] ; then
             for scope in $(echo "$wild"); do                
                 echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
                 amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-amass.txt"
