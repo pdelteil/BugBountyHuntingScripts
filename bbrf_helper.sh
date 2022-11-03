@@ -12,7 +12,7 @@ ENDCOLOR="\e[0m"
 updateProgram()
 {
 
-  if [[ -z "$1" ]]; then
+    if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} program rule"
         return 1
     fi
@@ -236,7 +236,7 @@ getUrls()
 # Example addPrograms intigriti hunter
 addPrograms()
 {
-    if [[ -z "$1" ]] || [ -z "$2" ]]; then
+    if [[ -z "$1" ]] || [[ -z "$2" ]]; then
       echo -ne "Use ${FUNCNAME[0]} site author\nExample ${FUNCNAME[0]} h1 hunter\nExample ${FUNCNAME[0]} bugcrowd hunter\n"
       return 1
     fi
@@ -329,8 +329,7 @@ addPrograms()
             #just to check everything went well
             bbrf scope in -p "$program"
             echo -ne "${ENDCOLOR}\n"
-                
-        fi         
+        fi
         echo -en "${YELLOW} Add OUT scope: ${ENDCOLOR}\n" 
         read -r outscope_input
         #if empty skip
