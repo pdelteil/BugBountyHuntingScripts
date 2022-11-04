@@ -460,7 +460,7 @@ addInChunks()
     end=$chunkSize
 
     for i in $(seq 1 $parts); do
-        echo -ne "{$YELLOW}Adding chunk $i/$parts{$ENDCOLOR}"
+        echo -ne "${YELLOW}Adding chunk $i/$parts${ENDCOLOR}"
         elements="${init},${end}p" 
 
         if [[ "$type" == "urls" ]]; then
