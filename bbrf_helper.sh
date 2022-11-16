@@ -361,9 +361,9 @@ addPrograms()
 
             if [[ "$valRunNuclei" == "true" ]]; then
                 echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
-                bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos
+                bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -ei weak-cipher-suites,mismatched-ssl
             else
-                return 1; 
+                return 1
             fi
         fi
     done
@@ -552,7 +552,6 @@ findProgram()
         domains=$(echo $show |jq -r '.domains'|grep "\."|tr -d '"')
         echo -en "\n${YELLOW} Domains: $domains${ENDCOLOR}\n"
         show=$(bbrf show "$program")
-        #return 1
     fi
 
     if [[ ${#program} -gt 0 ]]; then
@@ -596,7 +595,6 @@ listTagValues()
     for program in $(bbrf programs --show-disabled); do 
         key=$(bbrf show "$program"|jq '.tags.site')
         echo -n '.'
-        #echo $program ", "$key
         keys+=("$key") 
     done
     #show unique key values
