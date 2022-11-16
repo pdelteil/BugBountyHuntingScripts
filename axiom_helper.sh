@@ -133,3 +133,19 @@ findAndMoveScans()
         mv -i "$file" "$folder"
     done
 }
+# input program name
+nucleiScan()
+{
+
+    if [[ -z "$1" ]]; then
+      echo "Use ${FUNCNAME[0]} programName"
+      return 1
+    fi
+
+    program="$1"
+    file="/tmp/$1urls.tmp"
+    #dump all program's urls
+    bbrf urls -p "$program" > $file 
+    axiom-scan $file -m nuclei -stats -si 180 -es info,unknown 
+
+}
