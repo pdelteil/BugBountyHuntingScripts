@@ -147,6 +147,6 @@ nucleiScan()
     #dump all program's urls
     bbrf urls -p "$program" > $file 
     #TODO: remove excluded id, add the into config file
-    axiom-scan $file -m nuclei -stats -si 180 -es info,unknown -ei expired-ssl,weak-cipher-suites,self-signed-ssl,mismatched-ssl,CVE-2017-5487
+    axiom-scan $file -m nuclei -stats -si 180 -es info,unknown -eid expired-ssl,weak-cipher-suites,self-signed-ssl,mismatched-ssl,CVE-2017-5487
 
 }
