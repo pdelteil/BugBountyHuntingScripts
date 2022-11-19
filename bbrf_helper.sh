@@ -157,7 +157,7 @@ getDomains()
         fi
     elif [[ $flag == "-p" ]]; then
         if [[ -n "$2" ]]; then
-            params="-p $2"
+            params="-p$2"
             echo "$params"
         else
             echo "add Program name!"
@@ -361,7 +361,7 @@ addPrograms()
 
             if [[ "$valRunNuclei" == "true" ]]; then
                 echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
-                bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -ei weak-cipher-suites,mismatched-ssl
+                bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -ei weak-cipher-suites,mismatched-ssl,expired-ssl,self-signed-ssl
             else
                 return 1
             fi
