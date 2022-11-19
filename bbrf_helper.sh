@@ -361,7 +361,7 @@ addPrograms()
 
             if [[ "$valRunNuclei" == "true" ]]; then
                 echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
-                bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -ei weak-cipher-suites,mismatched-ssl
+                bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -ie weak-cipher-suites,mismatched-ssl
             else
                 return 1
             fi
@@ -460,7 +460,7 @@ addInChunks()
     end=$chunkSize
 
     for i in $(seq 1 $parts); do
-        echo -ne "${YELLOW}Adding chunk $i/$parts${ENDCOLOR}"
+        echo -ne "${YELLOW}Adding chunk $i/$parts${ENDCOLOR}\n"
         elements="${init},${end}p" 
 
         if [[ "$type" == "urls" ]]; then
