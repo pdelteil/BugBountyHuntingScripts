@@ -158,7 +158,6 @@ getDomains()
     elif [[ $flag == "-p" ]]; then
         if [[ -n "$2" ]]; then
             params="-p$2"
-            echo "$params"
         else
             echo "add Program name!"
             echo "> getDomains -p program "
