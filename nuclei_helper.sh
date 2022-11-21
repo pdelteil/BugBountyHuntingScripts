@@ -15,7 +15,7 @@ testNucleiTemplate()
  templateID=$1
  URL=$2
  pathToTemplate=$(locate $templateID|grep yaml|head -n 1) 
- echo "nuclei -debug -t $pathToTemplate -u $URL"
+ echo "nuclei -debug -t $pathToTemplate -u $URL -itags fuzz,dos"
  nuclei -debug -t $pathToTemplate -u $URL
 }
 
