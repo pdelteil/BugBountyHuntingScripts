@@ -747,14 +747,18 @@ getBugBountyData()
 #Get all urls from programs with a specific tag value
 # Examples
 # get all urls from Intigriti programs
-# > getUrlsWithProgramTag intigriti  
+# > getUrlsWithProgramTag site intigriti  
 
 # get all urls from bugcrowd programs
-# > getUrlsWithProgramTag bugcrowd
+# > getUrlsWithProgramTag site bugcrowd
+
+# get all urls from paid programs
+# > getUrlsWithProgramTag reward money
+
 
 getUrlsWithProgramTag()
 {   
-    if [[ -z "$1" ]] | [ -z "$2" ]]; then
+    if [[ -z "$1" ]] | [[ -z "$2" ]]; then
         echo "Use ${FUNCNAME[0]} tag value"
         echo "Example ${FUNCNAME[0]} site intigriti"
         return 1
