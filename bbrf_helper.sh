@@ -88,7 +88,7 @@ getStats()
     IFS=$'\n'
     filename="$1"
     #headers
-    headers="Program; Site; Program url; disabled; reward; author; notes; added Date; #domains; #urls; #IPS; #inscope" 
+    headers="Program; Site; Program url; disabled; reward; author; notes; added Date; gov; #domains; #urls; #IPS; #inscope" 
     echo -e $headers >> $filename
     echo "Getting stats of programs $param"
     
@@ -107,13 +107,14 @@ getStats()
         author=$(echo "$description" |jq -r '.tags.author')
         notes=$(echo "$description" |jq -r '.tags.notes') 
         addedDate=$(echo "$description" |jq -r '.tags.addedDate')
+        gov=$(echo "$description" |jq -r '.tags.gov')
         #metrics 
         numUrls=$(bbrf urls -p "$program"|wc -l)
         numDomains=$(bbrf domains -p "$program"|wc -l)
         #numIPs=$(bbrf ips -p "$program"|wc -l)
         numInScope=$(bbrf scope in -p "$program"|wc -l)
-        values="$program; $site; $programUrl; $disabled; $reward; $author; $notes; $addedDate; $numDomains; $numUrls; $numIPs;$numInScope"
-        echo -e $values >> $filename
+        values="$program; $site; $programUrl; $disabled; $reward; $author; $notes; $addedDate; $gov; $numDomains; $numUrls; $numIPs;$numInScope"
+        echo -e "$values" >> $filename
         i=$(( $i + 1))
     done
 }
