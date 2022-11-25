@@ -88,7 +88,7 @@ getStats()
     IFS=$'\n'
     filename="$1"
     #headers
-    headers="Program; Site; Program url; disabled; reward; author; notes; added Date; gov; #domains; #urls; #IPS; #inscope" 
+    headers="Program; Site; Program url; disabled; reward; author; notes; added Date; gov; #domains; #urls; #IPS; #inscope; #inscopeWildcard" 
     echo -e $headers >> $filename
     echo "Getting stats of programs $param"
     
@@ -113,7 +113,8 @@ getStats()
         numDomains=$(bbrf domains -p "$program"|wc -l)
         #numIPs=$(bbrf ips -p "$program"|wc -l)
         numInScope=$(bbrf scope in -p "$program"|wc -l)
-        values="$program; $site; $programUrl; $disabled; $reward; $author; $notes; $addedDate; $gov; $numDomains; $numUrls; $numIPs;$numInScope"
+        numInScopeWildcard=$(bbrf scope in --wildcard -p "$program"|wc -l)
+        values="$program; $site; $programUrl; $disabled; $reward; $author; $notes; $addedDate; $gov; $numDomains; $numUrls; $numIPs;$numInScope; $numInScopeWildcard"
         echo -e "$values" >> $filename
         i=$(( $i + 1))
     done
