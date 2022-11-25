@@ -6,14 +6,13 @@
 # TODO add flag to debug optional
 testNucleiTemplate()
 {
- if [ -z "$1" ]
-    then
+ if [[ -z "$1" ]]; then
       echo "Use ${FUNCNAME[0]} nuclei-template-id URL"
-      return 1;
+      return 1
     fi
 
- templateID=$1
- URL=$2
+ templateID="$1"
+ URL="$2"
  pathToTemplate=$(locate $templateID|grep yaml|head -n 1) 
  echo "nuclei -debug -t $pathToTemplate -u $URL -itags fuzz,dos"
  nuclei -debug -t $pathToTemplate -u $URL
@@ -26,10 +25,9 @@ testNucleiTemplate()
 #TODO: use several tagvalues
 searchTemplateByTag()
 {
-    if [ -z "$1" ] | [ -z "$2" ]
-    then
-      echo "Use ${FUNCNAME[0]} tagName tagValue"
-      return 1;
+    if [[ -z "$1" ]] | [[ -z "$2" ]]; then
+        echo "Use ${FUNCNAME[0]} tagName tagValue"
+        return 1
     fi
     configFile="$HOME/.config/nuclei/.templates-config.json"
     property="nuclei-templates-directory"
@@ -44,10 +42,9 @@ searchTemplateByTag()
 #Use runScanTemplateVersion v8.5.8 urls.txt
 runScanTemplateVersion()
 {
-    if [ -z "$1" ] | [ -z "$2" ]
-    then
-      echo "Use ${FUNCNAME[0]} version urls.txt"
-      return 1;
+    if [[ -z "$1" ]] | [[ -z "$2" ]]; then
+        echo "Use ${FUNCNAME[0]} version urls.txt"
+        return 1
     fi
     #git repo
     gitURL="https://github.com/projectdiscovery/nuclei-templates.git"
@@ -55,12 +52,27 @@ runScanTemplateVersion()
     file="$2"
     folder="/tmp/nuclei-templates-$branch"
 
-    if [ -d "$folder" ] 
-    then
+    if [[ -d "$folder" ]]; then
         echo "Directory $folder exists. Skipping git clone" 
     else
         git clone --depth=1 --branch $branch $gitURL $folder
     fi
 
     nuclei -update-directory $folder -no-update-templates -l $file
+}
+
+detectTemplatesIncorrectId()
+{
+    templatePath="$1"
+    echo "templateFileName - templateID"
+
+    for i in $(find "$templatePath" -depth -name '*.yaml'); do 
+        fname=$(basename -- "$i")
+        templateName=$(echo -n "$fname"|sed 's/\.yaml//g')
+        templateID=$(grep -E "^id:" "$i"|awk -F":" '{print $2}'|tr -d ' ')
+
+        if [[ "$templateName" != "$templateID" ]];then
+            echo "$templateName - $templateID"
+        fi
+    done
 }
