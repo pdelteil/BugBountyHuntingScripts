@@ -9,9 +9,10 @@ ENDCOLOR="\e[0m"
 #When you add a new outscope rule(s) you'd like that the program data gets updated
 #this means removing domains and urls that now are out of scope
 #This is something I need to do when I'm invited to a BBP that also has a VDP
+#Example 
+# > updateProgram notanIBMdomain.com IBM
 updateProgram()
 {
-
     if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} program rule"
         return 1
@@ -20,31 +21,41 @@ updateProgram()
     #this should work for adding/removing a inscope rule 
     program="$1"
     rule="$2"
+    #if rule is wildcard
+    wildcard=$(echo "$rule"|grep '\*')
 
+    if [[ ${#wildcard} -gt 0 ]]; then
+        echo "has wildcard"
+        rule2=$(echo "$rule"|sed 's/*\.//g')
+    else
+        rule2="*.$rule"
+    fi
     #check if the program has that rule 
     check=$(bbrf show "$program" | grep -i "$rule")
 
-    #careful when the remove url is a subdomain of a wildcard rule
+    #careful when the removed url is a subdomain of a wildcard rule
 
     if [[ ${#check} -gt 0 ]]; then
-        echo "rule in program"
+        echo "Rule $rule found in program $program"
         #removing rule from program
         #stats before removing
         inscopeRules=$(bbrf show "$program"|jq '.inscope'|grep '"'|wc -l)
         domains=$(bbrf domains -p "$program"|wc -l)
         urls=$(bbrf urls -p "$program"|wc -l)
         echo "Stats before update inscope rules: $inscopeRules, domains: $domains,  urls: $urls"
-
-        bbrf inscope remove "$2" -p "$program"
+        echo -ne "${RED}Removing inscope rule${ENDCOLOR}\n"
+        yes|bbrf inscope remove "$rule" "$rule2" -p "$program"
         #removing wildcard
-        rule=$(echo $rule|sed 's/*\.//g' )
+        rule=$(echo "$rule"|sed 's/*\.//g')
         #removing domains
+        echo "Removing domains"
         bbrf domains -p "$program"|grep -i "$rule" | bbrf domain remove - -p "$program"
         #remove urls
+        echo "Removing urls"
         bbrf urls -p "$program"|grep -i "$rule" |bbrf url remove -  #we don t need program here
     
     else
-        echo "rule not in program $program"
+        echo "rule $rule not in program $program"
         return -1
     fi
 
