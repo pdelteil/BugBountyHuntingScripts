@@ -6,16 +6,16 @@
 # TODO add flag to debug optional
 testNucleiTemplate()
 {
- if [[ -z "$1" ]]; then
-      echo "Use ${FUNCNAME[0]} nuclei-template-id URL"
-      return 1
+    if [[ -z "$1" ]]; then
+        echo "Use ${FUNCNAME[0]} nuclei-template-id URL"
+        return 1
     fi
 
- templateID="$1"
- URL="$2"
- pathToTemplate=$(locate $templateID|grep yaml|head -n 1) 
- echo "nuclei -debug -t $pathToTemplate -u $URL -itags fuzz,dos"
- nuclei -debug -t $pathToTemplate -u $URL
+    templateID="$1"
+    URL="$2"
+    pathToTemplate=$(locate $templateID|grep yaml|head -n 1) 
+    echo "nuclei -debug -t $pathToTemplate -u $URL -itags fuzz,dos"
+    nuclei -debug -t $pathToTemplate -u $URL
 }
 
 #examples 
@@ -63,6 +63,12 @@ runScanTemplateVersion()
 
 detectTemplatesIncorrectId()
 {
+   if [[ -z "$1" ]]; then
+        echo "Use ${FUNCNAME[0]} detectTemplatesIncorrectId templatePath"
+        echo "Example detectTemplatesIncorrectId ~/nuclei-templates"
+        return 1
+    fi
+
     templatePath="$1"
     echo "templateFileName - templateID"
 
