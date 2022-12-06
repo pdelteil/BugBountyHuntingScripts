@@ -375,8 +375,6 @@ addPrograms()
             if [[ "$valRunNuclei" == "true" ]]; then
                 echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
                 bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -eid weak-cipher-suites,mismatched-ssl,expired-ssl,self-signed-ssl
-            else
-                return 1
             fi
         fi
     done
