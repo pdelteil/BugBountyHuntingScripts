@@ -29,7 +29,7 @@ go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
 
 echo -ne "${YELLOW}Installing assetfinder ${ENDCOLOR}\n" 
 #assetfinder
-go get -u github.com/tomnomnom/assetfinder
+go install -v github.com/tomnomnom/assetfinder@latest
 
 echo -ne "${YELLOW}Installing httprobe ${ENDCOLOR}\n" 
 #httprobe
@@ -46,6 +46,9 @@ go install github.com/tomnomnom/waybackurls@latest
 echo -ne "${YELLOW}Installing amass ${ENDCOLOR}\n" 
 #amass 
 go install -v github.com/OWASP/Amass/v3/...@master
+
+#unfurl 
+go install -v github.com/tomnomnom/unfurl@latest
 
 echo -ne "${YELLOW}Adding bbrf_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/bbrf_helper.sh " >> $shellConfig
