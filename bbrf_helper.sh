@@ -154,6 +154,7 @@ getDomains()
     gauThreads=30
     #no params
     flag="$1"
+    params=""
     
     if [[ -z $flag ]]; then
         echo -ne "${YELLOW} Running bbrf mode ${ENDCOLOR}\n"
@@ -172,9 +173,17 @@ getDomains()
     elif [[ $flag == "-p" ]]; then
         if [[ -n "$2" ]]; then
             params="-p$2"
+            #check if program exists
+            show=$(showProgram "$2")
+            status=$(echo $?)
+            if [[ "$status" != "0" ]]; then
+                echo -ne "${RED}Program $2 does not exists!${ENDCOLOR}\n"
+                return 1
+            fi    
+
         else
             echo "add Program name!"
-            echo "> getDomains -p program "
+            echo "Use: getDomains -p program "
             return -1
         fi
     fi
@@ -190,7 +199,7 @@ getDomains()
 
         echo -ne "${RED} Running amass ${ENDCOLOR}\n"
         if [[ "$fileMode" = true ]] ; then
-            for scope in $(echo "$wild"); do                
+            for domain in $(echo "$wild"); do                
                 echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
                 amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-amass.txt"
             done
@@ -664,6 +673,7 @@ showProgram()
 
     if [[ ${#output} -gt 0 ]]; then
         echo "$output" 
+        return 0
     else    
         echo -ne "${RED}$program not found! ${ENDCOLOR}\n\n"
         return 1
@@ -680,6 +690,7 @@ showProgram()
         urls=$(bbrf urls -p "$program"|wc -l) 
         echo -en "${YELLOW}#domains: "$domains "\n"
         echo -en "#urls: "$urls"${ENDCOLOR}\n"
+        return 0
     else
         echo "Use ${FUNCNAME[0]} programName -stats [optional, displays number of urls and domains] "
         return 1
