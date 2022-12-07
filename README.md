@@ -11,6 +11,7 @@ assetfinder
 httprobe
 gau
 amass
+unfurl
 ```
 
 ## How to install
