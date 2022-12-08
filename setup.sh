@@ -56,13 +56,13 @@ echo "source $location/bbrf_helper.sh " >> $shellConfig
 echo -ne "${YELLOW}Adding nuclei_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/nuclei_helper.sh " >> $shellConfig
 
-echo -ne "${YELLOW}Adding general_helper.sh to $shellConfig{ENDCOLOR}\n"
+echo -ne "${YELLOW}Adding general_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/general_helper.sh " >> $shellConfig
 
-echo -ne "${YELLOW}Adding bbrf_helper.sh to $shellConfig{ENDCOLOR}\n"
+echo -ne "${YELLOW}Adding bbrf_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/axiom_helper.sh " >> $shellConfig
 
-echo -ne "${YELLOW}Adding amass_helper.sh to $shellConfig{ENDCOLOR}\n"
+echo -ne "${YELLOW}Adding amass_helper.sh to $shellConfig${ENDCOLOR}\n"
 echo "source $location/amass_helper.sh " >> $shellConfig
 
 source $shellConfig
