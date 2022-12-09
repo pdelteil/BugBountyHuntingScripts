@@ -801,9 +801,19 @@ getUrlsWithProgramTag()
 # based on 2 conditions: site (intrigriti, bugcrowd, h1, etc) and reward (money, points, thanks) 
 getProgramData()
 {
+    if [[ -z "$1" ]] | [[ -z "$2" ]] | [[ -z "$3" ]]; then
+        echo "Use ${FUNCNAME[0]} site reward type"
+        echo "site: (intrigriti, bugcrowd, h1, yeswehack,etc)"
+        echo "rewards: (money, points, thanks)"
+        echo "type: (inscope, outscope, urls, domains, ips)"
+        echo "Example: ${FUNCNAME[0]} bugcrowd money names"  
+        return 1
+    fi
+
     site=$1
-    reward=$2
+    reward=$2    
     type=$3
+
     if [[ "$type" == "inscope" ]]; then
         echo "getting inscope"
         data=("scope" "in" "--wildcard")
@@ -827,11 +837,22 @@ getProgramData()
     allPrograms=$(bbrf programs where site is "$site")
 
     for program in $(echo "$allPrograms"); do
-        description=$(bbrf show "$program")
-        rewardInfo=$(echo "$description"  |jq -r '.tags.reward')
-        if [[ "$rewardInfo" == "$reward" ]]; then
-            bbrf ${data[@]} -p "$program"
-        fi   
+   
+        if [[ "$type" == "names" ]];then
+            description=$(bbrf show "$program")
+            url=$(echo "$description"  |jq -r '.tags.url')
+            rewardInfo=$(echo "$description"  |jq -r '.tags.reward')
+
+            if [[ "$rewardInfo" == "$reward" ]]; then
+                echo "$program, $url"
+            fi
+        else
+            description=$(bbrf show "$program")
+            rewardInfo=$(echo "$description"  |jq -r '.tags.reward')
+            if [[ "$rewardInfo" == "$reward" ]]; then
+                bbrf ${data[@]} -p "$program"
+            fi   
+        fi
     done
 }
 #remove all urls from a program
