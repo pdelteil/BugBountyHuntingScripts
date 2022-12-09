@@ -797,7 +797,9 @@ getUrlsWithProgramTag()
     done
 }
 
-getPrograms()
+# retrieve programs data (type, with values 'inscope', 'outscope', 'urls', 'domains', 'ips') 
+# based on 2 conditions: site (intrigriti, bugcrowd, h1, etc) and reward (money, points, thanks) 
+getProgramData()
 {
     site=$1
     reward=$2
@@ -805,6 +807,10 @@ getPrograms()
     if [[ "$type" == "inscope" ]]; then
         echo "getting inscope"
         data=("scope" "in" "--wildcard")
+    fi
+    if [[ "$type" == "outscope" ]]; then
+        echo "getting inscope"
+        data=("scope" "out")
     fi
     if [[ "$type" == "urls" ]]; then
         echo "getting urls"
@@ -814,12 +820,16 @@ getPrograms()
         echo "getting domains"
         data=("domains")
     fi
+    if [[ "$type" == "ips" ]]; then
+        echo "getting ips"
+        data=("ips")
+    fi
     allPrograms=$(bbrf programs where site is "$site")
 
     for program in $(echo "$allPrograms"); do
         description=$(bbrf show "$program")
-        reward=$(echo "$description"  |jq -r '.tags.reward')
-        if [[ "$reward" == "money" ]]; then
+        rewardInfo=$(echo "$description"  |jq -r '.tags.reward')
+        if [[ "$rewardInfo" == "$reward" ]]; then
             bbrf ${data[@]} -p "$program"
         fi   
     done
