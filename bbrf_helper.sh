@@ -566,7 +566,8 @@ findProgram()
     fi
     show=$(bbrf show "$INPUT") 
     program=$(echo "$show" |jq -r '.program')
-    #echo "$program"
+
+    echo "$program"
     #case input is an IP
     if [[ $INPUT =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         domains=$(echo $show |jq -r '.domains'|grep "\."|tr -d '"')
@@ -793,6 +794,34 @@ getUrlsWithProgramTag()
   
     for program in $(echo "$allPrograms"); do
         bbrf urls -p "$program"
+    done
+}
+
+getPrograms()
+{
+    site=$1
+    reward=$2
+    type=$3
+    if [[ "$type" == "inscope" ]]; then
+        echo "getting inscope"
+        data=("scope" "in" "--wildcard")
+    fi
+    if [[ "$type" == "urls" ]]; then
+        echo "getting urls"
+        data=("urls")
+    fi
+    if [[ "$type" == "domains" ]]; then
+        echo "getting domains"
+        data=("domains")
+    fi
+    allPrograms=$(bbrf programs where site is "$site")
+
+    for program in $(echo "$allPrograms"); do
+        description=$(bbrf show "$program")
+        reward=$(echo "$description"  |jq -r '.tags.reward')
+        if [[ "$reward" == "money" ]]; then
+            bbrf ${data[@]} -p "$program"
+        fi   
     done
 }
 #remove all urls from a program
