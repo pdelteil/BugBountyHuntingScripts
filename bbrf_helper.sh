@@ -930,3 +930,8 @@ clearProgramData()
     removeInScope $PROGRAM
     removeOutScope $PROGRAM
 }
+
+excludeResults()
+{
+    grep -v '\.lex\.\|\.lazada\.\|lazada-seller\|/lazada\|redmart\|\.asia'
+}
