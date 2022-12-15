@@ -339,7 +339,7 @@ addPrograms()
         #echo $result
         if [[ $result == *"conflict"* ]]; then
             echo "Program already on BBRF!"
-            bbrf show "$proWgram"|jq
+            bbrf show "$program"|jq
             return -1
         fi
         echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
@@ -887,16 +887,23 @@ removeDomains()
 }
 
 #remove inscope from a program
+# then removing domains and urls is needed
 removeInScope()
 {
-    if [[ -z "$1" ]];   then
+    if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} program"
         echo "Example ${FUNCNAME[0]} IBM"
         return 1
     fi
 
     PROGRAM="$1"
-    bbrf scope in -p "$PROGRAM"|bbrf inscope remove -
+    bbrf scope in -p "$PROGRAM"|bbrf inscope remove - -p "$PROGRAM"
+    #remove domains
+    #domains=$(
+    bbrf domains -p "$PROGRAM" | bbrf domain remove - -p "$PROGRAM"
+    #remove urls
+    bbrf urls -p "$PROGRAM" | bbrf domain remove - 
+
 }
 
 #remove outscope from a program
@@ -931,7 +938,3 @@ clearProgramData()
     removeOutScope $PROGRAM
 }
 
-excludeResults()
-{
-    grep -v '\.lex\.\|\.lazada\.\|lazada-seller\|/lazada\|redmart\|\.asia'
-}
