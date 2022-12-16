@@ -1,70 +1,116 @@
-#general helper functions 
-#create a screen instance with a given name
+#general helper functions
+
+# create a screen instance with a given name
+# Example
+# Create a screen session called "mySession"
+# createScreen mySession
 function createScreen()
 {
     if [[ -z "$1" ]]; then
-      echo -e "#Creates a screen session with given name \n Use ${FUNCNAME[0]} SCREEN_NAME"
+      echo -e "Create a screen session with given name \n Use ${FUNCNAME[0]} SCREEN_NAME"
       return 1
     fi
 	screen -q -S "$1"
 }
 
+# Gets the IP address of a given domain
+# Example
+# Get the IP address of github.com
+# getIp github.com
+# Output: 140.82.121.4
 function getIp()
 {
-    if [[ -z "$1" ]]; then
-      echo -e "get Ip from domain\n Example: getIp example.com"
-      return 1
-    fi
-    dig $1 +short
+  # Check if the domain name argument is empty
+  if [[ -z "$1" ]]; then
+    # Print a usage message and return an error code if the argument is empty
+    echo "Get the IP address of a domain. Example: getIp example.com"
+    return 1
+  fi
+
+  domain="$1"
+  
+  # Use the dig command to get the IP address of the domain and print the result
+  dig "$domain" +short
 }
 
-# finds and then open a file with nano
-locateNano()
+# The locateNano function can be used to search for a file on the system and open it in the nano text editor.
+# To search for and open a file called "example.txt" in the nano editor, you can call the function like this:
+locateNano() 
 {
-    if [[ -z "$1" ]]; then
-      echo -e "Use ${FUNCNAME[0]} filename"
-      return 1
-    fi
-    search="$1"
-    location=$(locate $search|head -n 1)
-    #TODO choose from list when there are more than 1 result
-    if [[ ${#location} -gt 0 ]]; then
-        nano $location
-    else    
-        echo "Not found: $search"
-    fi
-}
-# finds and then open a file with nano
-locateCat()
-{
-    if [[ -z "$1" ]]; then
-      echo -e "Use ${FUNCNAME[0]} filename"
-      return 1
-    fi
-    search="$1"
-    location=$(locate $search|head -n 1)
-    #TODO choose from list when there are more than 1 result 
+  # Check if the filename argument is empty
+  if [[ -z "$1" ]]; then
+    # Print a usage message and return an error code if the argument is empty
+    echo "Use ${FUNCNAME[0]} filename"
+    return 1
+  fi
 
-    if [[ ${#location} -gt 0 ]]; then
-        echo $location
-        cat $location
-        echo ""
-    else
-        echo "Not found: $search"
-    fi
+  # Store the filename in a variable search
+  search="$1"
+  
+  # Use the locate command to find the first matching file and store the result in a variable called location
+  location=$(locate "$search" | head -n 1)
+
+  # TODO: Choose from the list of results if there are more than 1 match
+
+  # Check if the location variable is not empty
+  if [[ ${#location} -gt 0 ]]; then
+    # If the location is not empty, open the file in the nano editor
+    nano "$location"
+  else
+    # If the location is empty, print a message indicating that the file was not found
+    echo "File not found: $search"
+  fi
 }
+# The locateCat function can be used to search for a file on the system and display its contents. 
+# To search for and display the contents of a file called "example.txt", you can call the function like this:
+# locateCat example.txt
+
+locateCat() {
+  # Check if the filename argument is empty
+  if [[ -z "$1" ]]; then
+    # Print a usage message and return an error code if the argument is empty
+    echo "Use ${FUNCNAME[0]} filename"
+    return 1
+  fi
+
+  # Store the filename in a variable called search
+  search="$1"
+  
+  # Use the locate command to find the first matching file and store the result in a variable called location
+  location=$(locate "$search" | head -n 1)
+
+  # TODO: Choose from the list of results if there are more than 1 match
+
+  # Check if the location variable is not empty
+  if [[ ${#location} -gt 0 ]]; then
+    # If the location is not empty, print the location and the contents of the file
+    echo "$location"
+    cat "$location"
+    echo ""
+  else
+    # If the location is empty, print a message indicating that the file was not found
+    echo "Not found: $search"
+  fi
+}
+
+
 #use getField n (where n is the nth column)
 # example:  cat file.txt | getField 4 
 getField() 
 {
     if [[ -z "$1" ]]; then
-      echo -e "Use ${FUNCNAME[0]} number (nth column)"
+      echo -e "Use ${FUNCNAME[0]} number (nth column) [space as default separator]"
       echo "Example:  cat file.txt | getField 4"
       return 1
     fi
-    awk -v number=$1 '{print $number}'
-    #this is an attempt to receive the separator as a function parameter 
-    #awk -v column=$1 -v "field=$2" -F\\${field} '{print $column}' 
+    if [[ -z "$2" ]]; then
+        awk -v number=$1 '{print $number}'
+    fi
+    if [[ ! -z "$2" ]]; then
+       # Receive the column number and field separator as function parameters and use them to print the specified column using the specified field separator
+        awk -v column=$1 --field-separator=$2 '{print $column}'
+    fi
+
 }
 #get domain From URL
 getDomainFromURL()
@@ -89,11 +135,21 @@ sortByDomain()
 #diffFiles file1.txt file2.txt output.txt
 diffFiles()
 {
-    if [[ -z "$1" ]] | [[ -z "$2" ]] | [[ -z "$3" ]]; then
-        echo "Use ${FUNCNAME[0]} file1.txt file2.txt output.txt"
-        return 1
-    fi
-    comm -3 <(sort $1) <(sort $2) > $3
+  # Check if any of the filename arguments are empty
+  if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
+    # Print a usage message and return an error code if any of the arguments are empty
+    echo "Use ${FUNCNAME[0]} file1.txt file2.txt output.txt"
+    return 1
+  fi
+
+  # Store the filenames in variables
+  file1="$1"
+  file2="$2"
+  output="$3"
+
+  # Sort the lines in each input file and suppress column 3 (lines that appear in both files)
+  # Redirect the output to the output file
+  comm -3 <(sort "$file1") <(sort "$file2") > "$output"
 }
 #retreive the ORGs names in SSL Certs 
 getOrgsFromCerts()
@@ -130,7 +186,7 @@ getCNFromCerts()
 getTLDs()
 {
     URL="https://raw.githubusercontent.com/datasets/top-level-domain-names/master/top-level-domain-names.csv"
-    FILE="top-level-domain-names.csv"
+    FILE="/tmp/top-level-domain-names.csv"
 
     if [[ -z "$1" ]] ;    then
         echo "Use ${FUNCNAME[0]} targetDomain"
@@ -160,12 +216,32 @@ getTLDs()
 #finds the words that repeat the most in subdomains names
 sortByDomainCount()
 {
-    cat $1 | tr '\.' '\n'|sort| uniq -c |sort -nr
+  # Check if the input file argument is empty
+  if [[ -z "$1" ]]; then
+    # Print a usage message and return an error code if the argument is empty
+    echo "Use ${FUNCNAME[0]} INPUT_FILE"
+    return 1
+  fi
+
+  # Store the input file in a variable called input_file
+  input_file="$1"
+
+  # Read the input file, replace dots with newlines, sort the lines, count the number of occurrences of each line, and sort the results by count in descending order
+  cat "$input_file" | tr '\.' '\n' | sort | uniq -c | sort -nr
 }
 
-#find domains with IP address format to remove them
+# find domains with IP address format
 # ie: 108-249-27-4.lightspeed.wlfrct.sbcglobal.net
 findIpsInDomains()
 {
-    cat $1 |  grep -E '[0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3}\-[0-9]{1,3}'
+  # Check if the filename argument is empty
+  if [[ -z "$1" ]]; then
+    # Print a usage message and return an error code if the argument is empty
+    echo "Use ${FUNCNAME[0]} filename"
+    return 1
+  fi
+   
+  input_file="$1"
+  # Read the contents of the file and search for lines that contain an IP address in the format "X.X.X.X", where X is a number between 0 and 255.
+  cat "input_file" | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
 }
