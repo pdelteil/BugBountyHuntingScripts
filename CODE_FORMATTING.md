@@ -53,3 +53,5 @@
       echo "end"
    }
    ``` 
+   
+ Loosely based on https://google.github.io/styleguide/shellguide.html
