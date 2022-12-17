@@ -799,62 +799,76 @@ getUrlsWithProgramTag()
 
 # retrieve programs data (type, with values 'inscope', 'outscope', 'urls', 'domains', 'ips') 
 # based on 2 conditions: site (intrigriti, bugcrowd, h1, etc) and reward (money, points, thanks) 
-getProgramData()
-{
-    if [[ -z "$1" ]] | [[ -z "$2" ]] | [[ -z "$3" ]]; then
-        echo "Use ${FUNCNAME[0]} site reward type"
-        echo "site: (intrigriti, bugcrowd, h1, yeswehack,etc)"
-        echo "rewards: (money, points, thanks)"
-        echo "type: (inscope, outscope, urls, domains, ips)"
-        echo "Example: ${FUNCNAME[0]} bugcrowd money names"  
-        return 1
-    fi
+getProgramData() {
+  # Check if required arguments are provided
+  if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
+    echo "Usage: ${FUNCNAME[0]} SITE REWARD TYPE"
+    echo "SITE: (intrigriti, bugcrowd, h1, yeswehack, etc)"
+    echo "REWARDS: (money, points, thanks)"
+    echo "TYPE: (inscope, outscope, urls, domains, ips)"
+    echo "Example: ${FUNCNAME[0]} bugcrowd money names"
+    return 1
+  fi
 
-    site=$1
-    reward=$2    
-    type=$3
+  # Assign provided arguments to variables
+  local site=$1
+  local reward=$2
+  local type=$3
 
-    if [[ "$type" == "inscope" ]]; then
-        echo "getting inscope"
-        data=("scope" "in" "--wildcard")
-    fi
-    if [[ "$type" == "outscope" ]]; then
-        echo "getting inscope"
-        data=("scope" "out")
-    fi
-    if [[ "$type" == "urls" ]]; then
-        echo "getting urls"
-        data=("urls")
-    fi
-    if [[ "$type" == "domains" ]]; then
-        echo "getting domains"
-        data=("domains")
-    fi
-    if [[ "$type" == "ips" ]]; then
-        echo "getting ips"
-        data=("ips")
-    fi
-    allPrograms=$(bbrf programs where site is "$site")
+  # Set data array based on type
+  local data
+  case "$type" in
+    inscope)
+      echo "Getting inscope data"
+      data=("scope" "in" "--wildcard")
+      ;;
+    outscope)
+      echo "Getting outscope data"
+      data=("scope" "out")
+      ;;
+    urls)
+      echo "Getting url data"
+      data=("urls")
+      ;;
+    domains)
+      echo "Getting domain data"
+      data=("domains")
+      ;;
+    ips)
+      echo "Getting IP data"
+      data=("ips")
+      ;;
+    *)
+      echo "Invalid type provided. Valid options are: inscope, outscope, urls, domains, ips"
+      return 1
+      ;;
+  esac
 
-    for program in $(echo "$allPrograms"); do
-   
-        if [[ "$type" == "names" ]];then
-            description=$(bbrf show "$program")
-            url=$(echo "$description"  |jq -r '.tags.url')
-            rewardInfo=$(echo "$description"  |jq -r '.tags.reward')
+  # Get all programs for the provided site
+  local allPrograms=$(bbrf programs where site is "$site")
 
-            if [[ "$rewardInfo" == "$reward" ]]; then
-                echo "$program, $url"
-            fi
-        else
-            description=$(bbrf show "$program")
-            rewardInfo=$(echo "$description"  |jq -r '.tags.reward')
-            if [[ "$rewardInfo" == "$reward" ]]; then
-                bbrf ${data[@]} -p "$program"
-            fi   
-        fi
-    done
+  # Loop through programs and get data based on type and reward
+  for program in $(echo "$allPrograms"); do
+    local description=$(bbrf show "$program")
+    local rewardInfo=$(echo "$description" | jq -r '.tags.reward')
+
+    if [[ "$type" == "names" ]]; then
+      local url=$(echo "$description" | jq -r '.tags.url')
+      if [[ "$rewardInfo" == "$reward" ]]; then
+        echo "$program, $url"
+      fi
+    elif [[ "$rewardInfo" == "$reward" ]]; then
+      bbrf "${data[@]}" -p "$program"
+    fi
+  done
 }
+
+# Example usage:
+getProgramData bugcrowd money names
+getProgramData bugcrowd points urls
+getProgramData h1 thanks ips
+
+
 #remove all urls from a program
 # Examples
 # removes all urls from AT&T program
