@@ -21,7 +21,7 @@ function installTool()
         echo -ne "${YELLOW}  $cmdname is installed! Skipping${ENDCOLOR}\n"
     else
         echo -ne "${YELLOW}  $cmdname is not installed, installing...${ENDCOLOR}\n"
-        "$installcmd"
+        $installcmd
     fi
 }
 
