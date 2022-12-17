@@ -533,21 +533,27 @@ resolveDomainsInChunks()
 # Example
 # checkProgram hackerone 
 # checkProgram hacker  #all programs containing hacker in the program's name
-checkProgram()
-{
-    if [[ -z "$1" ]];
-    then
-      echo "Use ${FUNCNAME[0]} text"
-      return 1
-    fi
-    text="$1"
-    output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
-    if [[ ${#output} -gt 0 ]]; then
-        echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
-    else    
-        echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
-    fi
-    #TODO: call wshowProgram from here, showing numeric options
+checkProgram() {
+  # Check if an argument was provided
+  if [[ -z "$1" ]]; then
+    # If no argument was provided, print an error message and exit the function
+    echo "Use ${FUNCNAME[0]} text"
+    return 1
+  fi
+
+  # Set the text variable to the argument provided
+  text="$1"
+  
+  # Search for programs matching the text provided
+  output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
+  
+  # If any programs were found, print them
+  if [[ ${#output} -gt 0 ]]; then
+    echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
+  # If no programs were found, print an error message
+  else    
+    echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
+  fi
 }
 
 #finds the program name from a domain, URL or IP Adress. 
