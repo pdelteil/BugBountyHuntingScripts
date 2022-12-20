@@ -28,9 +28,13 @@ function installTool()
 function addtoBashrc()
 {
     helper="$1"
-    configfile="$2"
-    echo -ne "${YELLOW}Adding $helper to $configfile${ENDCOLOR}\n"
-    echo "source $location/$helper " >> $configfile
+    configFile="$2"
+    count=$(grep -c "$helper" "$configFile")
+    if [[ "$count" -eq 0 ]]; then
+        # Add the value to the file
+        echo -ne "${YELLOW}Adding $helper to $configFile${ENDCOLOR}\n"
+        echo "source $location/$helper " >> $configFile
+    fi
 }
 
 #installing dependencies 
