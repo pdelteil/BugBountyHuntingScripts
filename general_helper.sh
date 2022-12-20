@@ -245,3 +245,13 @@ findIpsInDomains()
   # Read the contents of the file and search for lines that contain an IP address in the format "X.X.X.X", where X is a number between 0 and 255.
   cat "input_file" | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
 }
+
+
+# Remove color codes from text
+# Example
+#  echo "This text has \033[31mred\033[0m color" | removeColor
+#  The output will be "This text has red color" with no color codes.
+removeColor() 
+{
+  sed 's/\x1b\[[0-9;]*m//g'
+}

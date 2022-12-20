@@ -156,7 +156,7 @@ nucleiScan()
         return
     fi
     #TODO: remove excluded id, add the into config file
-    options="-stats -si 180 -es info,unknown -eid expired-ssl,weak-cipher-suites,self-signed-ssl,missing-headers,mismatched-ssl"
+    options="-stats -si 180 -ts -es info,unknown -eid expired-ssl,weak-cipher-suites,self-signed-ssl,missing-headers,mismatched-ssl"
     program="$1"
 
     date=$(date +%Y-%m-%d_%H-%M-%S)

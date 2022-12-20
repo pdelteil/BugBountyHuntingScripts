@@ -13,15 +13,17 @@ location=$(pwd)
 
 function installTool()
 {
-    cmdname="$1"
-    installcmd="$2"
-    echo -ne "${YELLOW}- Checking for $cmdname ${ENDCOLOR}\n"
+    toolName="$1"
+    installCmd="$2"
+    echo -ne "${YELLOW}- Checking for $toolName ${ENDCOLOR}\n"
 
-    if command -v $cmdname &> /dev/null; then
-        echo -ne "${YELLOW}  $cmdname is installed! Skipping${ENDCOLOR}\n"
+    # Check if tool is installed
+    if [[ command -v $toolName &> /dev/null ]]; then
+        echo -ne "${YELLOW}  $toolName is installed! Skipping${ENDCOLOR}\n"
     else
-        echo -ne "${YELLOW}  $cmdname is not installed, installing...${ENDCOLOR}\n"
-        $installcmd
+       # Print message if command is not installed and run installation command
+       echo -ne "${YELLOW}  $toolName is not installed, installing...${ENDCOLOR}\n"
+        $installCmd
     fi
 }
 
@@ -29,9 +31,10 @@ function addtoBashrc()
 {
     helper="$1"
     configFile="$2"
+    # Check if helper path is already present in config file
     count=$(grep -c "$helper" "$configFile")
     if [[ "$count" -eq 0 ]]; then
-        # Add the value to the file
+        # If not present, add the value to the file
         echo -ne "${YELLOW}Adding $helper to $configFile${ENDCOLOR}\n"
         echo "source $location/$helper " >> $configFile
     fi
