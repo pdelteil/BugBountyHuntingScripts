@@ -230,7 +230,17 @@ reconScan()
 #get all domains from bbrf and get URLs using httpx and httprobe
 getAllUrls()
 {
- echo " "
+    date=$(date +%Y-%m-%d_%H-%M-%S)
+    local file="/tmp/domains.bbrf.$date.txt"
+    local options="-rl 300 --threads 110 -sc -td -ct -lc -wc -rt -title -location -method -websocket -ip -cname -cdn -stats -si 180 --rm-when-done"
+    local axiom_options="-o outputfile.httpx.txt --rm-when-done"
+    echo "Extracting domains from BBRF..."
+    bbrf domains -p IBM > "$file"
+    echo "Running axiom-scan..."
+    # Run scan and attaching to screen session 
+    #axiom-scan $file -m httpx $options $axiom_options
+    screen -S "axiom-scan-httpx" axiom-scan $file -m httpx $options #$axiom_options
+    addInChunks outputfile.httpx.txt urls 2500 
 }
 
  # resolve urls from domain using httpx and httprobe    

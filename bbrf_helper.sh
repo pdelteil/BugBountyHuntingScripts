@@ -98,9 +98,10 @@ getStats()
     fi
     IFS=$'\n'
     filename="$1"
-    #headers
+    
+    # Headers
     headers="Program; Site; Program url; disabled; reward; author; notes; added Date; gov; #domains; #urls; #IPS; #inscope; #inscopeWildcard" 
-    echo -e $headers >> $filename
+    echo -e "$headers" >> "$filename"
     echo "Getting stats of programs $param"
     
     allPrograms=$(bbrf programs $param --show-empty-scope)
@@ -109,17 +110,19 @@ getStats()
     i=1
     for program in $(echo "$allPrograms"); do 
         echo -en "${YELLOW}($i/$numberPrograms)${ENDCOLOR} $program\n"
-        #fields/columns
+
+        # Fields/columns
         description=$(bbrf show "$program")
-        site=$(echo "$description" |jq -r '.tags.site')
-        reward=$(echo "$description" |jq -r '.tags.reward')
-        programUrl=$(echo "$description" |jq -r '.tags.url')
-        disabled=$(echo "$description" |jq -r '.disabled')
-        author=$(echo "$description" |jq -r '.tags.author')
-        notes=$(echo "$description" |jq -r '.tags.notes') 
-        addedDate=$(echo "$description" |jq -r '.tags.addedDate')
-        gov=$(echo "$description" |jq -r '.tags.gov')
-        #metrics 
+        site=$(echo "$description" | jq -r '.tags.site')
+        reward=$(echo "$description" | jq -r '.tags.reward')
+        programUrl=$(echo "$description" | jq -r '.tags.url')
+        disabled=$(echo "$description" | jq -r '.disabled')
+        author=$(echo "$description" | jq -r '.tags.author')
+        notes=$(echo "$description" | jq -r '.tags.notes') 
+        addedDate=$(echo "$description" | jq -r '.tags.addedDate')
+        gov=$(echo "$description" | jq -r '.tags.gov')
+
+        # Metrics 
         numUrls=$(bbrf urls -p "$program"|wc -l)
         numDomains=$(bbrf domains -p "$program"|wc -l)
         #numIPs=$(bbrf ips -p "$program"|wc -l)
@@ -244,7 +247,12 @@ getDomains()
 getUrls()
 {
     threads=150
-    doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n')
+    if [[ -z "$1" ]]; then
+        doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n')
+    else
+        program="$1"
+        doms=$(bbrf domains -p "program"|grep -v DEBUG|tr ' ' '\n')
+    fi
     if [[ ${#doms} -gt 0 ]]; then
         echo -en "${RED} httpx domains ${ENDCOLOR}\n"
         echo "$doms"|httpx -silent -threads $threads|bbrf url add - -s httpx --show-new
@@ -753,6 +761,7 @@ getBugBountyData()
         echo -ne "${RED}Including disabled programs${ENDCOLOR}\n"
     fi
 
+    # Set the value of the "data" array based on the value of the first argument
     data=("$1")
 
     if [[ "$1" == "inscope" ]]; then
@@ -762,12 +771,19 @@ getBugBountyData()
     if [[ "$1" == "outscope" ]]; then
         data=("scope" "out")
     fi
+
+    # Get a list of all bug bounty programs
     allPrograms=$(bbrf programs $param)
 
     IFS=$'\n'
     for program in $(echo "$allPrograms"); do
+
+        # Get the description of the current program
         description=$(bbrf show "$program")
+
+        # Check if the program is a government program
         gov=$(echo "$description"  |jq -r '.tags.gov')
+        # If the program is not a government program, retrieve the data
         if [[ "$gov" != "true" ]]; then
             bbrf ${data[@]} -p "$program"
         fi   
@@ -784,7 +800,6 @@ getBugBountyData()
 
 # get all urls from paid programs
 # > getUrlsWithProgramTag reward money
-
 
 getUrlsWithProgramTag()
 {   
@@ -805,6 +820,8 @@ getUrlsWithProgramTag()
 
 # retrieve programs data (type, with values 'inscope', 'outscope', 'urls', 'domains', 'ips') 
 # based on 2 conditions: site (intrigriti, bugcrowd, h1, etc) and reward (money, points, thanks) 
+# getProgramData bugcrowd money names
+# getProgramData bugcrowd points urls
 getProgramData() {
   # Check if required arguments are provided
   if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
@@ -813,6 +830,7 @@ getProgramData() {
     echo "REWARDS: (money, points, thanks)"
     echo "TYPE: (inscope, outscope, urls, domains, ips)"
     echo "Example: ${FUNCNAME[0]} bugcrowd money names"
+    echo "Example: ${FUNCNAME[0]} bugcrowd points urls"
     return 1
   fi
 
@@ -825,27 +843,27 @@ getProgramData() {
   local data
   case "$type" in
     inscope)
-      echo "Getting inscope data"
+      echo -e "Getting inscope data" >&2
       data=("scope" "in" "--wildcard")
       ;;
     outscope)
-      echo "Getting outscope data"
+      echo -e "Getting outscope data" >&2
       data=("scope" "out")
       ;;
     urls)
-      echo "Getting url data"
+      echo -e "Getting url data" >&2
       data=("urls")
       ;;
     domains)
-      echo "Getting domain data"
+      echo -e "Getting domain data" >&2
       data=("domains")
       ;;
     ips)
-      echo "Getting IP data"
+      echo -e "Getting IP data" >&2
       data=("ips")
       ;;
     *)
-      echo "Invalid type provided. Valid options are: inscope, outscope, urls, domains, ips"
+      echo -e "Invalid type provided. Valid options are: inscope, outscope, urls, domains, ips" >&2
       return 1
       ;;
   esac
@@ -868,12 +886,6 @@ getProgramData() {
     fi
   done
 }
-
-# Example usage:
-getProgramData bugcrowd money names
-getProgramData bugcrowd points urls
-getProgramData h1 thanks ips
-
 
 #remove all urls from a program
 # Examples
