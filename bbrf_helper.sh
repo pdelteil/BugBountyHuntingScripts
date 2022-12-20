@@ -340,7 +340,7 @@ addPrograms()
         if [[ $result == *"conflict"* ]]; then
             echo "Program already on BBRF!"
             bbrf show "$program"|jq
-            return -1
+            return 1
         fi
         echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
         read -r inscope_input

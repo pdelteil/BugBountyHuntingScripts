@@ -82,3 +82,8 @@ detectTemplatesIncorrectId()
         fi
     done
 }
+
+excludeResults()
+{
+    grep -v '\.lex\.\|\.lazada\.\|lazada-seller\|/lazada\|redmart\|\.asia'
+}
