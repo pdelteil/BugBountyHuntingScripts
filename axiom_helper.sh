@@ -177,10 +177,9 @@ nucleiScan()
     fi
 
     echo "Running axiom-scan..."
-    screen -S "axiom-scan-nuclei" -d -m axiom-scan $file -m nuclei $options $spinup
+    screen -S "axiom-scan-nuclei" axiom-scan $file -m nuclei $options $spinup
 
 }
-
 # set as selected instances all available (running state) ones
 selectAllInstances()
 {
