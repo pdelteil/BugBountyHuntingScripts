@@ -188,7 +188,7 @@ getTLDs()
     URL="https://raw.githubusercontent.com/datasets/top-level-domain-names/master/top-level-domain-names.csv"
     FILE="/tmp/top-level-domain-names.csv"
 
-    if [[ -z "$1" ]] ;    then
+    if [[ -z "$1" ]]; then
         echo "Use ${FUNCNAME[0]} targetDomain"
         echo "Example ${FUNCNAME[0]} testing-sites"
         return 1
@@ -255,3 +255,12 @@ removeColor()
 {
   sed 's/\x1b\[[0-9;]*m//g'
 }
+
+#This function opens a file in the nano text editor and then sources it.
+nano2()
+{
+    inputFile="$1"
+    nano "$inputFile"
+    source "$inputFile"
+}
+
