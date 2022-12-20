@@ -156,7 +156,7 @@ nucleiScan()
         return
     fi
     #TODO: remove excluded id, add the into config file
-    options="-stats -si 180 -es info,unknown -eid expired-ssl,weak-cipher-suites,self-signed-ssl,missing-headers"
+    options="-stats -si 180 -es info,unknown -eid expired-ssl,weak-cipher-suites,self-signed-ssl,missing-headers,mismatched-ssl"
     program="$1"
 
     date=$(date +%Y-%m-%d_%H-%M-%S)
@@ -177,7 +177,15 @@ nucleiScan()
     fi
 
     echo "Running axiom-scan..."
-    echo "axiom-scan $file $options $spinup"
-    axiom-scan $file -m nuclei $options $spinup
+    screen -S "axiom-scan-nuclei" -d -m axiom-scan $file -m nuclei $options $spinup
 
+}
+
+# set as selected instances all available (running state) ones
+selectAllInstances()
+{
+    axiom-ls|grep running | getField 1|removeColor > ~/.axiom/selected.conf
+    axiom-select
+    instances=$(wc -l ~/.axiom/selected.conf| getField 1)
+    echo "number of instances $instances"
 }
