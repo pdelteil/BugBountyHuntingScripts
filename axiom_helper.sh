@@ -110,23 +110,35 @@ showLogs()
     fi
 }
 
-#find all stranded scan+* files and move them to a given folder 
-#only if they are not already on the folder. 
+# find all stranded scan+* files and move them to a given folder 
+# only if they are not already on the folder. 
 # Examples
 # moves all output files names scan+* to folder ~/result_scans
 # > findAndMoveScans ~/result_scans
 findAndMoveScans()
 {
-    if [[ -z "$1" ]]; then
-      echo "Use ${FUNCNAME[0]} outputFolder"
-      return 1
+
+    if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ -z "$1" ]; then
+        echo "Usage: findAndMoveScans FOLDER"
+        echo "Moves all files containing the word 'scan+' in their name to the specified FOLDER."
+        return
     fi
     IFS=$'\n'
     #input 
     folder="$1"
-    echo "Updating locate db (this could take a while)"
-    #TODO check if db is old enough or ask the user if update is required
-    sudo updatedb
+    dbpath=$(locate --statistics | head -n 1|awk '{print $2}')
+    db_age=$(stat -c %Y $dbpath)
+    curr_time=$(date +%s)
+    age_diff=$(( curr_time - db_age ))
+    if [[ "$age_diff" -gt 86400 ]]; then
+        # prompt user to update database if it is older than 1 day
+        read -p "Locate database is older than 1 day. Update database (y/n)? " 
+        update_db
+        if [[ "$update_db" == "y" ]]; then
+            echo "Updating locate db (this could take a while)"
+            sudo updatedb
+        fi
+    fi
     files=$(locate scan+|grep -v "$folder")
     for file in $(echo "$files"); do 
         echo "Moving $file to $folder"
@@ -136,17 +148,36 @@ findAndMoveScans()
 # input program name
 nucleiScan()
 {
+    if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]]; then
+        echo "Usage: nucleiScan [program]"
+        echo "Scans specified program or all programs if 'all' is provided as input using nuclei."
+        echo " Options:"
+        echo "  -h, --help Display this help message"
+        return
+    fi
+    #TODO: remove excluded id, add the into config file
+    options="-stats -si 180 -es info,unknown -eid expired-ssl,weak-cipher-suites,self-signed-ssl,missing-headers"
+    program="$1"
 
-    if [[ -z "$1" ]]; then
-      echo "Use ${FUNCNAME[0]} programName"
-      return 1
+    date=$(date +%Y-%m-%d_%H-%M-%S)
+    file="/tmp/$1_urls_$date.txt"
+
+    if [[ $program == "all" ]]; then
+        echo "Running bbrf urls --all --show-disabled this might take a while"
+        bbrf urls --all --show-disabled > $file
+    else
+        bbrf urls -p "$program" > $file
+    fi
+    instances=$(axiom-ls|grep Instances|awk '{print $5}')
+
+    if [[ $instances -eq 0 ]]; then
+      spinup="--spinup 50"
+    else
+      spinup=""
     fi
 
-    program="$1"
-    file="/tmp/$1urls.tmp"
-    #dump all program's urls
-    bbrf urls -p "$program" > $file 
-    #TODO: remove excluded id, add the into config file
-    axiom-scan $file -m nuclei -stats -si 180 -es info,unknown -eid expired-ssl,weak-cipher-suites,self-signed-ssl,mismatched-ssl,CVE-2017-5487
+    echo "Running axiom-scan..."
+    echo "axiom-scan $file $options $spinup"
+    axiom-scan $file -m nuclei $options $spinup
 
 }
