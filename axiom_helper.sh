@@ -117,37 +117,54 @@ showLogs()
 # > findAndMoveScans ~/result_scans
 findAndMoveScans()
 {
-
+    # Print usage information if -h or --help flag is used or no arguments are provided
     if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ -z "$1" ]; then
         echo "Usage: findAndMoveScans FOLDER"
         echo "Moves all files containing the word 'scan+' in their name to the specified FOLDER."
         return
     fi
+
+    # Set internal field separator to newline character
     IFS=$'\n'
-    #input 
+
+    # Set target folder to provided argument
     folder="$1"
+    
+    # Get path to locate database and its age
     dbpath=$(locate --statistics | head -n 1|awk '{print $2}')
     db_age=$(stat -c %Y $dbpath)
     curr_time=$(date +%s)
     age_diff=$(( curr_time - db_age ))
-    if [[ "$age_diff" -gt 86400 ]]; then
-        # prompt user to update database if it is older than 1 day
-        read -p "Locate database is older than 1 day. Update database (y/n)? " 
-        update_db
-        if [[ "$update_db" == "y" ]]; then
-            echo "Updating locate db (this could take a while)"
-            sudo updatedb
-        fi
+    age=$(( age_diff / 60 ))
+    # Prompt user to update database if it is older than 2 hours
+    read -p "Locate database is older than $age_diff seconds. Update database (this could take a while) (y/n)? " update_db
+    if [[ "$update_db" == "y" ]]; then
+        echo "Updating locate db"
+        sudo updatedb
     fi
+
+    # Get list of files containing "scan+" in their name and exclude the target folder
     files=$(locate scan+|grep -v "$folder")
-    for file in $(echo "$files"); do 
-        echo "Moving $file to $folder"
-        mv -i "$file" "$folder"
-    done
+
+    if [ -z "$files" ]; then
+        echo "No scan+* files found"
+        return 1
+
+    else
+        # Move each file to the target folder
+        for file in $(echo "$files"); do 
+            echo "Moving $file to $folder"
+            mv -i "$file" "$folder"
+        done
+    fi
 }
 # input program name
 nucleiScan()
 {
+    # Maximum number of instances to spin up
+    maxInstances=50
+
+    # Check for help flag
     if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]]; then
         echo "Usage: nucleiScan [program]"
         echo "Scans specified program or all programs if 'all' is provided as input using nuclei."
@@ -156,27 +173,35 @@ nucleiScan()
         return
     fi
     #TODO: remove excluded id, add the into config file
+    # Set options for scan
     options="-stats -si 180 -ts -es info,unknown -eid expired-ssl,weak-cipher-suites,self-signed-ssl,missing-headers,mismatched-ssl"
+
+    # Set program to scan
     program="$1"
 
+    # Create a file with a unique name based on the current date and time
     date=$(date +%Y-%m-%d_%H-%M-%S)
     file="/tmp/$1_urls_$date.txt"
 
+    # Get list of URLs for specified program or all programs
     if [[ $program == "all" ]]; then
         echo "Running bbrf urls --all --show-disabled this might take a while"
         bbrf urls --all --show-disabled > $file
     else
         bbrf urls -p "$program" > $file
     fi
-    instances=$(axiom-ls|grep Instances|awk '{print $5}')
+
+    # Get number of instances currently in state running
+    instances=$(axiom-ls|grep running)
 
     if [[ $instances -eq 0 ]]; then
-      spinup="--spinup 50"
+      spinup="--spinup $maxInstances"
     else
       spinup=""
     fi
 
     echo "Running axiom-scan..."
+    # Run scan and attaching to screen session 
     screen -S "axiom-scan-nuclei" axiom-scan $file -m nuclei $options $spinup
 
 }
@@ -188,3 +213,27 @@ selectAllInstances()
     instances=$(wc -l ~/.axiom/selected.conf| getField 1)
     echo "number of instances $instances"
 }
+
+reconScan()
+{
+ #getInscope 
+
+ #run amass
+ #run subfinder
+ #run assetfinder
+ 
+ #mergeOutput
+
+ #addDomains 
+ echo "filler"
+}
+#get all domains from bbrf and get URLs using httpx and httprobe
+getAllUrls()
+{
+ echo " "
+}
+
+ # resolve urls from domain using httpx and httprobe    
+
+
+
