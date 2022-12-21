@@ -99,8 +99,14 @@ locateCat() {
 getField() 
 {
     if [[ -z "$1" ]]; then
-      echo -e "Use ${FUNCNAME[0]} number (nth column) [space as default separator]"
-      echo "Example:  cat file.txt | getField 4"
+      echo -e "Use ${FUNCNAME[0]} number (nth column) separator [optional, use double quotes, space is the default separator]"
+      echo "Examples:  cat file.txt | getField 4"
+      echo "          echo \"word1 word2 word3\" | getField 2 "
+      echo "          word2"
+      echo "          echo \"word1 word2; word3\" | getField 2 \";\""
+      echo "          word3"
+
+
       return 1
     fi
     if [[ -z "$2" ]]; then
