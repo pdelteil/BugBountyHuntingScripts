@@ -18,7 +18,7 @@ function installTool()
     echo -ne "${YELLOW}- Checking for $toolName ${ENDCOLOR}\n"
 
     # Check if tool is installed
-    if [[ command -v $toolName &> /dev/null ]]; then
+    if command -v $toolName &> /dev/null; then
         echo -ne "${YELLOW}  $toolName is installed! Skipping${ENDCOLOR}\n"
     else
        # Print message if command is not installed and run installation command
