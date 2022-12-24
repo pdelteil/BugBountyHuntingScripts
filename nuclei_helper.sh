@@ -2,22 +2,26 @@
 
 # function to manually test results from nuclei
 # example of use 
-# testNucleiTemplate open-redirect http://www.sample.com
-# TODO add flag to debug optional
-testNucleiTemplate()
+# testNucleiTemplate open-redirect http://www.sample.com -debug
+testNucleiTemplate() 
 {
-    if [[ -z "$1" ]]; then
-        echo "Use ${FUNCNAME[0]} nuclei-template-id URL"
-        return 1
-    fi
+  if [[ -z "$1" ]]; then
+    echo "Use ${FUNCNAME[0]} nuclei-template-id URL [-debug]"
+    echo "This function runs the nuclei tool with the specified template and URL, and with the optional -debug flag."
+    return 1
+  fi
 
-    templateID="$1"
-    URL="$2"
-    pathToTemplate=$(locate $templateID|grep yaml|head -n 1) 
-    echo "nuclei -debug -t $pathToTemplate -u $URL -itags fuzz,dos"
-    nuclei -debug -t $pathToTemplate -u $URL
+  templateID="$1"
+  URL="$2"
+  debugFlag=""
+  if [[ "$3" == "-debug" ]]; then
+    debugFlag="-debug"
+  fi
+
+  pathToTemplate=$(locate "$templateID" | grep yaml | head -n 1) 
+  echo "nuclei $debugFlag -t $pathToTemplate -u $URL -itags fuzz,dos"
+  nuclei $debugFlag -t "$pathToTemplate" -u "$URL" -itags fuzz,dos
 }
-
 #examples 
 #search template by author
 #searchTemplateByTag author philippedelteil 
