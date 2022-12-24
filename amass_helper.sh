@@ -40,13 +40,29 @@ filterByWhoisParam()
 getMoreInscope()
 {
     if [[ -z "$1" ]]; then
-        echo -en "\nUse ${FUNCNAME[0]} programName\n\n"
+        echo -en "\nUsage: ${FUNCNAME[0]} programName [CONFIG_FILE]\n\n"
+        echo -en "Examples:\n"
+        echo -en "  ${FUNCNAME[0]} programName      # Use default config file (~/amass_config.ini)\n"
+        echo -en "  ${FUNCNAME[0]} programName /etc/amass_config.ini  # Use custom config file\n\n"
         return 1
     fi
-
     program="$1";
     domain=$(bbrf scope in --wildcard -p "$program"|sed 's/\*\.//g'| grep -v DEBUG|head -n 1)
     echo "Using $domain as domain"
-    amass intel -config ~/amass_config.ini -d $domain -whois #|awk '{print  "*."$1}
+
+    # Define config_file variable as an optional input parameter
+    config_file=${2:-~/amass_config.ini}
+    amass intel -config $config_file -d $domain -whois 
 }
 
+amassIntel() 
+{
+    if [[ -z "$1" ]]; then
+        echo "Usage: amassIntel DOMAIN [CONFIG_FILE]"
+        return 1
+    fi
+
+    domain=$1
+    config_file=${2:-~/amass_config.ini}
+    amass intel -config $config_file -d $domain -whois|sort 
+}
