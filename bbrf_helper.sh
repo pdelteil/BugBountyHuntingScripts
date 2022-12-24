@@ -135,13 +135,7 @@ getStats()
 }
 
 
-# This function it's an interactive program to add new bbh programs 
-# it requires dnsx, subfinder, gau, waybackurls, httprobe and assetfinder.
-# dnsx will get rid of dead subdomains
-# optional parameter is a file to output the data 
 # The objetive is to get subdomains using different tools and adding the results to BBRF 
-# The target program is the BBRF active program
-# TODO: add flag -p to run getDomains to an especific program
 # Examples 
 # Recon subdomains for active BBRF program
 # > getDomains 
@@ -920,21 +914,42 @@ removeDomains()
 
 #remove inscope from a program
 # then removing domains and urls is needed
-removeInScope()
-{
-    if [[ -z "$1" ]]; then
-        echo "Use ${FUNCNAME[0]} program"
-        echo "Example ${FUNCNAME[0]} IBM"
-        return 1
-    fi
+removeInScope() {
 
-    PROGRAM="$1"
-    bbrf scope in -p "$PROGRAM"|bbrf inscope remove - -p "$PROGRAM"
-    #remove domains
-    #domains=$(
-    bbrf domains -p "$PROGRAM" | bbrf domain remove - -p "$PROGRAM"
-    #remove urls
-    bbrf urls -p "$PROGRAM" | bbrf domain remove - 
+  # Print usage message if no arguments are provided
+  if [[ -z "$2" ]]; then
+    echo "Use ${FUNCNAME[0]} program [-all|inscope rule]"
+    echo "Example ${FUNCNAME[0]} IBM [-all]"
+    echo "Example ${FUNCNAME[0]} IBM *.ibm.com"
+    return 1
+  fi
+
+  PROGRAM="$1"
+  RULE="false"
+
+  # Remove all data for the program if the -all flag is provided
+  if [[ "$2" == "-all" ]]; then
+    RULE=""
+  # If the second argument is an inscope rule, remove data matching the inscope rule
+  elif [[ "$2" =~ ^(\*\.)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$ ]]; then
+     # If the inscope rule has a leading *., remove the *. before using it
+      if [[ "$2" =~ ^\*. ]]; then
+          RULE="${2#*.}"
+      else
+          RULE="$2"
+      fi
+
+  else
+    echo "Error $2 format is not supported"
+    return 1
+  fi
+    # Remove data matching the inscope rule in URLs and domains
+    echo "Removing inscope"
+    bbrf scope in -p "$PROGRAM" | grep "$RULE"| bbrf inscope remove - -p "$PROGRAM"
+    echo "Removing domains"
+    bbrf domains -p "$PROGRAM" | grep "$RULE" | bbrf domain remove - -p "$PROGRAM"
+    echo "Removing urls"
+    bbrf urls -p "$PROGRAM" | grep "$RULE" | bbrf url remove -
 
 }
 
