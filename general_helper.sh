@@ -33,6 +33,11 @@ function getIp()
   dig "$domain" +short
 }
 
+function getMyIp()
+{
+    curl ifconfig.me
+}
+
 # The locateNano function can be used to search for a file on the system and open it in the nano text editor.
 # To search for and open a file called "example.txt" in the nano editor, you can call the function like this:
 locateNano() 
@@ -105,7 +110,6 @@ getField()
       echo "          word2"
       echo "          echo \"word1 word2; word3\" | getField 2 \";\""
       echo "          word3"
-
 
       return 1
     fi
