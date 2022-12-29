@@ -122,11 +122,64 @@ getField()
     fi
 
 }
-#get domain From URL
+# Usage:
+#   extract_domain [URL]
+#
+# If URL is not provided, the function reads from stdin.
+#
+# Examples:
+#   extract_domain "http://www.example.com/path/to/resource"
+#   echo "http://www.example.com/path/to/resource" | extract_domain
+
 getDomainFromURL()
 {
-    url="$1"
-    awk -F'/' <<<"$1" #'{print $1}' # | sed 's/http:\/\///;s|\/.*||'
+    # Read the input URL from the command line argument or stdin
+    local URL
+    if [[ $# -eq 0 ]]; then
+        if read -t 0; then
+            # Read from stdin if there is input
+            URL=$(cat)
+        else
+            # Print an error message if no input is provided
+            echo "Error: No input URL provided"
+            return 1
+        fi
+    else
+        URL="$1"
+    fi
+
+    # Extract the protocol (e.g. "http")
+    local PROTOCOL=$(echo "$URL" | grep :// | sed -e's,^\(.*://\).*,\1,g')
+
+    # Remove the protocol
+    URL=$(echo "$URL" | sed -e "s,$PROTOCOL,,g")
+
+    # Extract the user (if any)
+    local USER=$(echo "$URL" | grep @ | cut -d@ -f1)
+
+    # Remove the user (if any)
+    URL=$(echo "$URL" | sed -e "s,$USER@,,g")
+
+    # Extract the hostname
+    local HOST=$(echo "$URL" | cut -d'/' -f1)
+
+    # Remove the hostname
+    URL=$(echo "$URL" | sed -e "s,$HOST,,g")
+
+    # Extract the port (if any)
+    local PORT=$(echo "$HOST" | grep : | cut -d: -f2)
+
+    # Remove the port (if any)
+    HOST=$(echo "$HOST" | sed -e "s,:$PORT,,g")
+
+    # Extract the path (if any)
+    local PATH_URL=$(echo "$URL" | grep "/" | cut -d'/' -f2-)
+
+    # Remove the path (if any)
+    URL=$(echo "$URL" | sed -e "s,/$PATH_URL,,g")
+
+    # Print the domain name
+    echo "$HOST"
 }
 #sort urls by TLD domain
 sortByDomain()
@@ -255,7 +308,6 @@ findIpsInDomains()
   # Read the contents of the file and search for lines that contain an IP address in the format "X.X.X.X", where X is a number between 0 and 255.
   cat "input_file" | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
 }
-
 
 # Remove color codes from text
 # Example
