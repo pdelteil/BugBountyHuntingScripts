@@ -5,6 +5,11 @@ RED="\e[31m"
 YELLOW="\e[33m"
 ENDCOLOR="\e[0m"
 
+# Set the text colors
+color1=$(tput setaf 1) # red
+color2=$(tput setaf 3) # yellow
+reset=$(tput sgr0) # reset text attributes
+
 #update program data after outscope change 
 #When you add a new outscope rule(s) you'd like that the program data gets updated
 #this means removing domains and urls that now are out of scope
@@ -157,7 +162,7 @@ getDomains()
         echo -ne "${YELLOW} Running bbrf mode ${ENDCOLOR}\n"
     elif [[ $flag == "-f" ]]; then
         if [[ -n "$2" ]]; then
-            file="$2"
+w            file="$2"
             tempFile="/tmp/$file.temp"
             echo -ne "${YELLOW} Running filemode ${ENDCOLOR}\n"
             echo -ne "${YELLOW}    Writing results to $tempFile  ${ENDCOLOR}\n"
@@ -196,7 +201,7 @@ getDomains()
 
         echo -ne "${RED} Running amass ${ENDCOLOR}\n"
         if [[ "$fileMode" = true ]] ; then
-            for domain in $(echo "$wild"); do                
+            for domain in $(echo "$wild"); do
                 echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
                 amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-amass.txt"
             done
@@ -813,25 +818,30 @@ getUrlsWithProgramTag()
 }
 
 # retrieve programs data (type, with values 'inscope', 'outscope', 'urls', 'domains', 'ips') 
-# based on 2 conditions: site (intrigriti, bugcrowd, h1, etc) and reward (money, points, thanks) 
+# based on 2 conditions: site (intigriti, bugcrowd, h1, etc) and reward (money, points, thanks) 
 # getProgramData bugcrowd money names
 # getProgramData bugcrowd points urls
 getProgramData() {
   # Check if required arguments are provided
   if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
-    echo "Usage: ${FUNCNAME[0]} SITE REWARD TYPE"
-    echo "SITE: (intrigriti, bugcrowd, h1, yeswehack, etc)"
-    echo "REWARDS: (money, points, thanks)"
-    echo "TYPE: (inscope, outscope, urls, domains, ips)"
-    echo "Example: ${FUNCNAME[0]} bugcrowd money names"
-    echo "Example: ${FUNCNAME[0]} bugcrowd points urls"
+    output=("Usage: ${FUNCNAME[0]} SITE REWARD TYPE" "  SITE: (intigriti, bugcrowd, h1, yeswehack, etc)" "  REWARDS: (money, points, thanks or all)" \
+            "  TYPE: (inscope, outscope, urls, domains, ips)" "    Example: ${FUNCNAME[0]} bugcrowd money names" "    Example: ${FUNCNAME[0]} bugcrowd points urls")
+    for line in "${output[@]}"; do
+        # Print the line with a different color on each iteration
+        if [ $((i % 2)) -eq 0 ]; then
+            echo "${color1}$line${reset}"
+        else
+            echo "${color2}$line${reset}"
+        fi
+        i=$((i + 1))
+    done
     return 1
   fi
 
   # Assign provided arguments to variables
-  local site=$1
-  local reward=$2
-  local type=$3
+  local site="$1"
+  local reward="$2"
+  local type="$3"
 
   # Set data array based on type
   local data
@@ -856,14 +866,19 @@ getProgramData() {
       echo -e "Getting IP data" >&2
       data=("ips")
       ;;
+    names)
+      echo -e "Getting programs names" >&2
+      data=("")
+      ;;
     *)
-      echo -e "Invalid type provided. Valid options are: inscope, outscope, urls, domains, ips" >&2
+      echo -e "Invalid type provided. Valid options are: names, inscope, outscope, urls, domains, ips" >&2
       return 1
       ;;
   esac
 
   # Get all programs for the provided site
   local allPrograms=$(bbrf programs where site is "$site")
+  IFS=$'\n'
 
   # Loop through programs and get data based on type and reward
   for program in $(echo "$allPrograms"); do
@@ -872,10 +887,11 @@ getProgramData() {
 
     if [[ "$type" == "names" ]]; then
       local url=$(echo "$description" | jq -r '.tags.url')
-      if [[ "$rewardInfo" == "$reward" ]]; then
+      if [[ "$rewardInfo" == "$reward" ]] || [[ "$reward" == "all" ]]; then
         echo "$program, $url"
       fi
-    elif [[ "$rewardInfo" == "$reward" ]]; then
+    # different the names 
+    elif [[ "$rewardInfo" == "$reward" ]] || [[ "$reward" == "all" ]]; then
       bbrf "${data[@]}" -p "$program"
     fi
   done
