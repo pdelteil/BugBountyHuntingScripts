@@ -133,24 +133,10 @@ getField()
 
 getDomainFromURL()
 {
-    # Read the input URL from the command line argument or stdin
-    local URL
-    if [[ $# -eq 0 ]]; then
-        if read -t 0; then
-            # Read from stdin if there is input
-            URL=$(cat)
-        else
-            # Print an error message if no input is provided
-            echo "Error: No input URL provided"
-            return 1
-        fi
-    else
-        URL="$1"
-    fi
-
+# Read each line of the input
+while read -r URL; do
     # Extract the protocol (e.g. "http")
     local PROTOCOL=$(echo "$URL" | grep :// | sed -e's,^\(.*://\).*,\1,g')
-
     # Remove the protocol
     URL=$(echo "$URL" | sed -e "s,$PROTOCOL,,g")
 
@@ -180,6 +166,9 @@ getDomainFromURL()
 
     # Print the domain name
     echo "$HOST"
+
+done
+
 }
 #sort urls by TLD domain
 sortByDomain()
