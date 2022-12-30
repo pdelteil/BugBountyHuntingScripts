@@ -172,7 +172,7 @@ nucleiScan()
         echo "  -h, --help Display this help message"
         return
     fi
-    #TODO: remove excluded id, add the into config file
+    #TODO: remove excluded id, add them into config file
     # Set options for scan
     options="-stats -si 180 -ts -es info,unknown -eid expired-ssl,weak-cipher-suites,self-signed-ssl,missing-headers,mismatched-ssl"
 
@@ -216,34 +216,61 @@ selectAllInstances()
 
 reconScan()
 {
- #getInscope 
+    date=$(date +%Y-%m-%d_%H-%M-%S)
+    local file="/tmp/domains.output.$date.txt"    
+    #getInscope 
+    #TODO: check if call fails
+    getProgramData intigriti all inscope | tee $file
+    
+    #run amass
+    axiom-scan $file -m amass -wL ~/amass_config.ini --spinup 50 -o ~/results/outputfile_amass_$date.txt
+    #run subfinder
+    # TODO: add config file
+    axiom-scan $file -m subfinder -t 15 -all -o ~/results/outputfile_subfinder_$date.txt
+    #run assetfinder
+    axiom-scan $file -m assetfinder --rm-when-done -o ~/results/outputfile_assetfinder_$date.txt
+    #mergeOutput
+    cat ~/results/outputfile_assetfinder_$date.txt ~/results/outputfile_subfinder_$date.txt \
+        ~/results/outputfile_amass_$date.txt > ~/results_outputfile_merged_$date.txt
 
- #run amass
- #run subfinder
- #run assetfinder
- 
- #mergeOutput
+    #use dnsvalidator to generate list of DNS servers
 
- #addDomains 
- echo "filler"
+    #resolveDomains 
+
+    #addDomains in Chunks
+
+    #reportNewDomains
+    
+    #addUrls in Chunks
+
+    #reportNewUrls
+    
+    #TODO another function
+        #nucleiScan 
+
+        #crawl with Katana
+
+        #bruteforce with feroxbuster 
+
+    echo "Done! "
 }
-#get all domains from bbrf and get URLs using httpx and httprobe
+
+# resolve urls from domain using httpx and httprobe    
 getAllUrls()
 {
+    #TESTING IN PROGRESS
     date=$(date +%Y-%m-%d_%H-%M-%S)
     local file="/tmp/domains.bbrf.$date.txt"
     local options="-rl 300 --threads 110 -sc -td -ct -lc -wc -rt -title -location -method -websocket -ip -cname -cdn -stats -si 180 --rm-when-done"
-    local axiom_options="-o outputfile.httpx.txt --rm-when-done"
+    #local axiom_options="-o outputfile.httpx.txt --rm-when-done"
     echo "Extracting domains from BBRF..."
-    bbrf domains -p IBM > "$file"
+    bbrf domains --all > "$file"
     echo "Running axiom-scan..."
-    # Run scan and attaching to screen session 
-    #axiom-scan $file -m httpx $options $axiom_options
+    # Run scan and attaching to screen session axiom-scan $file -m httpx $options $axiom_options
     screen -S "axiom-scan-httpx" axiom-scan $file -m httpx $options #$axiom_options
     addInChunks outputfile.httpx.txt urls 2500 
 }
 
- # resolve urls from domain using httpx and httprobe    
 
 
 
