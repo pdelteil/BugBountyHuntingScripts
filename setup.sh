@@ -16,15 +16,8 @@ function installTool()
     toolName="$1"
     installCmd="$2"
     echo -ne "${YELLOW}- Checking for $toolName ${ENDCOLOR}\n"
-
-    # Check if tool is installed
-    if command -v $toolName &> /dev/null; then
-        echo -ne "${YELLOW}  $toolName is installed! Skipping${ENDCOLOR}\n"
-    else
-       # Print message if command is not installed and run installation command
-       echo -ne "${YELLOW}  $toolName is not installed, installing...${ENDCOLOR}\n"
-        $installCmd
-    fi
+    echo -ne "${YELLOW}  $toolName is out of date or not installed, installing...${ENDCOLOR}\n"
+    $installCmd
 }
 
 function addtoBashrc()
