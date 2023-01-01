@@ -15,8 +15,7 @@ function installTool()
 {
     toolName="$1"
     installCmd="$2"
-    echo -ne "${YELLOW}- Checking for $toolName ${ENDCOLOR}\n"
-    echo -ne "${YELLOW}  $toolName is out of date or not installed, installing...${ENDCOLOR}\n"
+    echo -ne "${YELLOW} Checking if $toolName is out of date or not installed...${ENDCOLOR}\n"
     $installCmd
 }
 
