@@ -35,7 +35,7 @@ function addtoBashrc()
 #installing dependencies 
 echo -ne "${YELLOW}Installing dependencies...${ENDCOLOR}\n\n"
 
-installTool gcc          "sudo apt install gcc"
+installTool gcc          "sudo apt install gcc -qqq"
 installTool subfinder    "go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
 installTool httpx        "go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest"
 installTool dnsx         "go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest"
