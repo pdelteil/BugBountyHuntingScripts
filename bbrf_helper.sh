@@ -378,19 +378,21 @@ addPrograms()
             #scanPorts
             #run nuclei
             numUrls=$(bbrf urls|wc -l) 
-            echo -ne "${YELLOW} Run nuclei? [urls: $numUrls] (y/n)[default:no, press Enter]${ENDCOLOR} "
-            read runNuclei
-            case $runNuclei in
-                "yes")    valRunNuclei="true";;
-                "y"  )    valRunNuclei="true";;
-                "n"  )    valRunNuclei="false";;
-                "no" )    valRunNuclei="false";;
-                ""   )    valRunNuclei="false";;
-            esac
-
-            if [[ "$valRunNuclei" == "true" ]]; then
-                echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
-                bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -eid weak-cipher-suites,mismatched-ssl,expired-ssl,self-signed-ssl
+            if [[ "$numUrls" -gt 0 ]]; then
+                echo -ne "${YELLOW} Run nuclei? [urls: $numUrls] (y/n)[default:no, press Enter]${ENDCOLOR} "
+                read runNuclei
+                case $runNuclei in
+                    "yes")    valRunNuclei="true";;
+                    "y"  )    valRunNuclei="true";;
+                    "n"  )    valRunNuclei="false";;
+                    "no" )    valRunNuclei="false";;
+                    ""   )    valRunNuclei="false";;
+                esac
+    
+                if [[ "$valRunNuclei" == "true" ]]; then
+                    echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
+                    bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -eid weak-cipher-suites,mismatched-ssl,expired-ssl,self-signed-ssl
+                fi
             fi
         fi
     done
@@ -824,7 +826,7 @@ getUrlsWithProgramTag()
 getProgramData() {
   # Check if required arguments are provided
   if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
-    output=("Usage: ${FUNCNAME[0]} SITE REWARD TYPE" "  SITE: (intigriti, bugcrowd, h1, yeswehack, etc)" "  REWARDS: (money, points, thanks or all)" \
+    output=("Usage: ${FUNCNAME[0]} SITE REWARD TYPE" "  SITE: (intigriti, bugcrowd, h1, yeswehack or all)" "  REWARDS: (money, points, thanks or all)" \
             "  TYPE: (inscope, outscope, urls, domains, ips)" "    Example: ${FUNCNAME[0]} bugcrowd money names" "    Example: ${FUNCNAME[0]} bugcrowd points urls")
     for line in "${output[@]}"; do
         # Print the line with a different color on each iteration
@@ -875,9 +877,13 @@ getProgramData() {
       return 1
       ;;
   esac
+  if [[ "$site" == "all" ]]; then
+      local allPrograms=$(bbrf programs where reward is "$reward")
+  else
+      # Get all programs for the provided site
+      local allPrograms=$(bbrf programs where site is "$site")
+  fi
 
-  # Get all programs for the provided site
-  local allPrograms=$(bbrf programs where site is "$site")
   IFS=$'\n'
 
   # Loop through programs and get data based on type and reward
