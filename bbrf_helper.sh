@@ -883,15 +883,6 @@ getProgramData() {
       local allPrograms=$(bbrf programs where site is "$site")
   fi
 
-<<<<<<< HEAD
-=======
-  if [[ "$site" == "all" ]];then
-    local allPrograms=$(bbrf programs)
-  else
-    # Get all programs for the provided site
-    local allPrograms=$(bbrf programs where site is "$site")
-  fi
->>>>>>> e688fbb1bd3270cb97f605380cdab63ad428eb0a
   IFS=$'\n'
 
   # Loop through programs and get data based on type and reward
