@@ -162,7 +162,7 @@ getDomains()
         echo -ne "${YELLOW} Running bbrf mode ${ENDCOLOR}\n"
     elif [[ $flag == "-f" ]]; then
         if [[ -n "$2" ]]; then
-w            file="$2"
+            file="$2"
             tempFile="/tmp/$file.temp"
             echo -ne "${YELLOW} Running filemode ${ENDCOLOR}\n"
             echo -ne "${YELLOW}    Writing results to $tempFile  ${ENDCOLOR}\n"
@@ -582,7 +582,6 @@ findProgram()
     show=$(bbrf show "$INPUT") 
     program=$(echo "$show" |jq -r '.program')
 
-    echo "$program"
     #case input is an IP
     if [[ $INPUT =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
         domains=$(echo $show |jq -r '.domains'|grep "\."|tr -d '"')
@@ -827,7 +826,7 @@ getProgramData() {
   # Check if required arguments are provided
   if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
     output=("Usage: ${FUNCNAME[0]} SITE REWARD TYPE" "  SITE: (intigriti, bugcrowd, h1, yeswehack or all)" "  REWARDS: (money, points, thanks or all)" \
-            "  TYPE: (inscope, outscope, urls, domains, ips)" "    Example: ${FUNCNAME[0]} bugcrowd money names" "    Example: ${FUNCNAME[0]} bugcrowd points urls")
+            "  TYPE: (inscope, outscope, urls, domains, ips)" "    Example: ${FUNCNAME[0]} bugcrowd money names" "             ${FUNCNAME[0]} bugcrowd points urls" "             ${FUNCNAME[0]} all points inscope")
     for line in "${output[@]}"; do
         # Print the line with a different color on each iteration
         if [ $((i % 2)) -eq 0 ]; then
@@ -884,6 +883,15 @@ getProgramData() {
       local allPrograms=$(bbrf programs where site is "$site")
   fi
 
+<<<<<<< HEAD
+=======
+  if [[ "$site" == "all" ]];then
+    local allPrograms=$(bbrf programs)
+  else
+    # Get all programs for the provided site
+    local allPrograms=$(bbrf programs where site is "$site")
+  fi
+>>>>>>> e688fbb1bd3270cb97f605380cdab63ad428eb0a
   IFS=$'\n'
 
   # Loop through programs and get data based on type and reward
