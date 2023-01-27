@@ -1,14 +1,9 @@
 # shell script functions to be loaded on your bashrc file
 
-#Global variables
-RED="\e[31m"
-YELLOW="\e[33m"
-ENDCOLOR="\e[0m"
-
 # Set the text colors
-color1=$(tput setaf 1) # red
-color2=$(tput setaf 3) # yellow
-reset=$(tput sgr0) # reset text attributes
+RED=$(tput setaf 1) # red
+YELLOW=$(tput setaf 3) # yellow
+ENDCOLOR=$(tput sgr0) # reset text attributes
 
 #update program data after outscope change 
 #When you add a new outscope rule(s) you'd like that the program data gets updated
@@ -337,13 +332,34 @@ addPrograms()
             echo -en "${YELLOW}APi endpoints? ${ENDCOLOR} "
             read api_endpoints
         fi
+        echo -en "${YELLOW}Requires VPN? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
+        read vpn
+        case $vpn in 
+            0)    val_vpn="false";;
+            1)    val_vpn="true";;
+            "")   val_vpn="false";;
+        esac
+        echo -en "${YELLOW}CIDR? ${ENDCOLOR} (0:false[default:press Enter], 1:true) "
+        read cidr
+        case $cidr in 
+            0)    val_cidr="false";;
+            1)    val_cidr="true";;
+            "")   val_cidr="false";;
+        esac
+        if $val_cidr; then
+            #input comma separated values in the CIDR notation (IP/netmask, ie: 198.51.100.0/22)
+            echo -en "${YELLOW}CIRD Ranges? ${ENDCOLOR}"
+            read cidr_ranges
+        fi
+
         echo -en "${YELLOW}Notes/Comments? ${ENDCOLOR} (press enter if empty)"
         read notes
 
-        result=$(bbrf new "$program" -t site:"$site" -t reward:"$val"  -t url:"$url" -t recon:"$val_recon" \
+        result=$(bbrf new "$program" -t site:"$site" -t reward:"$val" -t url:"$url" -t recon:"$val_recon" \
                  -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" \
-                 -t author:"$author" -t notes:"$notes" -t api:"$val_api" -t api_endpoints:"$api_endpoints" -t public:"$val_public")
-        #echo $result
+                 -t author:"$author" -t notes:"$notes" -t api:"$val_api" -t api_endpoints:"$api_endpoints" \
+                 -t public:"$val_public" -t vpn:"$val_vpn" -t cidr:"$val_cidr" -t cidr_ranges:"$cidr_ranges")
+
         if [[ $result == *"conflict"* ]]; then
             echo "Program already on BBRF!"
             bbrf show "$program"|jq
@@ -828,9 +844,9 @@ getProgramData() {
     for line in "${output[@]}"; do
         # Print the line with a different color on each iteration
         if [ $((i % 2)) -eq 0 ]; then
-            echo "${color1}$line${reset}"
+            echo "${RED}$line${ENDCOLOR}"
         else
-            echo "${color2}$line${reset}"
+            echo "${YELLOW}$line${ENDCOLOR}"
         fi
         i=$((i + 1))
     done
