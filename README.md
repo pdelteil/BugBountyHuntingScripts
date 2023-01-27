@@ -24,6 +24,13 @@ cd Bug-bounty-hunting-scripts
 ./setup.sh 
 ```
 
+## How to update (if previously installed)
+
+```
+git pull 
+source ~/.bashrc 
+```
+
 (**you might need to source .bashrc or relogin**)
 
 You can check them running `declare -F` 
