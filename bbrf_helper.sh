@@ -394,19 +394,21 @@ addPrograms()
             #scanPorts
             #run nuclei
             numUrls=$(bbrf urls|wc -l) 
-            echo -ne "${YELLOW} Run nuclei? [urls: $numUrls] (y/n)[default:no, press Enter]${ENDCOLOR} "
-            read runNuclei
-            case $runNuclei in
-                "yes")    valRunNuclei="true";;
-                "y"  )    valRunNuclei="true";;
-                "n"  )    valRunNuclei="false";;
-                "no" )    valRunNuclei="false";;
-                ""   )    valRunNuclei="false";;
-            esac
-
-            if [[ "$valRunNuclei" == "true" ]]; then
-                echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
-                bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -eid weak-cipher-suites,mismatched-ssl,expired-ssl,self-signed-ssl
+            if [[ "$numUrls" -gt 0 ]]; then
+                echo -ne "${YELLOW} Run nuclei? [urls: $numUrls] (y/n)[default:no, press Enter]${ENDCOLOR} "
+                read runNuclei
+                case $runNuclei in
+                    "yes")    valRunNuclei="true";;
+                    "y"  )    valRunNuclei="true";;
+                    "n"  )    valRunNuclei="false";;
+                    "no" )    valRunNuclei="false";;
+                    ""   )    valRunNuclei="false";;
+                esac
+    
+                if [[ "$valRunNuclei" == "true" ]]; then
+                    echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
+                    bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -eid weak-cipher-suites,mismatched-ssl,expired-ssl,self-signed-ssl
+                fi
             fi
         fi
     done
@@ -890,13 +892,13 @@ getProgramData() {
       return 1
       ;;
   esac
-
-  if [[ "$site" == "all" ]];then
-    local allPrograms=$(bbrf programs)
+  if [[ "$site" == "all" ]]; then
+      local allPrograms=$(bbrf programs where reward is "$reward")
   else
-    # Get all programs for the provided site
-    local allPrograms=$(bbrf programs where site is "$site")
+      # Get all programs for the provided site
+      local allPrograms=$(bbrf programs where site is "$site")
   fi
+
   IFS=$'\n'
 
   # Loop through programs and get data based on type and reward

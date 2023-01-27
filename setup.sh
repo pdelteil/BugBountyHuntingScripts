@@ -15,16 +15,8 @@ function installTool()
 {
     toolName="$1"
     installCmd="$2"
-    echo -ne "${YELLOW}- Checking for $toolName ${ENDCOLOR}\n"
-
-    # Check if tool is installed
-    if command -v $toolName &> /dev/null; then
-        echo -ne "${YELLOW}  $toolName is installed! Skipping${ENDCOLOR}\n"
-    else
-       # Print message if command is not installed and run installation command
-       echo -ne "${YELLOW}  $toolName is not installed, installing...${ENDCOLOR}\n"
-        $installCmd
-    fi
+    echo -ne "${YELLOW} Checking if $toolName is out of date or not installed...${ENDCOLOR}\n"
+    $installCmd
 }
 
 function addtoBashrc()
@@ -43,7 +35,7 @@ function addtoBashrc()
 #installing dependencies 
 echo -ne "${YELLOW}Installing dependencies...${ENDCOLOR}\n\n"
 
-installTool gcc          "sudo apt install gcc"
+installTool gcc          "sudo apt install gcc -qqq"
 installTool subfinder    "go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
 installTool httpx        "go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest"
 installTool dnsx         "go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest"
