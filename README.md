@@ -4,13 +4,14 @@
 ## Required software 
 
 ```
-subfinder
-httpx 
-dnsx 
-assetfinder 
-httprobe
-gau
 amass
+assetfinder
+dnsx
+gau
+gawk
+httprobe
+httpx
+subfinder
 unfurl
 ```
 
