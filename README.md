@@ -4,13 +4,14 @@
 ## Required software 
 
 ```
-subfinder
-httpx 
-dnsx 
-assetfinder 
-httprobe
-gau
 amass
+assetfinder
+dnsx
+gau
+gawk
+httprobe
+httpx
+subfinder
 unfurl
 ```
 
@@ -22,6 +23,13 @@ git clone https://github.com/pdelteil/Bug-bounty-hunting-scripts.git
 cd Bug-bounty-hunting-scripts
 
 ./setup.sh 
+```
+
+## How to update (if previously installed)
+
+```
+git pull 
+source ~/.bashrc 
 ```
 
 (**you might need to source .bashrc or relogin**)
