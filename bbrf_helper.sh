@@ -841,7 +841,7 @@ getUrlsWithProgramTag()
 # getProgramData bugcrowd money names
 # getProgramData bugcrowd points urls
 getProgramData() {
-  rewards = 
+  rewards=(money points thanks)
   # Check if required arguments are provided
   if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
     output=("Usage: ${FUNCNAME[0]} SITE REWARD TYPE" "  SITE: (intigriti, bugcrowd, h1, yeswehack or all)" "  REWARDS: (money, points, thanks or all)" \
@@ -895,14 +895,23 @@ getProgramData() {
       return 1
       ;;
   esac
+  echo "$data"
+  IFS=$'\n'
+
   if [[ "$site" == "all" ]] && [[ "$reward" != "all" ]]; then
       local allPrograms=$(bbrf programs where reward is "$reward")
+  
+  elif [[ "$site" == "all" ]] && [[ "$reward" == "all" ]]; then
+      for ((i=0; i< ${#rewards[@]}; i++)); do
+          temp=$(echo "${rewards[$i]}")
+          programs=$(bbrf programs where reward is "$temp")
+          allPrograms+="$programs "
+      done
+  
   else
       # Get all programs for the provided site
       local allPrograms=$(bbrf programs where site is "$site")
   fi
-
-  IFS=$'\n'
 
   # Loop through programs and get data based on type and reward
   for program in $(echo "$allPrograms"); do
