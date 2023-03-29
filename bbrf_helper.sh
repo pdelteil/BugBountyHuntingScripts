@@ -823,6 +823,7 @@ getUrlsWithProgramTag()
 # getProgramData bugcrowd money names
 # getProgramData bugcrowd points urls
 getProgramData() {
+  rewards = 
   # Check if required arguments are provided
   if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
     output=("Usage: ${FUNCNAME[0]} SITE REWARD TYPE" "  SITE: (intigriti, bugcrowd, h1, yeswehack or all)" "  REWARDS: (money, points, thanks or all)" \
@@ -876,7 +877,7 @@ getProgramData() {
       return 1
       ;;
   esac
-  if [[ "$site" == "all" ]]; then
+  if [[ "$site" == "all" ]] && [[ "$reward" != "all" ]]; then
       local allPrograms=$(bbrf programs where reward is "$reward")
   else
       # Get all programs for the provided site
