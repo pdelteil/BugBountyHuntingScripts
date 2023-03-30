@@ -248,9 +248,10 @@ getUrls()
         doms=$(bbrf domains -p "program"|grep -v DEBUG|tr ' ' '\n')
     fi
     if [[ ${#doms} -gt 0 ]]; then
-        echo -en "${RED} httpx domains ${ENDCOLOR}\n"
+        numDomains=$(echo "$doms"|wc -l)
+        echo -en "${RED} Using httpx in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
         echo "$doms"|httpx -silent -threads $threads|bbrf url add - -s httpx --show-new
-        echo -en "${RED} httprobe domains ${ENDCOLOR}\n"
+        echo -en "${RED} Using httprobe in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
         echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new
     fi
 }
