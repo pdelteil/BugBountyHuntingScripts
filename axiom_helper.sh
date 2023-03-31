@@ -119,7 +119,7 @@ findAndMoveScans()
 {
     # Print usage information if -h or --help flag is used or no arguments are provided
     if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ -z "$1" ]; then
-        echo "Usage: findAndMoveScans FOLDER"
+        echo "Usage: ${FUNCNAME[0]} FOLDER"
         echo "Moves all files containing the word 'scan+' in their name to the specified FOLDER."
         return
     fi
@@ -159,6 +159,8 @@ findAndMoveScans()
     fi
 }
 # input program name
+# > nucleiScan program
+# > nucleiScan all 
 nucleiScan()
 {
     # Maximum number of instances to spin up
@@ -166,7 +168,7 @@ nucleiScan()
 
     # Check for help flag
     if [[ $# -eq 0 ]] || [[ $1 == "-h" ]] || [[ $1 == "--help" ]]; then
-        echo "Usage: nucleiScan [program]"
+        echo "Usage: ${FUNCNAME[0]} [program]"
         echo "Scans specified program or all programs if 'all' is provided as input using nuclei."
         echo " Options:"
         echo "  -h, --help Display this help message"
@@ -214,19 +216,72 @@ selectAllInstances()
     echo "number of instances $instances"
 }
 
+#builds a list of GOOD DNS servers 
+buildResolversList()
+{
+     # Check for help flag
+    if [[ $1 == "-h" ]] || [[ $1 == "--help" ]]; then
+        echo "Usage: ${FUNCNAME[0]}"
+        echo " Options:"
+        echo "  -h, --help Display this help message"
+        return
+    fi
+    dnsvalidatorThreads=30
+    maxInstances=50
+
+    # Set options for scan
+    options="-threads $dnsvalidatorThreads -o ~/resolvers.txt"
+    # Get number of instances currently in state running
+    instances=$(axiom-ls|grep running)
+
+    if [[ $instances -eq 0 ]]; then
+      spinup="--spinup $maxInstances"
+    else
+      spinup=""
+    fi
+    
+    #getting list of potential name servers 
+    wget https://public-dns.info/nameservers.txt -O /tmp/nameservers.txt
+    #build a resolver list using dnsvalidator
+    axiom-scan nameservers.txt -m dnsvalidator $options $spinup --rm-when-done
+    #resolve domains [dnsx]
+
+}
+
+discoverContent()
+{
+
+# katana
+
+# feroxbuster   
+echo ok
+
+}
+
+bruteForceDNSRecords()
+{
+
+#puredns
+#resolve again
+   echo remove
+
+
+}
 reconScan()
 {
     date=$(date +%Y-%m-%d_%H-%M-%S)
     local file="/tmp/domains.output.$date.txt"    
+    subfinderThreads=20
     #getInscope 
     #TODO: check if call fails
-    getProgramData intigriti all inscope | tee $file
+    getProgramData all money inscope | tee $file
     
+    #TODO: check if there is a fleet up -> param spinup 
     #run amass
-    axiom-scan $file -m amass -wL ~/amass_config.ini --spinup 50 -o ~/results/outputfile_amass_$date.txt
+    axiom-scan $file -m amass -wL ~/amass_config.ini -o ~/results/outputfile_amass_$date.txt
     #run subfinder
     # TODO: add config file
-    axiom-scan $file -m subfinder -t 15 -all -o ~/results/outputfile_subfinder_$date.txt
+    axiom-scan $file -m subfinder -wL ~/.config/subfinder/provider-config.yaml -t $subfinderThreads -all -o ~/results/outputfile_subfinder_$date.txt
     #run assetfinder
     axiom-scan $file -m assetfinder --rm-when-done -o ~/results/outputfile_assetfinder_$date.txt
     #mergeOutput
@@ -235,27 +290,24 @@ reconScan()
 
     #use dnsvalidator to generate list of DNS servers
 
-    #resolveDomains 
-
-    #addDomains in Chunks
+    #addDomains in Chunks (screen?)
 
     #reportNewDomains
     
-    #addUrls in Chunks
+    #Probe for URLS
+        #httpx / httprobe
+        #addUrls in Chunks
 
-    #reportNewUrls
+        #reportNewUrls
     
     #TODO another function
         #nucleiScan 
 
-        #crawl with Katana
-
-        #bruteforce with feroxbuster 
 
     echo "Done! "
 }
 
-# resolve urls from domain using httpx and httprobe    
+# resolve urls from domains using httpx and httprobe    
 getAllUrls()
 {
     #TESTING IN PROGRESS
@@ -270,7 +322,3 @@ getAllUrls()
     screen -S "axiom-scan-httpx" axiom-scan $file -m httpx $options #$axiom_options
     addInChunks outputfile.httpx.txt urls 2500 
 }
-
-
-
-
