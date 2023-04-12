@@ -7,7 +7,7 @@ This command is used to check if we already have a program in our database. It i
 Example:
 
 ```bash
-retr0@retr0:~$ checkProgram att
+$ checkProgram att
 Program found: ATT
 Automattic
 Mattermost  
@@ -24,7 +24,6 @@ One advantage of the command is that it is not **case sensitive**, so we don't h
 
 Another positive point is that **checkProgram** will not return any program whose name is exactly **att**, but any program that contains **att** in its name. This is good because if we do not remember the exact name of the program, but we know a part of its name, the command will show us the results that contain the **word** that you indicate. 
 
-**( ¡¡¡ You just give the command a hint and it does the rest !!! )**.
 
 ## addProgram [(h1/bugcrowd/anything/) author]
 
@@ -45,7 +44,7 @@ Example:
 After that, the command will ask for information about the program:
 
 ```bash
-retr0@retr0:~$ addPrograms h1
+$ addPrograms h1
 Program name: Test
 Reward? (1:money[default:press Enter], 2:points, 3:thanks) 1
 Url? https://hackerone.com/test?type=team                                      
@@ -68,7 +67,7 @@ Once we have provided the data that **addPrograms** asks for, it will start find
 For example, this returns **addPrograms** when we add a program like **Trustpilot**:
 
 ```bash
-retr0@retr0:~$ addPrograms h1
+$ addPrograms h1
 Program name: Trustpilot
 Reward? (1:money[default:press Enter], 2:points, 3:thanks)  1
 Url?  https://hackerone.com/trustpilot?type=team                                     
@@ -190,7 +189,7 @@ Source code?  (1:false[default:press Enter], 2:true) 1
 ```
 Note that if **addProgram** finds new URL's it will mark them as [new], but if it finds URL's that were already registered in the database, then it will mark them as [update].
 
-¡¡¡ Now you have a good amount of URL's on which to start looking for errors :sunglasses: !!!
+Now you have a good amount of URL's on which to start looking for errors :sunglasses: !
 
 ## getDomains ; getUrls
 
@@ -199,7 +198,7 @@ It may happen that you have already entered a program before and now you just wa
 In that case you should do the following:
 
 ```bash
-retr0@retr0:~$ checkProgram spotify
+$ checkProgram spotify
 Program found: Spotify
 
 bbrf use Spotify
@@ -252,12 +251,11 @@ Well this is more than enough for **findProgram**, if you enter a domain or URL 
 Example:
 
 ```bash
-retr0@retr0:~$ findProgram spotify.com
+$ findProgram spotify.com
 "h1, Spotify, money, https://hackerone.com/spotify?type=team, disabled:false, recon:false, source code: null"
-retr0@retr0:~$ findProgram https://hrblog.spotify.com
+$ findProgram https://hrblog.spotify.com
 "h1, Spotify, money, https://hackerone.com/spotify?type=team, disabled:false, recon:false, source code: null"
 ```
 
-¡¡¡ Great, now we know **Spotify** is the name of the program we were looking for !!!
+Great, now we know **Spotify** is the name of the program we were looking for.
 
-This was all the documentation for **BBRF Helper**, hope you enjoy the tool :heart:.
