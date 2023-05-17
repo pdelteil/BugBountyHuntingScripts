@@ -1,5 +1,27 @@
 #general helper functions
 
+function show_program_tags() {
+  program="$1"
+  local site=".tags.site"
+  local author=".tags.author"
+  local reward=".tags.reward"
+  local url=".tags.url"
+  local AddedDate=".tags.addedDate"
+  local disabled="(.disabled|tostring)"
+  local recon="(.tags.recon|tostring)"
+  local source="(.tags.sourceCode|tostring)"
+  local notes=".tags.notes"
+  local api=".tags.api"
+  local public=".tags.public"
+  local gov=".tags.gov"
+  local vpn=".tags.vpn"
+  local cidr=".tags.cidr"
+        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"'+ ", api: "+'"$api"'+", public: "+'"$public"'+", gov: "+'"$gov"'+", vpn: "+'"$vpn"'+", cidr: "+'"$cidr"
+  local output
+  output=$(bbrf show "$program" | jq "$tags" | tr -d '"' | sed 's/,/\n/g')
+
+  echo "$output"
+}
 
 print_lines_in_colors() {
   local variable="$1"  # Variable containing multiple lines

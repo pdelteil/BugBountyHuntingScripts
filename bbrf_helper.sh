@@ -609,26 +609,7 @@ findProgram()
     fi
 
     if [[ ${#program} -gt 0 ]]; then
-        #This tags are specific for my way of storing data
-        #If you use addPrograms to inpput your programs this will work just fine
-        site=".tags.site"
-        author=".tags.author"
-        reward=".tags.reward"
-        url=".tags.url"
-        AddedDate=".tags.addedDate"
-        disabled="(.disabled|tostring)"
-        recon="(.tags.recon|tostring)"
-        source="(.tags.sourceCode|tostring)"
-        notes=".tags.notes"
-        api=".tags.api"
-        public=".tags.public"
-        gov=".tags.gov"
-        vpn=".tags.vpn"
-        cidr=".tags.cidr"
-        #this part is hard to update -> need to find a way to simplify it
-        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"'+ ", api: "+'"$api"'+", public: "+'"$public"'+", gov: "+'"$gov"'+", vpn: "+'"$vpn"'+", cidr: "+'"$cidr"
-        output=$(bbrf show "$program" | jq "$tags" |tr -d '"'| sed 's/,/\n/g')
-        #echo -ne "\n$output\n\n"
+        output=$(show_program_tags "$program")
         print_lines_in_colors "$output"
   
     else
@@ -706,10 +687,12 @@ showProgram()
         return 1
     fi
     program="$1"
-    output=$(bbrf show "$program"|jq)
+    #output=$(bbrf show "$program"|jq)
+    output=$(show_program_tags "$program")
 
     if [[ ${#output} -gt 0 ]]; then
-        echo "$output" 
+        #output=$(echo "$output"|tr -d ":\",{}[]")
+        print_lines_in_colors "$output" 
         return 0
     else    
         echo -ne "${RED}$program not found! ${ENDCOLOR}\n\n"
