@@ -1,5 +1,30 @@
 #general helper functions
 
+
+print_lines_in_colors() {
+  local variable="$1"  # Variable containing multiple lines
+
+  # Set initial line count
+  local line_count=0
+
+  # Loop through each line of the variable
+  while IFS= read -r line; do
+    ((line_count++))
+
+    # Determine the color based on the line count
+    if ((line_count % 2 == 0)); then
+      color_code=$(tput setaf 2)  # Green color for even lines
+    else
+      color_code=$(tput setaf 4)  # Blue color for odd lines
+    fi
+
+    # Print the line in the chosen color
+    printf "%s%s%s\n" "$color_code" "$line" "$(tput sgr0)"
+
+  done <<< "$variable"
+}
+
+
 # create a screen instance with a given name
 # Example
 # Create a screen session called "mySession"
