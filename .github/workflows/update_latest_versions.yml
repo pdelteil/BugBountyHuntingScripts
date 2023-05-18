@@ -13,12 +13,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: Create and switch to new branch
+      - name: Extract version number
+        id: extract_version
         run: |
-          git checkout -b update-latest-version
+          echo "::set-output name=version::${{ github.ref }}"
+
+      - name: Format version number
+        id: format_version
+        run: |
+          echo "::set-output name=formatted_version::${{ steps.extract_version.outputs.version#refs/tags/ }}"
 
       - name: Update version
-        run: echo ${{ github.ref }} > latest_version.txt
+        run: echo ${{ steps.format_version.outputs.formatted_version }} > latest_version.txt
 
       - name: Commit and push changes
         run: |
@@ -26,7 +32,4 @@ jobs:
           git config user.email "action@github.com"
           git add latest_version.txt
           git commit -m "Update latest version"
-          git push origin update-latest-version
-
-      - name: Switch back to the default branch
-        run: git checkout ${{ github.ref }}
+          git push
