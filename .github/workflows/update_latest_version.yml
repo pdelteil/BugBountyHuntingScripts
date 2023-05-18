@@ -1,0 +1,25 @@
+name: Update Latest Version
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  update_version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Update version
+        run: echo ${{ github.ref }} > latest_version.txt
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add latest_version.txt
+          git commit -m "Update latest version"
+          git push
