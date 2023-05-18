@@ -21,7 +21,8 @@ jobs:
       - name: Format version number
         id: format_version
         run: |
-          echo "::set-output name=formatted_version::${{ steps.extract_version.outputs.version.replace('refs/tags/', '') }}"
+          formatted_version=$(echo ${{ steps.extract_version.outputs.version }} | sed 's/refs\/tags\///')
+          echo "::set-output name=formatted_version::$formatted_version"
 
       - name: Update version
         run: echo ${{ steps.format_version.outputs.formatted_version }} > latest_version.txt
