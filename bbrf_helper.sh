@@ -574,13 +574,22 @@ checkProgram() {
   
   # Search for programs matching the text provided
   output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
-  
+  result="Program Name;Site\n"
+  while IFS= read -r line; do
+    # Process each line of the output
+    site=$(bbrf show "$line"|jq|grep site|awk -F":" '{print $2}'|tr -d ",\" ")
+    #echo "$line;$site"
+    result+="$line;$site\n"
+
+  done <<< "$output"
+
   # If any programs were found, print them
   if [[ ${#output} -gt 0 ]]; then
-    echo -ne "${YELLOW}Programs found:\n$output ${ENDCOLOR} \n\n"
+      test=$(echo -e "$result")
+      print_table "$test"
   # If no programs were found, print an error message
   else    
-    echo -ne "${RED}No program found! ${ENDCOLOR}\n\n"
+    echo -ne "${RED}No programs found! ${ENDCOLOR}\n\n"
   fi
 }
 
