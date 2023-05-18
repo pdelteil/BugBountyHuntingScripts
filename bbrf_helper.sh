@@ -610,7 +610,7 @@ findProgram()
 
     if [[ ${#program} -gt 0 ]]; then
         output=$(show_program_tags "$program")
-        print_lines_in_colors "$output"
+        print_table "$output"
   
     else
         echo -ne "${RED}No program found!${ENDCOLOR}\n\n"
@@ -692,7 +692,8 @@ showProgram()
 
     if [[ ${#output} -gt 0 ]]; then
         #output=$(echo "$output"|tr -d ":\",{}[]")
-        print_lines_in_colors "$output" 
+        print_table  "$output"
+        #print_lines_in_colors "$output" 
         return 0
     else    
         echo -ne "${RED}$program not found! ${ENDCOLOR}\n\n"

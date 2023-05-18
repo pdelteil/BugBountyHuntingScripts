@@ -2,6 +2,7 @@
 
 function show_program_tags() {
   program="$1"
+  local name="._id"
   local site=".tags.site"
   local author=".tags.author"
   local reward=".tags.reward"
@@ -16,36 +17,81 @@ function show_program_tags() {
   local gov=".tags.gov"
   local vpn=".tags.vpn"
   local cidr=".tags.cidr"
-        tags='" Site: "+'"$site"' +", Name: "+._id+", Author: "+'"$author"'+", Reward: "+'"$reward"'+", Url: "+'"$url"'+", disabled: "+'"$disabled"'+", Added Date: "+'"$AddedDate"'+", recon: "+'"$recon"' +", source code: "+'"$source"' + ", Notes: "+'"$notes"'+ ", api: "+'"$api"'+", public: "+'"$public"'+", gov: "+'"$gov"'+", vpn: "+'"$vpn"'+", cidr: "+'"$cidr"
+  local tags='"Name;"+'"$name"'+",Site;"+'"$site"'+",Author;"+'"$author"'+",Reward;"+'"$reward"'+",Url;"+'"$url"'+",disabled;"+'"$disabled"'+",Added Date;"+'"$AddedDate"'+",recon;"+'"$recon"' +",source code;"+'"$source"' + ",Notes;"+'"$notes"'+ ",api;"+'"$api"'+",public;"+'"$public"'+",gov;"+'"$gov"'+",vpn;"+'"$vpn"'+",cidr;"+'"$cidr"
+
   local output
   output=$(bbrf show "$program" | jq "$tags" | tr -d '"' | sed 's/,/\n/g')
-
   echo "$output"
 }
 
-print_lines_in_colors() {
-  local variable="$1"  # Variable containing multiple lines
+print_table() {
+    var="$1"
+    # Split the variable into lines
+    IFS=$'\n' read -rd '' -a lines <<< "$var"
+    # Define an array of colors for each column
+    colors=("32" "31")  #  Green, Red
 
-  # Set initial line count
-  local line_count=0
+    # Function to print horizontal line
+    print_horizontal_line() {
+      for ((i = 0; i < ${#max_widths[@]}; i++)); do
+        printf "+-%*s-" "${max_widths[i]}" "" | tr ' ' '-'
+      done
+      printf "+\n"
+    }
 
-  # Loop through each line of the variable
-  while IFS= read -r line; do
-    ((line_count++))
+    # Function to print table cells with colors
+    print_cell() {
+      local value="$1"
+      local width="$2"
+      local color="$3"
+      printf "| \e[1;${color}m%-*s\e[0m " "$width" "$value"
+    }
 
-    # Determine the color based on the line count
-    if ((line_count % 2 == 0)); then
-      color_code=$(tput setaf 2)  # Green color for even lines
-    else
-      color_code=$(tput setaf 4)  # Blue color for odd lines
-    fi
+    # Initialize the maximum widths array with zeros
+    max_widths=()
+    for ((i = 0; i < ${#colors[@]}; i++)); do
+      max_widths[$i]=0
+    done
 
-    # Print the line in the chosen color
-    printf "%s%s%s\n" "$color_code" "$line" "$(tput sgr0)"
+    # Calculate the maximum width of each column
+    for line in "${lines[@]}"; do
+      IFS=';' read -ra fields <<< "$line"
+      for ((i = 0; i < ${#fields[@]}; i++)); do
+        field="${fields[i]}"
+        width=${#field}
+        if (( width > max_widths[i] )); then
+          max_widths[i]=$width
+        fi
+      done
+    done
 
-  done <<< "$variable"
+    # Print the top border
+    print_horizontal_line
+
+    # Print the table header with colors
+    IFS=';' read -ra header_fields <<< "${lines[0]}"
+    for i in "${!colors[@]}"; do
+      print_cell "${header_fields[i]}" "${max_widths[i]}" "${colors[i]}"
+    done
+    printf "|\n"
+    
+    # Print the separator line
+    print_horizontal_line
+    
+    # Print each line as a row in the table with colors
+    for line in "${lines[@]:1}"; do
+      IFS=';' read -ra fields <<< "$line"
+      for i in "${!colors[@]}"; do
+        value="${fields[i]}"
+        print_cell "$value" "${max_widths[i]}" "${colors[i]}"
+      done
+      printf "|\n"
+    done
+
+    # Print the bottom border
+    print_horizontal_line
 }
-
+    
 
 # create a screen instance with a given name
 # Example
