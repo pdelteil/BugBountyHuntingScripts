@@ -21,7 +21,7 @@ jobs:
       - name: Format version number
         id: format_version
         run: |
-          echo "::set-output name=formatted_version::${{ steps.extract_version.outputs.version#refs/tags/ }}"
+          echo "::set-output name=formatted_version::${{ steps.extract_version.outputs.version.replace('refs/tags/', '') }}"
 
       - name: Update version
         run: echo ${{ steps.format_version.outputs.formatted_version }} > latest_version.txt
