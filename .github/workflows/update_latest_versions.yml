@@ -1,14 +1,23 @@
-on: 
-  push:
-    branches:
-      - master
+name: Update File on Release
+
+on:
+  release:
+    types:
+      - created
 
 jobs:
-  release-on-push:
+  update-file:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
-      - uses: rymndhng/release-on-push-action@master
-        with:
-          bump_version_scheme: minor
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Update file with release version
+        run: |
+          echo "${{ github.event.release.tag_name }}" > latest_version.txt
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add version.txt
+          git commit -m "Update version.txt with release version" || true
+          git push
