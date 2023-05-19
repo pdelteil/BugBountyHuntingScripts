@@ -15,9 +15,9 @@ jobs:
 
       - name: Update file with release version
         run: |
-          echo "${{ github.event.release.tag_name }}" > version.txt
+          echo "${{ github.event.release.tag_name }}" > latest_version.txt
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add version.txt
+          git add latest_version.txt
           git commit -m "Update version.txt with release version" || true
           git push origin HEAD:main
