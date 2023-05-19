@@ -12,12 +12,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Update file with release version
         run: |
-          echo "${{ github.event.release.tag_name }}" > latest_version.txt
+          echo "${{ github.event.release.tag_name }}" > version.txt
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add latest_version.txt
-          git commit -m "Update latest_version.txt with release version" || true          
+          git add version.txt
+          git commit -m "Update version.txt with release version" || true
           git push origin ${{ github.head_ref }}
