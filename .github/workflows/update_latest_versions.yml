@@ -9,11 +9,9 @@ jobs:
   update-file:
     runs-on: ubuntu-latest
 
-    steps:
+  steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Update file with release version
         run: |
@@ -22,4 +20,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add latest_version.txt
           git commit -m "Update latest_version.txt with release version" || true
-          git push origin ${{ github.head_ref }}
+          git push origin HEAD:main
