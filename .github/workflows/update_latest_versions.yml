@@ -19,5 +19,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add latest_version.txt
-          git commit -m "Update latest_version.txt with release version" || true
-          git push
+          git commit -m "Update latest_version.txt with release version" || true          
+          git push origin ${{ github.head_ref }}
