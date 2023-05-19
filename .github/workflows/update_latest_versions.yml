@@ -1,2 +1,14 @@
-- name: Tag/Release on Push Action
-  uses: rymndhng/release-on-push-action@v0.27.0
+on: 
+  push:
+    branches:
+      - master
+
+jobs:
+  release-on-push:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: rymndhng/release-on-push-action@master
+        with:
+          bump_version_scheme: minor
