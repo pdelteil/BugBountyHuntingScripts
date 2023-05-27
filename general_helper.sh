@@ -408,3 +408,14 @@ nano2()
     source "$inputFile"
 }
 
+remove_protocol_and_path() {
+  while IFS= read -r line; do
+    # Remove the protocol (e.g., "http://", "https://", "ftp://")
+    line=${line#*//}
+    
+    # Remove the path by extracting the domain or hostname
+    line=${line%%/*}
+    
+    echo "$line"
+  done
+}
