@@ -409,13 +409,27 @@ nano2()
 }
 
 remove_protocol_and_path() {
-  while IFS= read -r line; do
-    # Remove the protocol (e.g., "http://", "https://", "ftp://")
-    line=${line#*//}
-    
-    # Remove the path by extracting the domain or hostname
-    line=${line%%/*}
-    
-    echo "$line"
-  done
+  if [ -t 0 ]; then
+    # No input from pipe, read from standard input
+    while IFS= read -r line; do
+      process_line "$line"
+    done
+  else
+    # Read from pipe
+    while IFS= read -r line; do
+      process_line "$line"
+    done < /dev/stdin
+  fi
+}
+
+process_line() {
+  local line=$1
+
+  # Remove the protocol (e.g., "http://", "https://", "ftp://")
+  line=${line#*//}
+
+  # Remove the path by extracting the domain or hostname
+  line=${line%%/*}
+
+  echo "$line"
 }
