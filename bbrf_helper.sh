@@ -5,7 +5,10 @@ RED=$(tput setaf 1) # red
 YELLOW=$(tput setaf 3) # yellow
 ENDCOLOR=$(tput sgr0) # reset text attributes
 
-source general_helper.sh
+# Get the directory of the script
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
+source "$script_dir"/general_helper.sh
 
 #update program data after outscope change 
 #When you add a new outscope rule(s) you'd like that the program data gets updated
