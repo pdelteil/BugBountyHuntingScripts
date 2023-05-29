@@ -1,5 +1,8 @@
 #general helper functions
 
+# Get the directory of the script
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+
 function show_program_tags() {
   program="$1"
   local name="._id"
@@ -432,4 +435,52 @@ process_line() {
   line=${line%%/*}
 
   echo "$line"
+}
+
+check_latest_version() {
+
+    local tool_file="$script_dir/latest_version.txt"
+    local github_repo="pdelteil/BugBountyHuntingScripts"
+    local github_tag
+
+    # Get the latest GitHub tag
+    github_tag=$(curl -s "https://api.github.com/repos/${github_repo}/tags" | jq -r '.[0].name')
+
+    if [[ -z "${github_tag}" ]]; then
+        echo "Error: Unable to retrieve the latest GitHub tag."
+        return 1
+    fi
+
+    # Extract the version from the tool file
+    local tool_version
+    tool_version=$(grep -oP 'v\d+\.\d+\.\d+' "${tool_file}")
+
+    if [[ -z "${tool_version}" ]]; then
+        echo "Error: Unable to extract the version from the tool file."
+        return 1
+    fi
+
+    echo "Latest GitHub tag: ${github_tag}"
+    echo "Local tool version: ${tool_version}"
+
+    # Compare versions
+    if [[ "${tool_version}" == "${github_tag}" ]]; then
+        echo "The tool is up to date."
+    else
+        echo "A new version is available."
+        # Prompt user to update the tool
+        read -rp "Do you want to update the tool? (y/n): " choice
+
+        if [[ "${choice}" =~ ^[Yy]$ ]]; then
+            # Update tool using git pull
+            git -C "$(dirname "${tool_file}")" pull
+
+            # Source .bashrc to reflect changes
+            source ~/.bashrc
+
+            echo "Tool updated successfully."
+        else
+            echo "Tool update skipped."
+        fi
+    fi
 }
