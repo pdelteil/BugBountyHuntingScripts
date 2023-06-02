@@ -42,3 +42,7 @@ You can also use tab to autocomplete them.
 
 [How to use (Wiki)](https://github.com/pdelteil/Bug-bounty-hunting-scripts/wiki/How-to-use-the-scripts)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=pdelteil/BugBountyHuntingScripts&type=Date)](https://star-history.com/#pdelteil/BugBountyHuntingScripts&Date)
+
