@@ -45,7 +45,7 @@ installTool assetfinder  "go install -v github.com/tomnomnom/assetfinder@latest"
 installTool httprobe     "go install -v github.com/tomnomnom/httprobe@master"
 installTool gau          "go install -v github.com/lc/gau/v2/cmd/gau@latest"
 installTool waybackurls  "go install -v github.com/tomnomnom/waybackurls@latest"
-installTool amass        "go install -v github.com/OWASP/Amass/v3/...@master"
+installTool amass        "go install -v github.com/owasp-amass/amass/v4/...@master"
 installTool unfurl       "go install -v github.com/tomnomnom/unfurl@latest"
 
 echo  "" 
