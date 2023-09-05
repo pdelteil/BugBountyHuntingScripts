@@ -55,6 +55,17 @@ addtoBashrc general_helper.sh $shellConfig
 addtoBashrc axiom_helper.sh $shellConfig
 addtoBashrc amass_helper.sh $shellConfig
 
+# Define the lines to be added GO CONFIG
+lines_to_add="export GOROOT=/usr/local/go
+export GOPATH=\$HOME/go
+export PATH=\$GOPATH/bin:\$GOROOT/bin:\$HOME/.local/bin:\$PATH"
+
+# Check if lines already exist in .bashrc
+if ! grep -qxF "$lines_to_add" $shellConfig; then
+    # If lines do not exist, append them to .bashrc
+    echo "$lines_to_add" >> $shellConfig
+fi
+
 source $shellConfig
 
 echo -ne "\n${YELLOW}After installation you need to configure API KEYs for${ENDCOLOR} ${RED}subfinder and amass${ENDCOLOR}\n\n"
