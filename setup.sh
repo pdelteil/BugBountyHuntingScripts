@@ -14,7 +14,7 @@ function installTool()
 {
     toolName="$1"
     installCmd="$2"
-    echo -ne "${YELLOW} Checking if $toolName is out of date or not installed...${ENDCOLOR}\n"
+    echo -ne "${YELLOW}\n Checking if $toolName is out of date or not installed...${ENDCOLOR}\n"
     $installCmd
 }
 
@@ -57,4 +57,4 @@ addtoBashrc amass_helper.sh $shellConfig
 
 source $shellConfig
 
-echo -ne "\n${YELLOW}After installation you need to configure API KEYs for${ENDCOLOR} ${RED}subfinder and amass${ENDCOLOR}\n"
+echo -ne "\n${YELLOW}After installation you need to configure API KEYs for${ENDCOLOR} ${RED}subfinder and amass${ENDCOLOR}\n\n"
