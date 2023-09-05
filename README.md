@@ -9,8 +9,10 @@ assetfinder
 dnsx
 gau
 gawk
+go
 httprobe
 httpx
+snapd
 subfinder
 unfurl
 ```
