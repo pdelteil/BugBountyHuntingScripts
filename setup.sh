@@ -57,4 +57,4 @@ addtoBashrc amass_helper.sh $shellConfig
 
 source $shellConfig
 
-echo -ne "${YELLOW}After installation you need to configure API KEYs for${ENDCOLOR} ${RED}subfinder and amass${ENDCOLOR}"
+echo -ne "\n${YELLOW}After installation you need to configure API KEYs for${ENDCOLOR} ${RED}subfinder and amass${ENDCOLOR}\n"
