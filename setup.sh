@@ -37,6 +37,7 @@ sudo apt update
 installTool snap         "sudo apt install snapd"
 installTool gcc          "sudo apt install gcc -qqq"
 installTool gawk         "sudo apt install gawk"
+installTool jq           "sudo apt install jq" 
 installTool go           "sudo snap install go --classic"
 installTool subfinder    "go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
 installTool httpx        "go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest"
