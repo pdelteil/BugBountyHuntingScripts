@@ -10,6 +10,7 @@ dnsx
 gau
 gawk
 go
+jq
 httprobe
 httpx
 snapd
