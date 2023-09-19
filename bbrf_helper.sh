@@ -10,6 +10,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 source "$script_dir"/general_helper.sh
 
+AMASS_CONFIG="~/amass_config.ini"
 #update program data after outscope change 
 #When you add a new outscope rule(s) you'd like that the program data gets updated
 #this means removing domains and urls that now are out of scope
@@ -200,15 +201,23 @@ getDomains()
         echo "$wild"|bbrf domain add - $params --show-new
 
         echo -ne "${RED} Running amass ${ENDCOLOR}\n"
+        if [ -f "$AMASS_CONFIG" ]; then
+            echo -ne "\t amass using $AMASS_CONFIG config file"
+            # You can perform actions on the file here
+        else
+            echo -ne "\t amass not using a config file, $AMASS_CONFIG not found"
+            # You can handle the case where the file doesn't exist here
+        fi
+
         if [[ "$fileMode" = true ]] ; then
             for domain in $(echo "$wild"); do
                 echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-amass.txt"
+                amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-amass.txt"
             done
             else
                 for domain in $(echo "$wild"); do
                     echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                    amass enum -d $domain -config ~/amass_config.ini -passive 2>/dev/null | dnsx -t $dnsxThreads -silent | bbrf domain add - -s amass $params --show-new
+                    amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent | bbrf domain add - -s amass $params --show-new
                 done
             fi
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
