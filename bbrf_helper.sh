@@ -576,7 +576,13 @@ checkProgram() {
   text="$1"
   
   # Search for programs matching the text provided
-  output=$(bbrf programs --show-disabled --show-empty-scope | grep -i "$text")
+  output=$(bbrf programs --show-disabled --show-empty-scope)
+
+  if [[ "$output" =~ "unauthorized" ]]; then
+        echo -en "${RED}BBRF unauthorized! Check user/password\n${ENDCOLOR}"
+        return 1
+  fi
+  output=$(echo "$output" |  grep -i "$text")
   result="Program Name;Site\n"
   while IFS= read -r line; do
     # Process each line of the output
@@ -611,6 +617,12 @@ findProgram()
       return 1
     fi
     show=$(bbrf show "$INPUT") 
+
+    if [[ "$show" =~ "unauthorized" ]]; then
+        echo -en "${RED}BBRF unauthorized! Check user/password\n${ENDCOLOR}"
+        return 1
+    fi
+    
     program=$(echo "$show" |jq -r '.program')
 
     #case input is an IP
