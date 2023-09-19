@@ -13,6 +13,7 @@ go
 jq
 httprobe
 httpx
+nuclei
 snapd
 subfinder
 unfurl
