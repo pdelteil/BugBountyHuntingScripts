@@ -30,7 +30,11 @@ cd Bug-bounty-hunting-scripts
 ```
 
 ## How to update (if previously installed)
+```
+check_latest_version
+```
 
+OR
 ```
 git pull 
 source ~/.bashrc 
