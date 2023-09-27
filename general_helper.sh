@@ -20,7 +20,7 @@ function show_program_tags() {
   local gov=".tags.gov"
   local vpn=".tags.vpn"
   local cidr=".tags.cidr"
-  local tags='"Name;"+'"$name"'+",Site;"+'"$site"'+",Author;"+'"$author"'+",Reward;"+'"$reward"'+",Url;"+'"$url"'+",disabled;"+'"$disabled"'+",Added Date;"+'"$AddedDate"'+",recon;"+'"$recon"' +",source code;"+'"$source"' + ",Notes;"+'"$notes"'+ ",api;"+'"$api"'+",public;"+'"$public"'+",gov;"+'"$gov"'+",vpn;"+'"$vpn"'+",cidr;"+'"$cidr"
+  local tags='"Program Name;"+'"$name"'+",Site;"+'"$site"'+",Author;"+'"$author"'+",Reward;"+'"$reward"'+",Url;"+'"$url"'+",disabled;"+'"$disabled"'+",Added Date;"+'"$AddedDate"'+",recon;"+'"$recon"' +",source code;"+'"$source"' + ",Notes;"+'"$notes"'+ ",api;"+'"$api"'+",public;"+'"$public"'+",gov;"+'"$gov"'+",vpn;"+'"$vpn"'+",cidr;"+'"$cidr"
 
   local output
   output=$(bbrf show "$program" | jq "$tags" | tr -d '"' | sed 's/,/\n/g')

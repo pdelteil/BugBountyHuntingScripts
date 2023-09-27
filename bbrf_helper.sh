@@ -579,6 +579,8 @@ checkProgram() {
   if [[ -z "$1" ]]; then
     # If no argument was provided, print an error message and exit the function
     echo "Use ${FUNCNAME[0]} text"
+    echo "To display the detail of the program found (only if exact match was found)"
+    echo "Use ${FUNCNAME[0]} text -show"
     return 1
   fi
 
@@ -586,26 +588,36 @@ checkProgram() {
   text="$1"
   
   # Search for programs matching the text provided
-  output=$(bbrf programs --show-disabled --show-empty-scope)
+  programs=$(bbrf programs --show-disabled --show-empty-scope)
 
-  if [[ "$output" =~ "unauthorized" ]]; then
+  if [[ "$programs" =~ "unauthorized" ]]; then
         echo -en "${RED}BBRF unauthorized! Check user/password\n${ENDCOLOR}"
         return 1
   fi
-  output=$(echo "$output" |  grep -i "$text")
+  programs=$(echo "$programs"|grep -i "$text")
+  #output header
   result="Program Name;Site\n"
+
+  # Count the number of lines in $output using 'wc' command
+  count=$(echo "$programs" | wc -l)
+
+  # Check if the line count is 1
+  if [ "$count" -eq 1 ]; then
+    showProgram "$programs"
+    return 1
+  fi 
   while IFS= read -r line; do
     # Process each line of the output
     site=$(bbrf show "$line"|jq|grep site|awk -F":" '{print $2}'|tr -d ",\" ")
     #echo "$line;$site"
     result+="$line;$site\n"
 
-  done <<< "$output"
+  done <<< "$programs"
 
-  # If any programs were found, print them
-  if [[ ${#output} -gt 0 ]]; then
-      test=$(echo -e "$result")
-      print_table "$test"
+  # If more than 1 program was found, print them
+  if [[ ${#programs} -gt 1 ]]; then
+      program=$(echo -e "$result")
+      print_table "$program"
   # If no programs were found, print an error message
   else    
     echo -ne "${RED}No programs found! ${ENDCOLOR}\n\n"
@@ -721,7 +733,6 @@ showProgram()
         return 1
     fi
     program="$1"
-    #output=$(bbrf show "$program"|jq)
     output=$(show_program_tags "$program")
 
     if [[ ${#output} -gt 0 ]]; then
