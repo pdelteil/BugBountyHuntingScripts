@@ -374,8 +374,8 @@ addPrograms()
                  -t public:"$val_public" -t vpn:"$val_vpn" -t cidr:"$val_cidr" -t cidr_ranges:"$cidr_ranges")
 
         if [[ $result == *"conflict"* ]]; then
-            echo "Program already on BBRF!"
-            bbrf show "$program"|jq
+            echo -ne "${RED}Program already on BBRF!${ENDCOLOR}\n"
+            showProgram "$program"
             return 1
         fi
         echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
@@ -388,15 +388,18 @@ addPrograms()
             bbrf scope in -p "$program"
             echo -ne "${ENDCOLOR}\n"
         fi
-        echo -en "${YELLOW} Add OUT scope: ${ENDCOLOR}\n" 
-        read -r outscope_input
-        #if empty skip
-        if [[ ! -z "$outscope_input" ]]; then
-           bbrf outscope add $outscope_input -p "$program"
-           echo -ne "${RED} outscope: \n"
-           #just to check everything went well
-           bbrf scope out -p "$program"
-           echo -ne "${ENDCOLOR}\n"  
+        # if inscope has no wildcards dont ask for outscope
+        if [[ "$inscope_input" == *\*.* ]]; then
+            echo -en "${YELLOW} Add OUT scope: ${ENDCOLOR}\n" 
+            read -r outscope_input
+            #if empty skip
+            if [[ ! -z "$outscope_input" ]]; then
+               bbrf outscope add $outscope_input -p "$program"
+               echo -ne "${RED} outscope: \n"
+               #just to check everything went well
+               bbrf scope out -p "$program"
+               echo -ne "${ENDCOLOR}\n"  
+            fi
         fi
         if [[ ${#inscope_input} -gt 0 ]]; then
             echo -ne "${RED}Getting domains${ENDCOLOR}\n"
