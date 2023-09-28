@@ -594,13 +594,12 @@ checkProgram() {
         echo -en "${RED}BBRF unauthorized! Check user/password\n${ENDCOLOR}"
         return 1
   fi
-  programs=$(echo "$programs"|grep -i "$text")
+  programs=$(echo -n "$programs"|grep -i "$text")
   #output header
   result="Program Name;Site\n"
 
   # Count the number of lines in $output using 'wc' command
-  count=$(echo "$programs" | wc -l)
-
+  count=$(echo -n "$programs" | wc -l)
   # Check if the line count is 1
   if [ "$count" -eq 1 ]; then
     showProgram "$programs"
@@ -611,7 +610,6 @@ checkProgram() {
     site=$(bbrf show "$line"|jq|grep site|awk -F":" '{print $2}'|tr -d ",\" ")
     #echo "$line;$site"
     result+="$line;$site\n"
-
   done <<< "$programs"
 
   # If more than 1 program was found, print them
@@ -725,7 +723,7 @@ showActiveProgram()
     echo "$program" 
 
 }
-# displays details a given program
+# displays details of a given program
 showProgram()
 {
     if [[ -z "$1" ]]; then
@@ -739,23 +737,23 @@ showProgram()
         #output=$(echo "$output"|tr -d ":\",{}[]")
         print_table  "$output"
         #print_lines_in_colors "$output" 
-        return 0
+        #return 0
     else    
         echo -ne "${RED}$program not found! ${ENDCOLOR}\n\n"
         return 1
-        
     fi
-    
+
     flag="$2" 
     if [[ -z "$flag" ]]; then    
         return 1
     fi
    
     if [[ "$flag" == "-stats" ]]; then
-        domains=$(bbrf domains -p "$program"|wc -l)
+        echo -en "Calculating stats for $program ...\n"
+        domains=$(bbrf domains -p "$program"|wc -l )
         urls=$(bbrf urls -p "$program"|wc -l) 
-        echo -en "${YELLOW}#domains: "$domains "\n"
-        echo -en "#urls: "$urls"${ENDCOLOR}\n"
+        echo -en "\n${YELLOW}Domains: "$domains "\n"
+        echo -en "Urls: "$urls"${ENDCOLOR}\n"
         return 0
     else
         echo "Use ${FUNCNAME[0]} programName -stats [optional, displays number of urls and domains] "
