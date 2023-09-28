@@ -595,12 +595,13 @@ checkProgram() {
         echo -en "${RED}BBRF unauthorized! Check user/password\n${ENDCOLOR}"
         return 1
   fi
-  programs=$(echo -n "$programs"|grep -i "$text")
+  programs=$(echo "$programs"|grep -i "$text")
   #output header
   result="Program Name;Site\n"
-
+  #  echo "$programs"
   # Count the number of lines in $output using 'wc' command
   count=$(echo -n "$programs" | wc -l)
+  #echo $count
   # Check if the line count is 1
   if [ "$count" -eq 1 ]; then
     showProgram "$programs"
@@ -612,7 +613,6 @@ checkProgram() {
     #echo "$line;$site"
     result+="$line;$site\n"
   done <<< "$programs"
-
   # If more than 1 program was found, print them
   if [[ ${#programs} -gt 1 ]]; then
       program=$(echo -e "$result")
@@ -733,19 +733,22 @@ showProgram()
     fi
     program="$1"
     output=$(show_program_tags "$program")
+    flag="$2" 
 
+    #case but no flag stats
     if [[ ${#output} -gt 0 ]]; then
         #output=$(echo "$output"|tr -d ":\",{}[]")
         print_table  "$output"
         #print_lines_in_colors "$output" 
+     if [[ "$flag" != "-stats" ]]; then
         return 0
+     fi
     else    
         echo -ne "${RED}$program not found! ${ENDCOLOR}\n\n"
         #error
         return 1
     fi
 
-    flag="$2" 
     if [[ -z "$flag" ]]; then    
         return 1
     fi
