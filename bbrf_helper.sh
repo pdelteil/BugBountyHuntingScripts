@@ -178,6 +178,7 @@ getDomains()
             params="-p$2"
             #check if program exists
             show=$(showProgram "$2")
+            #stores the return value of the showProgram function
             status=$(echo $?)
             if [[ "$status" != "0" ]]; then
                 echo -ne "${RED}Program $2 does not exists!${ENDCOLOR}\n"
@@ -195,7 +196,6 @@ getDomains()
     scopeIn=$(bbrf scope in $params)
     echo "$scopeIn"|bbrf domain add - $params --show-new
     wild=$(bbrf scope in --wildcard $params| grep -v DEBUG)
-    # when there's no wildcard we don't need the next steps
     if [[ ${#wild} -gt 0 ]]; then
         echo "$wild"|bbrf inscope add - $params
         echo "$wild"|bbrf domain add - $params --show-new
@@ -249,15 +249,16 @@ getDomains()
 }
 
 # This function is used when adding a new program and after the getDomains function
+# getUrls PROGRAM
 # it requires httpx and httprobe
 getUrls()
 {
     threads=150
     if [[ -z "$1" ]]; then
         doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n')
-    else
+    else    
         program="$1"
-        doms=$(bbrf domains -p "program"|grep -v DEBUG|tr ' ' '\n')
+        doms=$(bbrf domains -p "$program"|grep -v DEBUG|tr ' ' '\n')
     fi
     if [[ ${#doms} -gt 0 ]]; then
         numDomains=$(echo "$doms"|wc -l)
@@ -737,9 +738,10 @@ showProgram()
         #output=$(echo "$output"|tr -d ":\",{}[]")
         print_table  "$output"
         #print_lines_in_colors "$output" 
-        #return 0
+        return 0
     else    
         echo -ne "${RED}$program not found! ${ENDCOLOR}\n\n"
+        #error
         return 1
     fi
 
