@@ -38,7 +38,6 @@ updateProgram()
     fi
     #check if the program has that rule 
     check=$(bbrf show "$program" | grep -i "$rule")
-
     #careful when the removed url is a subdomain of a wildcard rule
 
     if [[ ${#check} -gt 0 ]]; then
@@ -598,15 +597,18 @@ checkProgram() {
   programs=$(echo "$programs"|grep -i "$text")
   #output header
   result="Program Name;Site\n"
-  #  echo "$programs"
-  # Count the number of lines in $output using 'wc' command
-  count=$(echo -n "$programs" | wc -l)
-  #echo $count
+  if [ -z "$programs" ]; then
+      count=0
+  else
+      # Count the number of lines in $output using 'wc' command
+      count=$(echo  "$programs" | wc -l)
+  fi
+
   # Check if the line count is 1
   if [ "$count" -eq 1 ]; then
     showProgram "$programs"
     return 1
-  fi 
+  fi
   while IFS= read -r line; do
     # Process each line of the output
     site=$(bbrf show "$line"|jq|grep site|awk -F":" '{print $2}'|tr -d ",\" ")
