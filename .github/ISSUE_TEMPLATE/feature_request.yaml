@@ -9,6 +9,21 @@ body:
       value: |
         Thanks for taking the time!
   - type: dropdown
+    id: helper
+    attributes:
+      label: Affected helper
+      description: Where to write code
+      options:
+        - amass_helper
+        - axiom_helper
+        - bbrf_helper
+        - general_helper
+        - nuclei_helper
+        - setup
+      default: 2
+    validations:
+      required: true
+  - type: dropdown
     id: type
     attributes:
       label: Priority
