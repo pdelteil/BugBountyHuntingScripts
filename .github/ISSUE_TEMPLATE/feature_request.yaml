@@ -1,0 +1,30 @@
+name: New feature
+description: Add a new feature
+title: "[ Feature ]  "
+assignees:
+  - pdelteil
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time!
+  - type: dropdown
+    id: type
+    attributes:
+      label: Priority
+      description: How fast do you need it?
+      options:
+        - High
+        - Medium
+        - Low
+      default: 2
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of new  feature
+      placeholder: Description of new  feature     
+    validations:
+      required: true
+
