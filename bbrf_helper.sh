@@ -887,9 +887,9 @@ getProgramData() {
     for line in "${output[@]}"; do
         # Print the line with a different color on each iteration
         if [ $((i % 2)) -eq 0 ]; then
-            echo "${RED}$line${ENDCOLOR}"
+            echo -ne "${RED}$line${ENDCOLOR}\n"
         else
-            echo "${YELLOW}$line${ENDCOLOR}"
+            echo -ne "${YELLOW}$line${ENDCOLOR}\n"
         fi
         i=$((i + 1))
     done
