@@ -534,3 +534,7 @@ fi
 
 }
 
+# replaces newlines for spaces
+flatten() {
+    tr '\n' ' '
+}
