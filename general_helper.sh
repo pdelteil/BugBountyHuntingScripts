@@ -484,3 +484,53 @@ check_latest_version() {
         fi
     fi
 }
+
+# create tmux instance with a given name
+# Example
+# Create tmux session called "mySession"
+# createTmux mySession
+function createTmux()
+{
+    if [[ -z "$1" ]]; then
+      echo -e "Create tmux session with given name \n Use ${FUNCNAME[0]} TMUX_NAME"
+      return 1
+    fi
+    tmux new -s "$1"
+}
+
+function attachTmux()
+{
+
+IFS=$'\n'
+sessions=($(tmux ls ))
+
+# Show enumerated tmux sessions
+if [ ${#sessions[@]} -eq 0 ]; then
+    echo "No tmux sessions found."
+else
+    echo "Available tmux sessions:"
+    for i in "${!sessions[@]}"; do
+        echo "[$i] ${sessions[$i]}"
+    done
+
+    # Prompt user to choose a session ID
+    read -p "Enter the ID of the session to attach: " session_id
+
+    # Validate user input
+    if ! [[ "$session_id" =~ ^[0-9]+$ ]]; then
+        echo "Invalid session ID. Please enter a valid numeric ID."
+        exit 1
+    fi
+
+    if [ "$session_id" -ge 0 ] && [ "$session_id" -lt "${#sessions[@]}" ]; then
+        chosen_session="${sessions[$session_id]}"
+        chosen_session=$(echo $chosen_session|awk -F: '{print $1}')
+        tmux attach -t "$chosen_session"
+    else
+        echo "Invalid session ID. Please enter a valid ID within the range."
+        exit 1
+    fi
+fi
+
+}
+
