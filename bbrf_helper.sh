@@ -677,6 +677,8 @@ listTagValues()
 
     tag="$1"
     IFS=$'\n'
+    cond = ".tags.$tag"
+
     for program in $(bbrf programs --show-disabled); do 
         key=$(bbrf show "$program"|jq '.tags.site')
         echo -n '.'
