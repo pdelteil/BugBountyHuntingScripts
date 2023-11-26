@@ -1083,16 +1083,16 @@ URL="https://raw.githubusercontent.com/trickest/resolvers/main/resolvers.txt"
 wget -q $URL -O "$store/resolvers.txt"
 
 for i in $(bbrf programs);do 
-    echo "Cleaning domains in program $i"
+    echo -ne "${YELLOW}Cleaning domains in program $i ${ENDCOLOR}\n"
     p="$i"
     oldDomains="$store/domains.$p.txt" 
     resolvedDomains="$store/domains.$p.resolved.txt"
     toRemoveDomains="$store/diff.domains.$p.txt"
     bbrf domains -p "$p" > "$oldDomains"
-    dnsx -l "$oldDomains" -t $threads -silent -o "$resolvedDomains" -r "$store/resolvers.txt"
+    dnsx -l "$oldDomains" -t $threads -silent -o "$resolvedDomains" -r "$store/resolvers.txt" -retry 4
     diffFiles "$oldDomains" "$resolvedDomains" "$toRemoveDomains"
     num=$(wc -l "$toRemoveDomains"|getField 1)
-    echo "Removing $num domains"
+    echo -ne "${RED}Removing $num domains ${ENDCOLOR}\n"
     cat "$toRemoveDomains"|bbrf domain remove -
     echo "----------------------------------------"
 done

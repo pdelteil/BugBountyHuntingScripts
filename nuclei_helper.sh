@@ -18,6 +18,19 @@ testNucleiTemplate()
     debugFlag="-debug"
   fi
 
+  # Get path to locate database and its age
+  dbpath=$(locate --statistics | head -n 1|awk '{print $2}')
+  db_age=$(stat -c %Y $dbpath)
+  curr_time=$(date +%s)
+  age_diff=$(( curr_time - db_age ))
+  age=$(( age_diff / 60 ))
+  # Prompt user to update database if it is older than 2 hours
+  read -p "Locate database is older than $age_diff seconds. Update database (this could take a while) (y/n)? " update_db
+  if [[ "$update_db" == "y" ]]; then
+      echo "Updating locate db"
+      sudo updatedb
+  fi
+
   pathToTemplate=$(locate "$templateID" | grep yaml | head -n 1) 
   echo "nuclei $debugFlag -t $pathToTemplate -u $URL -itags fuzz,dos"
   nuclei $debugFlag -t "$pathToTemplate" -u "$URL" -itags fuzz,dos
