@@ -882,10 +882,12 @@ getUrlsWithProgramTag()
 # getProgramData bugcrowd points urls
 getProgramData() {
   rewards=(money points thanks)
+  IFS=$'\n'
+
   # Check if required arguments are provided
   if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
     output=("Usage: ${FUNCNAME[0]} SITE REWARD TYPE" "  SITE: (intigriti, bugcrowd, h1, yeswehack or all)" "  REWARDS: (money, points, thanks or all)" \
-            "  TYPE: (inscope, outscope, urls, domains, ips)" "    Example: ${FUNCNAME[0]} bugcrowd money names" "             ${FUNCNAME[0]} bugcrowd points urls" "             ${FUNCNAME[0]} all points inscope")
+            "  TYPE: (names, inscope, inscope-wilcards, outscope, urls, domains, ips)" "    Example: ${FUNCNAME[0]} bugcrowd money names" "             ${FUNCNAME[0]} bugcrowd points urls" "             ${FUNCNAME[0]} all points inscope")
     for line in "${output[@]}"; do
         # Print the line with a different color on each iteration
         if [ $((i % 2)) -eq 0 ]; then
@@ -908,7 +910,11 @@ getProgramData() {
   case "$type" in
     inscope)
       echo -e "Getting inscope data" >&2
-      data=("scope" "in" "--wildcard")
+      data=("scope" "in")
+      ;;
+    inscope-wildcards)
+      echo -e "Getting inscope wildcards data" >&2
+      data=("scope" "in" "wildcards")
       ;;
     outscope)
       echo -e "Getting outscope data" >&2
@@ -931,12 +937,11 @@ getProgramData() {
       data=("")
       ;;
     *)
-      echo -e "Invalid type provided. Valid options are: names, inscope, outscope, urls, domains, ips" >&2
+      echo -e "Invalid type provided. Valid options are: names, inscope, inscope-wildcards, outscope, urls, domains, ips" >&2
       return 1
       ;;
   esac
   echo "$data"
-  IFS=$'\n'
 
   if [[ "$site" == "all" ]] && [[ "$reward" != "all" ]]; then
       local allPrograms=$(bbrf programs where reward is "$reward")
@@ -951,6 +956,12 @@ getProgramData() {
   else
       # Get all programs for the provided site
       local allPrograms=$(bbrf programs where site is "$site")
+      #workaround 
+      size=$(echo "$allPrograms"|wc -l)
+      if [[ $size -eq 1 ]];then
+        echo -ne "${RED}$site not found!${ENDCOLOR}\n"
+        return 1
+      fi
   fi
 
   # Loop through programs and get data based on type and reward
@@ -963,7 +974,7 @@ getProgramData() {
       if [[ "$rewardInfo" == "$reward" ]] || [[ "$reward" == "all" ]]; then
         echo "$program, $url"
       fi
-    # different the names 
+    # when type is not names 
     elif [[ "$rewardInfo" == "$reward" ]] || [[ "$reward" == "all" ]]; then
       bbrf "${data[@]}" -p "$program"
     fi
