@@ -11,7 +11,7 @@ AXIOM_PATH="$HOME/.axiom"
 # 
 showLogs()
 {
-    modules=(httpx nuclei puredns-bruteforce shuffledns waybackurls amass)
+    modules=(httpx nuclei puredns-bruteforce shuffledns waybackurls amass subfinder)
     if [[ -z "$1" ]]; then
         echo -e "\nUse ${FUNCNAME[0]} axiomModule -stats (optional, will show only number of output values)"
         echo -en "${YELLOW}Supported modules\n"
@@ -61,6 +61,13 @@ showLogs()
     
     #shuffledns
     elif [[ $axiomModule = "shuffledns" ]]; then
+        if [[ ${#log_path} -gt 5 ]]; then
+            cd $log_path
+            cat $log_path/*|grep -v 'INF\|WRN\|projectdiscovery'
+        fi
+    #elif end
+    #subfinder
+     elif [[ $axiomModule = "subfinder" ]]; then
         if [[ ${#log_path} -gt 5 ]]; then
             cd $log_path
             cat $log_path/*|grep -v 'INF\|WRN\|projectdiscovery'
