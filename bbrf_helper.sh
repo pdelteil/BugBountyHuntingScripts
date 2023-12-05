@@ -911,10 +911,13 @@ getProgramData() {
     inscope)
       echo -e "Getting inscope data" >&2
       data=("scope" "in")
+      #additional command
+      cmd=("grep" "-v" "'\*'")
       ;;
     inscope-wildcards)
+      #only show inscope with wildcards 
       echo -e "Getting inscope wildcards data" >&2
-      data=("scope" "in" "wildcards")
+      data=("scope" "in" "--wildcards")
       ;;
     outscope)
       echo -e "Getting outscope data" >&2
@@ -941,7 +944,7 @@ getProgramData() {
       return 1
       ;;
   esac
-  echo "$data"
+  #echo "${data[@]}"
 
   if [[ "$site" == "all" ]] && [[ "$reward" != "all" ]]; then
       local allPrograms=$(bbrf programs where reward is "$reward")
@@ -976,7 +979,12 @@ getProgramData() {
       fi
     # when type is not names 
     elif [[ "$rewardInfo" == "$reward" ]] || [[ "$reward" == "all" ]]; then
-      bbrf "${data[@]}" -p "$program"
+      if [[ "$type" == "inscope" ]]; then
+          (bbrf "${data[@]}" -p "$program" |grep -v "*")
+      else
+          bbrf "${data[@]}" -p "$program"
+      fi
+
     fi
   done
 }
