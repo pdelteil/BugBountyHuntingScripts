@@ -333,7 +333,7 @@ getCNFromCerts()
 # to find new domains. This function first uses flat country TLDs and in a second iterating tests for com.tld (cases like com.ar, com.br, com.pe, etc)
 getTLDs()
 {
-    URL="https://raw.githubusercontent.com/datasets/top-level-domain-names/master/top-level-domain-names.csv"
+    URL="https://raw.githubusercontent.com/pdelteil/top-level-domain-names/master/top-level-domain-names.csv"
     FILE="/tmp/top-level-domain-names.csv"
 
     if [[ -z "$1" ]]; then

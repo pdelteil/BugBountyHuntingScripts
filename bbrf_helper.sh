@@ -911,8 +911,6 @@ getProgramData() {
     inscope)
       echo -e "Getting inscope data" >&2
       data=("scope" "in")
-      #additional command
-      cmd=("grep" "-v" "'\*'")
       ;;
     inscope-wildcards)
       #only show inscope with wildcards 
@@ -980,6 +978,7 @@ getProgramData() {
     # when type is not names 
     elif [[ "$rewardInfo" == "$reward" ]] || [[ "$reward" == "all" ]]; then
       if [[ "$type" == "inscope" ]]; then
+           echo -e "Program $program " >&2
           (bbrf "${data[@]}" -p "$program" |grep -v "*")
       else
           bbrf "${data[@]}" -p "$program"
