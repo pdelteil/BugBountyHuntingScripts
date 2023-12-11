@@ -252,11 +252,11 @@ getDomains()
 # it requires httpx and httprobe
 getUrls()
 {
-    threads=150
+    threads=200
     if [[ -z "$1" ]]; then
         doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n')
     else    
-        program="$1"
+        program="$2"
         doms=$(bbrf domains -p "$program"|grep -v DEBUG|tr ' ' '\n')
     fi
     if [[ ${#doms} -gt 0 ]]; then
