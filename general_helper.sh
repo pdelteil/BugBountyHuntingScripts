@@ -542,7 +542,7 @@ flatten() {
 getWayMoreUrls()
 {
     domain="$1"
-    installedPath="~/software/waymore/waymore.py"
+    installedPath="$HOME/software/waymore/waymore.py"
     python3 "$installedPath" -i "$domain" -mode U
 }
 getWayBackUrls()
