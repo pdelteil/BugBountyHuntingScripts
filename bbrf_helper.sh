@@ -594,34 +594,36 @@ checkProgram() {
         echo -en "${RED}BBRF unauthorized! Check user/password\n${ENDCOLOR}"
         return 1
   fi
-  programs=$(echo "$programs"|grep -i "$text")
+  #matches $text in programs names
+  matchedPrograms=$(echo "$programs"|grep -i "$text")
   #output header
   result="Program Name;Site\n"
-  if [ -z "$programs" ]; then
+  if [[ -z "$matchedPrograms" ]]; then
       count=0
   else
       # Count the number of lines in $output using 'wc' command
-      count=$(echo  "$programs" | wc -l)
+      count=$(echo "$matchedPrograms" | wc -l)
   fi
 
   # Check if the line count is 1
-  if [ "$count" -eq 1 ]; then
-    showProgram "$programs"
+  # Displays the details of the program and then exits
+  if [[ "$count" -eq 1 ]]; then
+    showProgram "$matchedPrograms"
     return 1
   fi
-  while IFS= read -r line; do
+  #get site of matched programs 
+  while IFS= read -r program; do
     # Process each line of the output
-    site=$(bbrf show "$line"|jq|grep site|awk -F":" '{print $2}'|tr -d ",\" ")
-    #echo "$line;$site"
-    result+="$line;$site\n"
-  done <<< "$programs"
+    site=$(bbrf show "$program"|jq|grep site|awk -F":" '{print $2}'|tr -d ",\" ")
+    result+="$program;$site\n"
+  done <<< "$matchedPrograms"
   # If more than 1 program was found, print them
-  if [[ ${#programs} -gt 1 ]]; then
+  if [[ ${#matchedPrograms} -gt 1 ]]; then
       program=$(echo -e "$result")
       print_table "$program"
   # If no programs were found, print an error message
   else    
-    echo -ne "${RED}No programs found! ${ENDCOLOR}\n\n"
+        echo -ne "${RED}No programs found! ${ENDCOLOR}\n\n"
   fi
 }
 
