@@ -252,7 +252,7 @@ getDomains()
 # it requires httpx and httprobe
 getUrls()
 {
-    threads=200
+    threads=500
     if [[ -z "$1" ]]; then
         doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n')
     else    
@@ -915,7 +915,7 @@ getProgramData() {
     inscope-wildcards)
       #only show inscope with wildcards 
       echo -e "Getting inscope wildcards data" >&2
-      data=("scope" "in" "--wildcards")
+      data=("scope" "in" "--wildcard")
       ;;
     outscope)
       echo -e "Getting outscope data" >&2
@@ -949,8 +949,8 @@ getProgramData() {
   
   elif [[ "$site" == "all" ]] && [[ "$reward" == "all" ]]; then
       for ((i=0; i< ${#rewards[@]}; i++)); do
-          temp=$(echo "${rewards[$i]}")
-          programs=$(bbrf programs where reward is "$temp")
+          reward=$(echo "${rewards[$i]}")
+          programs=$(bbrf programs where reward is "$reward")
           allPrograms+="$programs "
       done
   
@@ -981,7 +981,7 @@ getProgramData() {
            echo -e "Program $program " >&2
           (bbrf "${data[@]}" -p "$program" |grep -v "*")
       else
-          bbrf "${data[@]}" -p "$program"
+          (bbrf "${data[@]}" -p "$program")
       fi
 
     fi
