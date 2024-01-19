@@ -53,7 +53,7 @@ showLogs()
         if [[ ${#log_path} -gt 5 ]]; then
             cd $log_path
             #nuclei especific grep rules 
-            cat $log_path/*|grep $year|grep -v Unsolicited
+            cat $log_path/*|grep $year|grep -v Unsolicited|sort -k1
         else 
             echo "$axiomModule $error"
 
