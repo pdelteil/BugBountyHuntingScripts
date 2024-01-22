@@ -884,6 +884,7 @@ getUrlsWithProgramTag()
 # getProgramData bugcrowd points urls
 getProgramData() {
   rewards=(money points thanks)
+  allPrograms=""
   IFS=$'\n'
 
   # Check if required arguments are provided
@@ -952,6 +953,7 @@ getProgramData() {
   elif [[ "$site" == "all" ]] && [[ "$reward" == "all" ]]; then
       for ((i=0; i< ${#rewards[@]}; i++)); do
           reward=$(echo "${rewards[$i]}")
+          echo -e "Getting programs with reward ${rewards[$i]}" >&2
           programs=$(bbrf programs where reward is "$reward")
           allPrograms+="$programs "
       done
