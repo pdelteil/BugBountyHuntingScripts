@@ -1,4 +1,4 @@
-# shell script functions to be loaded on your bashrc file
+*# shell script functions to be loaded on your bashrc file
 
 # Set the text colors
 RED=$(tput setaf 1) # red
@@ -880,7 +880,7 @@ getUrlsWithProgramTag()
 
 # retrieve programs data (type, with values 'inscope', 'outscope', 'urls', 'domains', 'ips') 
 # based on 2 conditions: site (intigriti, bugcrowd, h1, etc) and reward (money, points, thanks) 
-# getProgramData bugcrowd money names
+# -getProgramData bugcrowd money names
 # getProgramData bugcrowd points urls
 getProgramData() {
   rewards=(money points thanks)
@@ -952,9 +952,9 @@ getProgramData() {
   
   elif [[ "$site" == "all" ]] && [[ "$reward" == "all" ]]; then
       for ((i=0; i< ${#rewards[@]}; i++)); do
-          reward=$(echo "${rewards[$i]}")
+          rewardValue=$(echo "${rewards[$i]}")
           echo -e "Getting programs with reward ${rewards[$i]}" >&2
-          programs=$(bbrf programs where reward is "$reward")
+          programs=$(bbrf programs where reward is "$rewardValue")
           allPrograms+="$programs "
       done
   
@@ -973,7 +973,7 @@ getProgramData() {
   for program in $(echo "$allPrograms"); do
     local description=$(bbrf show "$program")
     local rewardInfo=$(echo "$description" | jq -r '.tags.reward')
-
+ 
     if [[ "$type" == "names" ]]; then
       local url=$(echo "$description" | jq -r '.tags.url')
       if [[ "$rewardInfo" == "$reward" ]] || [[ "$reward" == "all" ]]; then
