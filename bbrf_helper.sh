@@ -614,7 +614,7 @@ checkProgram() {
   #get site of matched programs 
   while IFS= read -r program; do
     # Process each line of the output
-    site=$(bbrf show "$program"|jq|grep site|awk -F":" '{print $2}'|tr -d ",\" ")
+    site=$(bbrf show "$program"|jq|grep '"site"'|awk -F":" '{print $2}'|tr -d ",\" ")
     result+="$program;$site\n"
   done <<< "$matchedPrograms"
   # If more than 1 program was found, print them
