@@ -1,4 +1,4 @@
-*# shell script functions to be loaded on your bashrc file
+# shell script functions to be loaded on your bashrc file
 
 # Set the text colors
 RED=$(tput setaf 1) # red
@@ -880,7 +880,7 @@ getUrlsWithProgramTag()
 
 # retrieve programs data (type, with values 'inscope', 'outscope', 'urls', 'domains', 'ips') 
 # based on 2 conditions: site (intigriti, bugcrowd, h1, etc) and reward (money, points, thanks) 
-# -getProgramData bugcrowd money names
+# getProgramData bugcrowd money names
 # getProgramData bugcrowd points urls
 getProgramData() {
   rewards=(money points thanks)
@@ -955,6 +955,7 @@ getProgramData() {
           rewardValue=$(echo "${rewards[$i]}")
           echo -e "Getting programs with reward ${rewards[$i]}" >&2
           programs=$(bbrf programs where reward is "$rewardValue")
+          echo -e "Found " $(echo "$programs"|wc -l) >&2
           allPrograms+="$programs "
       done
   
