@@ -5,6 +5,8 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 function show_program_tags() {
   program="$1"
+  local s1=":"
+  local s2=";"
   local name="._id"
   local site=".tags.site"
   local author=".tags.author"
@@ -20,15 +22,19 @@ function show_program_tags() {
   local gov=".tags.gov"
   local vpn=".tags.vpn"
   local cidr=".tags.cidr"
-  local tags='"Program Name;"+'"$name"'+",Site;"+'"$site"'+",Author;"+'"$author"'+",Reward;"+'"$reward"'+",Url;"+'"$url"'+",disabled;"+'"$disabled"'+",Added Date;"+'"$AddedDate"'+",recon;"+'"$recon"' +",source code;"+'"$source"' + ",Notes;"+'"$notes"'+ ",api;"+'"$api"'+",public;"+'"$public"'+",gov;"+'"$gov"'+",vpn;"+'"$vpn"'+",cidr;"+'"$cidr"
+  local tags='"Program Name'"$s1"'"+'"$name"'+"'"$s2"'Site'"$s1"'"+'"$site"'+"'"$s2"'Author'"$s1"'"+'"$author"'+"'"$s2"'Reward'"$s1"'"+'"$reward"'+"'"$s2"'Url'"$s1"'"+'"$url"'+"'"$s2"'disabled'"$s1"'"+'"$disabled"'+"'"$s2"'Added Date'"$s1"'"+'"$AddedDate"'+"'"$s2"'recon'"$s1"'"+'"$recon"' +"'"$s2"'source code'"$s1"'"+'"$source"' + "'"$s2"'Notes'"$s1"'"+'"$notes"'+ "'"$s2"'api'"$s1"'"+'"$api"'+"'"$s2"'public'"$s1"'"+'"$public"'+"'"$s2"'gov'"$s1"'"+'"$gov"'+"'"$s2"'vpn'"$s1"'"+'"$vpn"'+"'"$s2"'cidr'"$s1"'"+'"$cidr"
 
   local output
-  output=$(bbrf show "$program" | jq "$tags" | tr -d '"' | sed 's/,/\n/g')
+  #easy way to debug
+  #echo "$tags" >> /tmp/log.txt
+
+  output=$(bbrf show "$program" | jq "$tags" | tr -d '"' | sed "s/$s2/\n/g")
   echo "$output"
 }
 
 print_table() {
     var="$1"
+    separator=':'
     # Split the variable into lines
     IFS=$'\n' read -rd '' -a lines <<< "$var"
     # Define an array of colors for each column
@@ -58,7 +64,7 @@ print_table() {
 
     # Calculate the maximum width of each column
     for line in "${lines[@]}"; do
-      IFS=';' read -ra fields <<< "$line"
+      IFS="$separator" read -ra fields <<< "$line"
       for ((i = 0; i < ${#fields[@]}; i++)); do
         field="${fields[i]}"
         width=${#field}
@@ -72,7 +78,7 @@ print_table() {
     print_horizontal_line
 
     # Print the table header with colors
-    IFS=';' read -ra header_fields <<< "${lines[0]}"
+    IFS="$separator" read -ra header_fields <<< "${lines[0]}"
     for i in "${!colors[@]}"; do
       print_cell "${header_fields[i]}" "${max_widths[i]}" "${colors[i]}"
     done
@@ -83,7 +89,7 @@ print_table() {
     
     # Print each line as a row in the table with colors
     for line in "${lines[@]:1}"; do
-      IFS=';' read -ra fields <<< "$line"
+      IFS="$separator" read -ra fields <<< "$line"
       for i in "${!colors[@]}"; do
         value="${fields[i]}"
         print_cell "$value" "${max_widths[i]}" "${colors[i]}"
