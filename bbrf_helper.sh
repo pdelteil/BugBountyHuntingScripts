@@ -586,7 +586,7 @@ checkProgram() {
 
   # Set the text variable to the argument provided
   text="$1"
-  
+  separator=":"
   # Search for programs matching the text provided
   programs=$(bbrf programs --show-disabled --show-empty-scope)
 
@@ -597,7 +597,7 @@ checkProgram() {
   #matches $text in programs names
   matchedPrograms=$(echo "$programs"|grep -i "$text")
   #output header
-  result="Program Name;Site\n"
+  result="Program Name $separator Site\n"
   if [[ -z "$matchedPrograms" ]]; then
       count=0
   else
@@ -615,7 +615,7 @@ checkProgram() {
   while IFS= read -r program; do
     # Process each line of the output
     site=$(bbrf show "$program"|jq|grep '"site"'|awk -F":" '{print $2}'|tr -d ",\" ")
-    result+="$program;$site\n"
+    result+="$program $separator $site\n"
   done <<< "$matchedPrograms"
   # If more than 1 program was found, print them
   if [[ ${#matchedPrograms} -gt 1 ]]; then
