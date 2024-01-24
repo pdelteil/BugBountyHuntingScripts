@@ -5,7 +5,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 function show_program_tags() {
   program="$1"
-  local s1=":"
+  local s1="="
   local s2=";"
   local name="._id"
   local site=".tags.site"
@@ -34,7 +34,7 @@ function show_program_tags() {
 
 print_table() {
     var="$1"
-    separator=':'
+    separator='='
     # Split the variable into lines
     IFS=$'\n' read -rd '' -a lines <<< "$var"
     # Define an array of colors for each column

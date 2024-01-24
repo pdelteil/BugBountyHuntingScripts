@@ -586,7 +586,7 @@ checkProgram() {
 
   # Set the text variable to the argument provided
   text="$1"
-  separator=":"
+  separator="="
   # Search for programs matching the text provided
   programs=$(bbrf programs --show-disabled --show-empty-scope)
 
