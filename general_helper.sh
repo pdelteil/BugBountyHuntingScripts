@@ -391,13 +391,12 @@ findIpsInDomains()
   # Check if the filename argument is empty
   if [[ -z "$1" ]]; then
     # Print a usage message and return an error code if the argument is empty
-    echo "Use ${FUNCNAME[0]} filename"
-    return 1
+    echo "Use ${FUNCNAME[0]} filename" return 1
   fi
    
   input_file="$1"
   # Read the contents of the file and search for lines that contain an IP address in the format "X.X.X.X", where X is a number between 0 and 255.
-  cat "input_file" | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+  cat "$input_file" | grep -E '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
 }
 
 # Remove color codes from text
