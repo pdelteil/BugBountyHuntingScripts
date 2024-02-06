@@ -11,7 +11,7 @@ AXIOM_PATH="$HOME/.axiom"
 # 
 showLogs()
 {
-    modules=(httpx nuclei puredns-bruteforce shuffledns waybackurls amass subfinder)
+    modules=(httpx nuclei puredns-bruteforce shuffledns waybackurls amass subfinder naabu)
     if [[ -z "$1" ]]; then
         echo -e "\nUse ${FUNCNAME[0]} axiomModule -stats (optional, will show only number of output values)"
         echo -en "${YELLOW}Supported modules\n"
@@ -84,6 +84,19 @@ showLogs()
     #elif end
     #httpx
     elif [[ $axiomModule = "httpx" ]]; then
+        if [[ ${#log_path} -gt 5 ]]; then
+            cd $log_path
+            if [[ "$stats" == "-stats" ]]; then
+                wc -l *
+            else
+               tail -f *
+            fi
+        else 
+            echo "$axiomModule $error"
+        fi
+    #elif end
+    #naabu
+    elif [[ $axiomModule = "naabu" ]]; then
         if [[ ${#log_path} -gt 5 ]]; then
             cd $log_path
             if [[ "$stats" == "-stats" ]]; then
