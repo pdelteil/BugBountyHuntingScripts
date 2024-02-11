@@ -948,20 +948,20 @@ getProgramData() {
   #echo "${data[@]}"
 
   if [[ "$site" == "all" ]] && [[ "$reward" != "all" ]]; then
-      local allPrograms=$(bbrf programs where reward is "$reward")
+      local allPrograms=$(bbrf programs where reward is "$reward" --show-empty-scope)
   
   elif [[ "$site" == "all" ]] && [[ "$reward" == "all" ]]; then
       for ((i=0; i< ${#rewards[@]}; i++)); do
           rewardValue=$(echo "${rewards[$i]}")
           echo -e "Getting programs with reward ${rewards[$i]}" >&2
-          programs=$(bbrf programs where reward is "$rewardValue")
+          programs=$(bbrf programs where reward is "$rewardValue" --show-empty-scope)
           echo -e "Found " $(echo "$programs"|wc -l) >&2
           allPrograms+="$programs "
       done
   
   else
       # Get all programs for the provided site
-      local allPrograms=$(bbrf programs where site is "$site")
+      local allPrograms=$(bbrf programs where site is "$site" --show-empty-scope)
       #workaround 
       size=$(echo "$allPrograms"|wc -l)
       if [[ $size -eq 1 ]];then
