@@ -1,6 +1,7 @@
 #functions for h1
 
 #get the inscope rules from the csv file obtained from program's detail
+#This can be done with HackerOne's API using structured_scopes
 H1_getScopefromCsv()
 {
     input=$1
