@@ -262,7 +262,8 @@ getUrls()
     if [[ ${#doms} -gt 0 ]]; then
         numDomains=$(echo "$doms"|wc -l)
         echo -en "${RED} Using httpx in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
-        echo "$doms"|httpx -silent -threads $threads|bbrf url add - -s httpx --show-new
+        #only using HEAD method, since in this step we just care about resolving URLS
+        echo "$doms"|httpx -x HEAD -update -silent -threads $threads|bbrf url add - -s httpx --show-new
         echo -en "${RED} Using httprobe in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
         echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new
     fi
