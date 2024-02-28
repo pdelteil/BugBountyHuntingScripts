@@ -219,9 +219,9 @@ getDomains()
             fi
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [[ "$fileMode" = true ]]; then
-                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
+                echo "$wild"|subfinder -update -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
             else
-                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
+                echo "$wild"|subfinder -update -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
             fi
  
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
