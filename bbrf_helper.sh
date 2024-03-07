@@ -219,9 +219,9 @@ getDomains()
             fi
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [[ "$fileMode" = true ]]; then
-                echo "$wild"|subfinder -update -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
+                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
             else
-                echo "$wild"|subfinder -update -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
+                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
             fi
  
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
@@ -263,7 +263,7 @@ getUrls()
         numDomains=$(echo "$doms"|wc -l)
         echo -en "${RED} Using httpx in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
         #only using HEAD method, since in this step we just care about resolving URLS
-        echo "$doms"|httpx -x HEAD -update -silent -threads $threads|bbrf url add - -s httpx --show-new
+        echo "$doms"|httpx -x HEAD -silent -threads $threads|bbrf url add - -s httpx --show-new
         echo -en "${RED} Using httprobe in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
         echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new
     fi
@@ -370,7 +370,7 @@ addPrograms()
         read notes
 
         result=$(bbrf new "$program" -t site:"$site" -t reward:"$val" -t url:"$url" -t recon:"$val_recon" \
-                 -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" \
+                 -t android:"$val_android" -t iOS:"$val_iOS" -t sourceCode:"$val_source" -t addedDate:"$addedDate" -t lastUpdate:"$lastUpdate" \
                  -t author:"$author" -t notes:"$notes" -t api:"$val_api" -t api_endpoints:"$api_endpoints" \
                  -t public:"$val_public" -t vpn:"$val_vpn" -t cidr:"$val_cidr" -t cidr_ranges:"$cidr_ranges")
 
