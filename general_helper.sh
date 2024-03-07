@@ -13,16 +13,18 @@ function show_program_tags() {
   local reward=".tags.reward"
   local url=".tags.url"
   local AddedDate=".tags.addedDate"
+  local lastUpdate=".tags.lastUpdate"
   local disabled="(.disabled|tostring)"
   local recon="(.tags.recon|tostring)"
   local source="(.tags.sourceCode|tostring)"
   local notes=".tags.notes"
   local api=".tags.api"
-  local public=".tags.public"
+  local pub=".tags.public"
   local gov=".tags.gov"
   local vpn=".tags.vpn"
   local cidr=".tags.cidr"
-  local tags='"Program Name'"$s1"'"+'"$name"'+"'"$s2"'Site'"$s1"'"+'"$site"'+"'"$s2"'Author'"$s1"'"+'"$author"'+"'"$s2"'Reward'"$s1"'"+'"$reward"'+"'"$s2"'Url'"$s1"'"+'"$url"'+"'"$s2"'disabled'"$s1"'"+'"$disabled"'+"'"$s2"'Added Date'"$s1"'"+'"$AddedDate"'+"'"$s2"'recon'"$s1"'"+'"$recon"' +"'"$s2"'source code'"$s1"'"+'"$source"' + "'"$s2"'Notes'"$s1"'"+'"$notes"'+ "'"$s2"'api'"$s1"'"+'"$api"'+"'"$s2"'public'"$s1"'"+'"$public"'+"'"$s2"'gov'"$s1"'"+'"$gov"'+"'"$s2"'vpn'"$s1"'"+'"$vpn"'+"'"$s2"'cidr'"$s1"'"+'"$cidr"
+    # add +"'"$s2"'String'"$s1"'"+'"$var"'
+  local tags='"Program Name'"$s1"'"+'"$name"'+"'"$s2"'Site'"$s1"'"+'"$site"'+"'"$s2"'Author'"$s1"'"+'"$author"'+"'"$s2"'Reward'"$s1"'"+'"$reward"'+"'"$s2"'Url'"$s1"'"+'"$url"'+"'"$s2"'disabled'"$s1"'"+'"$disabled"'+"'"$s2"'Added Date'"$s1"'"+'"$AddedDate"'+"'"$s2"'Last Update'"$s1"'"+'"$lastUpdate"'+"'"$s2"'recon'"$s1"'"+'"$recon"' +"'"$s2"'source code'"$s1"'"+'"$source"' + "'"$s2"'Notes'"$s1"'"+'"$notes"'+ "'"$s2"'api'"$s1"'"+'"$api"'+"'"$s2"'public'"$s1"'"+'"$pub"'+"'"$s2"'gov'"$s1"'"+'"$gov"'+"'"$s2"'vpn'"$s1"'"+'"$vpn"'+"'"$s2"'cidr'"$s1"'"+'"$cidr"
 
   local output
   #easy way to debug
