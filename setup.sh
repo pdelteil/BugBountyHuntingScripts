@@ -56,6 +56,7 @@ addtoBashrc nuclei_helper.sh $shellConfig
 addtoBashrc general_helper.sh $shellConfig
 addtoBashrc axiom_helper.sh $shellConfig
 addtoBashrc amass_helper.sh $shellConfig
+addtoBashrc hackerone_helper.sh $shellConfig
 
 # Define the lines to be added GO CONFIG
 lines_to_add="export GOROOT=/usr/local/go
