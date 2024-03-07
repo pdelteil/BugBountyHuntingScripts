@@ -200,7 +200,7 @@ getDomains()
         echo "$wild"|bbrf domain add - $params --show-new
 
         echo -ne "${RED} Running amass ${ENDCOLOR}\n"
-        if [ -f "$AMASS_CONFIG" ]; then
+        if [[ -f "$AMASS_CONFIG" ]]; then
             :  #echo -ne "\t ${YELLOW} amass using $AMASS_CONFIG config file\n${ENDCOLOR}"
         else
             echo -ne "\t${RED} amass not using a config file, $AMASS_CONFIG not found\n${ENDCOLOR}"

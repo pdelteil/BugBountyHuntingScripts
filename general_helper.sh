@@ -555,12 +555,3 @@ getWayBackUrls()
     input="$1"
     echo "$input" |waybackurls
 }
-
-#getInscope from H1 CSV file
-getInscopeFromCSV()
-{
-    input="$1"
-
-    awk -F"," '$4 == "true" {print}' "$1" |grep 'URL\|WILDCARD'|getField 1 ","|sed 's/https:\/\///g; s/http:\/\///g'|flatten
-
-}
