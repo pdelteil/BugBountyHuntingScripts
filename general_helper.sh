@@ -227,49 +227,60 @@ getField()
 
 }
 # Usage:
-#   extract_domain [URL]
+#   getDomainFromURL [URL]
 #
 # If URL is not provided, the function reads from stdin.
 #
 # Examples:
-#   extract_domain "http://www.example.com/path/to/resource"
-#   echo "http://www.example.com/path/to/resource" | extract_domain
+#   getDomainFromURL "http://www.example.com/path/to/resource"
+#   echo "http://www.example.com/path/to/resource" | getDomainFromURL
 
 getDomainFromURL()
 {
 # Read each line of the input
 while read -r URL; do
-    # Extract the protocol (e.g. "http")
-    local PROTOCOL=$(echo "$URL" | grep :// | sed -e's,^\(.*://\).*,\1,g')
-    # Remove the protocol
-    URL=$(echo "$URL" | sed -e "s,$PROTOCOL,,g")
 
-    # Extract the user (if any)
-    local USER=$(echo "$URL" | grep @ | cut -d@ -f1)
+    #not an URL but I assume it's a domain
+    if [[ "$URL" != *"://"* ]]; then
+        echo "$URL"
+        continue
+    fi 
 
-    # Remove the user (if any)
-    URL=$(echo "$URL" | sed -e "s,$USER@,,g")
+    if [[ -n "$URL" && "$URL" == *"://"* ]]; then
+        # Extract the protocol (e.g. "http")
+        local PROTOCOL=$(echo "$URL" | grep :// | sed -e's,^\(.*://\).*,\1,g')
+        # Remove the protocol
+        URL=$(echo "$URL" | sed -e "s,$PROTOCOL,,g")
+    fi
+    if [[ -n "$URL" && "$URL" == *"@"* ]]; then
+        # Extract the user (if any)
+        local USER=$(echo "$URL" | grep @ | cut -d@ -f1)
 
+        # Remove the user (if any)
+        URL=$(echo "$URL" | sed -e "s,$USER@,,g")
+    fi
     # Extract the hostname
-    local HOST=$(echo "$URL" | cut -d'/' -f1)
+    #local HOST=$(echo "$URL" | cut -d'/' -f1)
 
     # Remove the hostname
-    URL=$(echo "$URL" | sed -e "s,$HOST,,g")
+    #URL=$(echo "$URL" | sed -e "s,$HOST,,g")
 
-    # Extract the port (if any)
-    local PORT=$(echo "$HOST" | grep : | cut -d: -f2)
+    if [[ -n "$URL" && "$URL" == *":"* ]]; then
+        # Extract the port (if any)
+        local PORT=$(echo "$URL" | grep : | cut -d: -f2)
 
-    # Remove the port (if any)
-    HOST=$(echo "$HOST" | sed -e "s,:$PORT,,g")
+        # Remove the port (if any)
+        URL=$(echo "$URL" | sed -e "s,:$PORT,,g")
+    fi
+    if [[ -n "$URL" && "$URL" == *"/"* ]]; then
+        # Extract the path (if any)
+        local PATH_URL=$(echo "$URL" | grep "/" | cut -d'/' -f2-)
 
-    # Extract the path (if any)
-    local PATH_URL=$(echo "$URL" | grep "/" | cut -d'/' -f2-)
-
-    # Remove the path (if any)
-    URL=$(echo "$URL" | sed -e "s,/$PATH_URL,,g")
-
+        # Remove the path (if any)
+        URL=$(echo "$URL" | sed -e "s,/$PATH_URL,,g")
+    fi
     # Print the domain name
-    echo "$HOST"
+    echo "$URL"
 
 done
 
