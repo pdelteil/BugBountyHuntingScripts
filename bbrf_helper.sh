@@ -257,15 +257,23 @@ getUrls()
         doms=$(bbrf domains|grep -v DEBUG|tr ' ' '\n')
     else    
         program="$2"
+        #TODO: check if program exists
         doms=$(bbrf domains -p "$program"|grep -v DEBUG|tr ' ' '\n')
     fi
     if [[ ${#doms} -gt 0 ]]; then
         numDomains=$(echo "$doms"|wc -l)
         echo -en "${RED} Using httpx in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
-        #only using HEAD method, since in this step we just care about resolving URLS
-        echo "$doms"|httpx -x HEAD -silent -threads $threads|bbrf url add - -s httpx --show-new
-        echo -en "${RED} Using httprobe in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
-        echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new
+        if [[ -z "$1" ]]; then
+            #only using HEAD method, since in this step we just care about resolving URLS
+            echo "$doms"|httpx -x HEAD -silent -threads $threads|bbrf url add - -s httpx --show-new
+            echo -en "${RED} Using httprobe in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
+            echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new
+        else
+                #only using HEAD method, since in this step we just care about resolving URLS
+            echo "$doms"|httpx -x HEAD -silent -threads $threads|bbrf url add - -s httpx --show-new -p "$program"
+            echo -en "${RED} Using httprobe in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
+            echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new -p "$program"
+        fi
     fi
 }
 # Use this function if you need to add several programs from a site
