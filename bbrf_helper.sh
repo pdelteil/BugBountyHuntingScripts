@@ -154,6 +154,7 @@ getDomains()
     dnsxThreads=200
     subfinderThreads=100
     gauThreads=30
+    resolvers='~/resolvers.txt'
     #no params
     flag="$1"
     params=""
@@ -209,40 +210,40 @@ getDomains()
         if [[ "$fileMode" = true ]] ; then
             for domain in $(echo "$wild"); do
                 echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent |tee --append "$tempFile-amass.txt"
+                amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent -r $resolvers |tee --append "$tempFile-amass.txt"
             done
             else
                 for domain in $(echo "$wild"); do
                     echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                    amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent | bbrf domain add - -s amass $params --show-new
+                    amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent -r $resolvers | bbrf domain add - -s amass $params --show-new
                 done
             fi
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [[ "$fileMode" = true ]]; then
-                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |tee --append "$tempFile-subfinder.txt"
+                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent -r $resolvers |tee --append "$tempFile-subfinder.txt"
             else
-                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent |bbrf domain add - -s subfinder $params --show-new
+                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent -r $resolvers |bbrf domain add - -s subfinder $params --show-new
             fi
  
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
             if [[ "$fileMode" = true ]]; then
-                echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent|tee --append "$tempFile-assetfinder.txt"
+                echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent -r $resolvers|tee --append "$tempFile-assetfinder.txt"
             else
-                echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent|bbrf domain add - -s assetfinder $params --show-new
+                echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent -r $resolvers|bbrf domain add - -s assetfinder $params --show-new
             fi
 
             echo -ne "${RED} Running gau ${ENDCOLOR}\n"
             if [[ "$fileMode" = true ]] ; then
-                gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| tee --append "$tempFile-gau.txt"
+                gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent -r $resolvers| tee --append "$tempFile-gau.txt"
              else
-                gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent| bbrf domain add - -s gau $params --show-new
+                gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent -r $resolvers| bbrf domain add - -s gau $params --show-new
             fi
 
             echo -ne "${RED} Running waybackurls ${ENDCOLOR}\n"
             if [[ "$fileMode" = true ]] ; then
-                echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| tee --append "$tempFile-waybackurls.txt"
+                echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent -r $resolvers| tee --append "$tempFile-waybackurls.txt"
              else
-                echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent| bbrf domain add - -s waybackurls $params --show-new
+                echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent -r $resolvers| bbrf domain add - -s waybackurls $params --show-new
             fi
    fi
 }
