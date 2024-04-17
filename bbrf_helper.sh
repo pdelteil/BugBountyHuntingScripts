@@ -210,40 +210,55 @@ getDomains()
         if [[ "$fileMode" = true ]] ; then
             for domain in $(echo "$wild"); do
                 echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent -r $resolvers |tee --append "$tempFile-amass.txt"
+                #change to find SERVAIL domains, saving also domains not resolving
+                #amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent -r $resolvers |tee --append "$tempFile-amass.txt"
+                amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null  |tee --append "$tempFile-amass.txt"
             done
             else
                 for domain in $(echo "$wild"); do
                     echo -ne "${YELLOW}  Querying $domain ${ENDCOLOR}\n"
-                    amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent -r $resolvers | bbrf domain add - -s amass $params --show-new
+                    #change to find SERVAIL domains, saving also domains not resolving
+                    #amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | dnsx -t $dnsxThreads -silent -r $resolvers | bbrf domain add - -s amass $params --show-new
+                    amass enum -d $domain -config $AMASS_CONFIG -passive 2>/dev/null | bbrf domain add - -s amass $params --show-new
                 done
             fi
             echo -ne "${RED} Running subfinder ${ENDCOLOR}\n"
             if [[ "$fileMode" = true ]]; then
-                echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent -r $resolvers |tee --append "$tempFile-subfinder.txt"
+                #change to find SERVAIL domains, saving also domains not resolving
+                #echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent -r $resolvers |tee --append "$tempFile-subfinder.txt"
+                echo "$wild"|subfinder -all -t $subfinderThreads -silent |tee --append "$tempFile-subfinder.txt"
             else
                 echo "$wild"|subfinder -all -t $subfinderThreads -silent |dnsx -t $dnsxThreads -silent -r $resolvers |bbrf domain add - -s subfinder $params --show-new
             fi
  
             echo -ne "${RED} Running assetfinder ${ENDCOLOR}\n"
             if [[ "$fileMode" = true ]]; then
-                echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent -r $resolvers|tee --append "$tempFile-assetfinder.txt"
+                #change to find SERVAIL domains, saving also domains not resolving
+                #echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent -r $resolvers|tee --append "$tempFile-assetfinder.txt"
+                echo "$wild"|assetfinder|tee --append "$tempFile-assetfinder.txt"
             else
-                echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent -r $resolvers|bbrf domain add - -s assetfinder $params --show-new
+                #change to find SERVAIL domains, saving also domains not resolving
+                #echo "$wild"|assetfinder|dnsx -t $dnsxThreads -silent -r $resolvers|bbrf domain add - -s assetfinder $params --show-new
+                echo "$wild"|assetfinder|bbrf domain add - -s assetfinder $params --show-new
             fi
 
             echo -ne "${RED} Running gau ${ENDCOLOR}\n"
+            gau=$(gau --subs "$wild" --threads $gauThreads| unfurl -u domains)
             if [[ "$fileMode" = true ]] ; then
-                gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent -r $resolvers| tee --append "$tempFile-gau.txt"
+                #change to find SERVAIL domains, saving also domains not resolving
+                #echo "$gau"| dnsx -t $dnsxThreads -silent -r $resolvers| tee --append "$tempFile-gau.txt"
+                echo "$gau" | tee --append "$tempFile-gau.txt"
              else
-                gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent -r $resolvers| bbrf domain add - -s gau $params --show-new
+                #gau --subs "$wild" --threads $gauThreads| unfurl -u domains | dnsx -t $dnsxThreads -silent -r $resolvers| bbrf domain add - -s gau $params --show-new
+                echo "$gau" | bbrf domain add - -s gau $params --show-new
             fi
 
             echo -ne "${RED} Running waybackurls ${ENDCOLOR}\n"
+            wayback=$(echo "$wild"| waybackurls| unfurl -u domains)
             if [[ "$fileMode" = true ]] ; then
-                echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent -r $resolvers| tee --append "$tempFile-waybackurls.txt"
+                echo "$wayback"| tee --append "$tempFile-waybackurls.txt"
              else
-                echo "$wild"| waybackurls| unfurl -u domains| dnsx  -t $dnsxThreads -silent -r $resolvers| bbrf domain add - -s waybackurls $params --show-new
+                echo "$wayback"| bbrf domain add - -s waybackurls $params --show-new
             fi
    fi
 }
@@ -900,7 +915,7 @@ getProgramData() {
   # Check if required arguments are provided
   if [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
     output=("Usage: ${FUNCNAME[0]} SITE REWARD TYPE" "  SITE: (intigriti, bugcrowd, h1, yeswehack or all)" "  REWARDS: (money, points, thanks or all)" \
-            "  TYPE: (names, inscope, inscope-wilcards, outscope, urls, domains, ips)" "    Example: ${FUNCNAME[0]} bugcrowd money names" "             ${FUNCNAME[0]} bugcrowd points urls" "             ${FUNCNAME[0]} all points inscope")
+            "  TYPE: (names, inscope, inscope-wildcards, outscope, urls, domains, ips)" "    Example: ${FUNCNAME[0]} bugcrowd money names" "             ${FUNCNAME[0]} bugcrowd points urls" "             ${FUNCNAME[0]} all points inscope")
     for line in "${output[@]}"; do
         # Print the line with a different color on each iteration
         if [ $((i % 2)) -eq 0 ]; then
