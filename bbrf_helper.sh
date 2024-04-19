@@ -1116,9 +1116,13 @@ clearProgramData()
     fi
 
     PROGRAM="$1"
+    echo "Removing urls"
     removeUrls $PROGRAM
+    echo "Removing domains"
     removeDomains $PROGRAM
+    echo "Removing inscope"
     removeInScope $PROGRAM
+    echo "Removing outscope"
     removeOutScope $PROGRAM
 }
 
