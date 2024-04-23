@@ -403,6 +403,7 @@ addPrograms()
             showProgram "$program"
             return 1
         fi
+        templates='/home/ubuntu/software/Custom-nuclei-templates/toRun'
         echo -en "${YELLOW} Add IN scope: ${ENDCOLOR}\n"
         read -r inscope_input
         #if empty skip
@@ -428,13 +429,13 @@ addPrograms()
         fi
         if [[ ${#inscope_input} -gt 0 ]]; then
             echo -ne "${RED}Getting domains${ENDCOLOR}\n"
-            getDomains  
+            getDomains -p "$program"
             echo -ne "${RED}Getting urls ${ENDCOLOR}\n"
-            getUrls  
+            getUrls -p "$program"
             #getIPs
             #scanPorts
             #run nuclei
-            numUrls=$(bbrf urls|wc -l) 
+            numUrls=$(bbrf urls -p "$program"|wc -l) 
             if [[ "$numUrls" -gt 0 ]]; then
                 echo -ne "${YELLOW} Run nuclei? [urls: $numUrls] (y/n)[default:no, press Enter]${ENDCOLOR} "
                 read runNuclei
@@ -448,7 +449,16 @@ addPrograms()
     
                 if [[ "$valRunNuclei" == "true" ]]; then
                     echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
-                    bbrf urls | nuclei -t ~/nuclei-templates -es info,unknown -stats -si 180 -itags fuzz,dos -eid weak-cipher-suites,mismatched-ssl,expired-ssl,self-signed-ssl
+                    #domains
+                    domains=$(bbrf domains -p "$program")
+                    echo "$domains"|nuclei -vv -t $templates -id elasticbeanstalk-takeover,azure-takeover-detection \
+                           -stats -ts -bs 30 -rl 200 -si 180|notify -silent
+                     #DNS takeover
+                     echo "$domains"|~/software/dnsx/dnsx -rc servfail -j -trace -r ~/resolvers.txt| \
+                          jq -r '("\u001b[31mhost: \(.host)\u001b[0m\n" + (.trace.chain | map(select(.ns != null and (.ns[] | contains("dnsmadeeasy") or contains("digicertdns")))) | .[-1].ns[] | select(test("dnsmadeeasy|digicertdns"))))' \
+                          | grep host|sed 's/^/DNSMADEEASY /'|notify -silent 
+                     #urls
+                     bbrf urls -p "$program"|nuclei -vv -t $templates -eid servfail-refused-hosts,elasticbeanstalk-takeover,azure-takeover-detection -stats -ts -bs 30 -rl 200 -si 180 |notify -silent
                 fi
             fi
         fi
