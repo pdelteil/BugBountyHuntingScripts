@@ -455,10 +455,10 @@ addPrograms()
                            -stats -ts -bs 30 -rl 200 -si 180|notify -silent
                      #DNS takeover
                      echo "$domains"|~/software/dnsx/dnsx -rc servfail -j -trace -r ~/resolvers.txt| \
-                          jq -r '("\u001b[31mhost: \(.host)\u001b[0m\n" + (.trace.chain | map(select(.ns != null and (.ns[] | contains("dnsmadeeasy") or contains("digicertdns")))) | .[-1].ns[] | select(test("dnsmadeeasy|digicertdns"))))' \
-                          | grep host|sed 's/^/DNSMADEEASY /'|notify -silent 
+                          jq -r '("\u001b[31m \(.host)\u001b[0m\n" + (.trace.chain | map(select(.ns != null and (.ns[] | contains("dnsmadeeasy") or contains("digicertdns")))) | .[-1].ns[] | select(test("dnsmadeeasy|digicertdns"))))' \
+                          | grep host|sed 's/^/DNSMADEEASY /'|sort -u|notify -silent 
                      #urls
-                     bbrf urls -p "$program"|nuclei -vv -t $templates -eid servfail-refused-hosts,elasticbeanstalk-takeover,azure-takeover-detection -stats -ts -bs 30 -rl 200 -si 180 |notify -silent
+                     bbrf urls -p "$program"|nuclei -vv -t $templates -eid servfail-refused-hosts,elasticbeanstalk-takeover,azure-takeover-detection -stats -bs 30 -rl 200 -si 180 |sort -u|notify -silent
                 fi
             fi
         fi
