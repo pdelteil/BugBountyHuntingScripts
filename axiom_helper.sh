@@ -53,7 +53,7 @@ showLogs()
         if [[ ${#log_path} -gt 5 ]]; then
             cd $log_path
             #nuclei especific grep rules 
-            cat $log_path/*|grep $year|grep -v 'Unsolicited\|Skipped'|sort -k1
+            cat $log_path/*|grep -E  'info|high|medium|critical|unknown|low'| grep -vE 'WRN|Unsolicited|Skipped'|sort -k1
         else 
             echo "$axiomModule $error"
 
@@ -264,29 +264,9 @@ buildResolversList()
     wget https://public-dns.info/nameservers.txt -O /tmp/nameservers.txt
     #build a resolver list using dnsvalidator
     axiom-scan nameservers.txt -m dnsvalidator $options $spinup --rm-when-done
-    #resolve domains [dnsx]
 
 }
 
-discoverContent()
-{
-
-# katana
-
-# feroxbuster   
-echo ok
-
-}
-
-bruteForceDNSRecords()
-{
-
-#puredns
-#resolve again
-   echo remove
-
-
-}
 reconScan()
 {
     date=$(date +%Y-%m-%d_%H-%M-%S)
@@ -300,7 +280,6 @@ reconScan()
     #run amass
     axiom-scan $file -m amass -wL ~/amass_config.ini -o ~/results/outputfile_amass_$date.txt
     #run subfinder
-    # TODO: add config file
     axiom-scan $file -m subfinder -wL ~/.config/subfinder/provider-config.yaml -t $subfinderThreads -all -o ~/results/outputfile_subfinder_$date.txt
     #run assetfinder
     axiom-scan $file -m assetfinder --rm-when-done -o ~/results/outputfile_assetfinder_$date.txt
@@ -322,7 +301,6 @@ reconScan()
     
     #TODO another function
         #nucleiScan 
-
 
     echo "Done! "
 }
