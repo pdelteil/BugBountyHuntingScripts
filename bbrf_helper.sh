@@ -196,6 +196,7 @@ getDomains()
     scopeIn=$(bbrf scope in $params)
     echo "$scopeIn"|bbrf domain add - $params --show-new
     wild=$(bbrf scope in --wildcard $params| grep -v DEBUG)
+    #When the program has wildcards in the inscope
     if [[ ${#wild} -gt 0 ]]; then
         echo "$wild"|bbrf inscope add - $params
         echo "$wild"|bbrf domain add - $params --show-new
@@ -281,12 +282,12 @@ getUrls()
         echo -en "${RED} Using httpx in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
         if [[ -z "$1" ]]; then
             #only using HEAD method, since in this step we just care about resolving URLS
-            echo "$doms"|httpx -x HEAD -silent -threads $threads|bbrf url add - -s httpx --show-new
+            echo "$doms"|httpx -x HEAD -silent -threads $threads -r $resolvers -p 80,8080,8000,8888,8008,8081,8443,8880,8009,8002|bbrf url add - -s httpx --show-new
             echo -en "${RED} Using httprobe in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
             echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new
         else
                 #only using HEAD method, since in this step we just care about resolving URLS
-            echo "$doms"|httpx -x HEAD -silent -threads $threads|bbrf url add - -s httpx --show-new -p "$program"
+            echo "$doms"|httpx -x HEAD -silent -threads $threads -r $resolvers -p|bbrf url add - -s httpx --show-new -p "$program"
             echo -en "${RED} Using httprobe in $numDomains domains (threads: $threads)${ENDCOLOR}\n"
             echo "$doms"|httprobe -c $threads --prefer-https|bbrf url add - -s httprobe --show-new -p "$program"
         fi
@@ -451,14 +452,13 @@ addPrograms()
                     echo -ne "\n${RED}Running nuclei${ENDCOLOR}\n"
                     #domains
                     domains=$(bbrf domains -p "$program")
-                    echo "$domains"|nuclei -vv -t $templates -id elasticbeanstalk-takeover,azure-takeover-detection \
-                           -stats -ts -bs 30 -rl 200 -si 180|notify -silent
+                    echo "$domains"|nuclei -vv -t $templates/dns -stats -ts -bs 30 -rl 200 -si 180|notify -silent
                      #DNS takeover
                      echo "$domains"|~/software/dnsx/dnsx -rc servfail -j -trace -r ~/resolvers.txt| \
                           jq -r '("\u001b[31m \(.host)\u001b[0m\n" + (.trace.chain | map(select(.ns != null and (.ns[] | contains("dnsmadeeasy") or contains("digicertdns")))) | .[-1].ns[] | select(test("dnsmadeeasy|digicertdns"))))' \
                           | grep host|sed 's/^/DNSMADEEASY /'|sort -u|notify -silent 
                      #urls
-                     bbrf urls -p "$program"|nuclei -vv -t $templates -eid servfail-refused-hosts,elasticbeanstalk-takeover,azure-takeover-detection -stats -bs 30 -rl 200 -si 180 |sort -u|notify -silent
+                     bbrf urls -p "$program"|nuclei -vv -t $templates -etags dns -stats -bs 30 -rl 200 -si 180 |sort -u|notify -silent
                 fi
             fi
         fi
